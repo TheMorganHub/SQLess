@@ -1,0 +1,225 @@
+package com.sqless.sql.connection;
+
+import com.sqless.settings.UserPreferencesLoader;
+import com.sqless.utils.UIUtils;
+import com.sqless.ui.UIConnectionWizard;
+import com.sqless.sql.objects.SQLDatabase;
+import com.sqless.utils.SQLUtils;
+import java.awt.Frame;
+import java.net.InetAddress;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * This class manages everything related to SQLess's connection with the SQLDB
+ * engine. Whenever a connection is made, this class' {@code SQLDatabase} object
+ * will hold the database to which SQLess is currently connected.
+ * <p>
+ * A lot of the methods in this class are mirrored by {@code SQLUtils} for the
+ * sake of convenience, always referencing this class.</p>
+ * <p>
+ * This class follows the singleton pattern, because there will only be one set
+ * of drivers loaded and one connection to the engine.</p>
+ *
+ * @author David Orquin, Tomás Casir, Valeria Fornieles
+ */
+public class SQLConnectionManager {
+
+    private static final SQLConnectionManager INSTANCE = new SQLConnectionManager();
+    private Connection connection;
+    private SQLDatabase connectedDB;
+    private boolean loadedVersion;
+    private String version;
+    private String username;
+    private String password;
+    private String hostName;
+    private String port;
+
+    private SQLConnectionManager() {
+        loadSQLDrivers();
+    }
+
+    private void loadSQLDrivers() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            UIUtils.showErrorMessage("Problem loading drivers", "Could not load SQL Drivers", null);
+            System.err.println("Could not load SQL drivers: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    public Connection newQueryConnection() {
+        Connection newCon = null;
+        try {
+            DriverManager.setLoginTimeout(3);
+            newCon = DriverManager.getConnection("jdbc:mysql://" + hostName + "/" + connectedDB.getName()
+                    + "?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true", username, password);
+        } catch (SQLException e) {
+        }
+        return newCon;
+    }
+
+    private boolean connectToDatabase(String dbName, String username, String password,
+            String hostName, String port, Frame parent) {
+        try {
+            long start = System.currentTimeMillis();
+
+            DriverManager.setLoginTimeout(3);
+            connection = DriverManager.getConnection("jdbc:mysql://" + hostName + "/" + dbName
+                    + "?zeroDateTimeBehavior=convertToNull", username, password);
+
+            long elapsed = System.currentTimeMillis() - start;
+            this.hostName = hostName;
+            this.username = username;
+            this.password = password;
+            this.port = port;
+            System.out.println("[ConnectionManager]: Connected to " + dbName + " at " + hostName + ":" + port
+                    + " as " + username + " in " + elapsed + "ms");
+            return true;
+        } catch (SQLException e) {
+            UIUtils.showErrorMessage("Error connecting to DB Engine", e.getMessage(), parent);
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Attempts to connect to a database using the saved host in
+     * {@code UserPreferencesLoader}.
+     *
+     * @param dbName The name of the DB to connect through the saved host.
+     * @param parent The parent {@code Frame} that will display any errors that
+     * occur within this operation.
+     */
+    private void connectToSavedHost(String dbName, Frame parent) {
+        UserPreferencesLoader userPrefs = UserPreferencesLoader.getInstance();
+        String hostName = userPrefs.getProperty("Connection.Host");
+        String port = userPrefs.getProperty("Connection.Port");
+        String username = userPrefs.getProperty("Connection.Username");
+        String password = userPrefs.getProperty("Connection.Password");
+        boolean success = connectToDatabase(dbName, username, password, hostName, port, parent);
+        if (success) {
+            connectedDB = new SQLDatabase(dbName);
+        } else {
+            UIConnectionWizard fixConnection = new UIConnectionWizard(parent,
+                    UIConnectionWizard.Task.REPAIR);
+            fixConnection.setVisible(true);
+            connectToSavedHost(dbName, parent);
+        }
+    }
+
+    /**
+     * Closes any active connection and sets a new one. Use this method to start
+     * a connection with any database using the saved host. This method makes a
+     * call to {@code private} method
+     * {@link #connectToSavedHost(java.lang.String, java.awt.Frame)}; this takes
+     * care of any and all operations involved in connecting a client to a DB
+     * engine as well as error handling.
+     *
+     * @param dbName The name of the DB to which the client wants to connect.
+     * @param parent The {@code Frame} that will display any errors that occur
+     * within this operation.
+     */
+    public void setNewConnection(String dbName, Frame parent) {
+        closeConnection();
+        connectToSavedHost(dbName, parent);
+    }
+    
+    /**
+     * Tests a specified connection by attempting to connect to database
+     * "master" in SQLServer using a temporary {@code Connection} object. If
+     * successful, the {@code Connection} is then promptly closed.
+     *
+     * @param username
+     * @param password
+     * @param hostName
+     * @param port
+     * @param parent
+     * @return {@code true} if the connection to the host name was successful,
+     * {@code false} otherwise.
+     */
+    public boolean testConnection(String username, String password, String hostName, String port, Frame parent) {
+        try (Connection testCon = DriverManager.getConnection("jdbc:mysql://" + hostName + "/mysql", username, password)) {
+            DriverManager.setLoginTimeout(3);
+            System.out.println("Testing connection at " + hostName + ":" + port + " as " + username);
+            System.out.println("Test successful.");
+            return true;
+        } catch (SQLException e) {
+            UIUtils.showErrorMessage("Error connecting to DB Engine", e.getMessage(), parent);
+            System.out.println("Test failed.");
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public String getServerHostname() {
+        String serverHostName = "";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery("select @@hostname");
+            serverHostName = rs.next() ? rs.getString(1) : "UNAVAILABLE";
+        } catch (SQLException ex) {
+        }
+
+        return serverHostName;
+    }
+
+    private String loadVersion() {
+        if (loadedVersion) {
+            return version;
+        }
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT @@VERSION");
+            version = rs.next() ? rs.getString(1) : "";
+            loadedVersion = true;
+        } catch (SQLException ex) {
+            UIUtils.showErrorMessage("Error", "Could not retrieve version", null);
+        }
+        return version;
+    }
+
+    public String getMySQLVersion() {
+        return loadVersion().split("\n")[0];
+    }
+
+    public boolean clientIsLocalhost() {
+        return getClientHostname().equalsIgnoreCase(getServerHostname());
+    }
+
+    public String getClientHostname() {
+        String hostname = "Unknown";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (java.net.UnknownHostException ex) {
+            System.out.println("Hostname can not be resolved");
+        }
+        return hostname;
+    }
+
+    public void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("[ConnectionManager]: Closed connection with database " + connectedDB.getName());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public SQLDatabase getConnectedDB() {
+        return connectedDB;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public static SQLConnectionManager getInstance() {
+        return INSTANCE;
+    }
+
+}

@@ -1,0 +1,424 @@
+package com.sqless.utils;
+
+import java.awt.Color;
+import javax.swing.JEditorPane;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import jsyntaxpane.SyntaxDocument;
+
+/**
+ * A class that provides tools suited for text manipulation and document
+ * handling.
+ *
+ * @author David Orquin, Tomás Casir, Valeria Fornieles
+ */
+public class TextUtils {
+
+    public static final Color DARK_GREY = new Color(0x777777);
+    public static final Color BRIGHT_GREY = new Color(0xC4C4C4);
+    public static final Color DEAD_GREY = new Color(192, 192, 192);
+
+    /**
+     * Splits a given {@code String} in lines and adds each line to an array of
+     * {@code String}
+     *
+     * @param s a {@code String}
+     * @return a {@code String} array with the lines.
+     */
+    public static String[] getLines(String s) {
+        return s.contains("\r\n") ? s.split("(?<=\r\n)") : s.split("(?<=\n)");
+    }
+
+    public static void insertIntoDoc(JEditorPane pane, String s, boolean normaliseEndings) {
+        SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
+
+        try {
+            sDoc.remove(0, sDoc.getLength());
+            sDoc.insertString(0, normaliseEndings ? normaliseLineEndings(s) : s, null);
+        } catch (BadLocationException ex) {
+            //Bad location
+        }
+    }
+
+    public static void appendToDoc(JTextPane pane, String s, boolean addLineBreak) {
+        if (pane.getStyle("NormalStyle") == null) {
+            Style errorStyle = pane.addStyle("NormalStyle", null);
+            StyleConstants.setFontFamily(errorStyle, "Segoe UI");
+            StyleConstants.setFontSize(errorStyle, 12);
+        }
+
+        StyledDocument doc = (StyledDocument) pane.getDocument();
+        try {
+            doc.insertString(doc.getLength(), s + (addLineBreak ? "\n" : ""), pane.getStyle("NormalStyle"));
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    /**
+     * Appends a given string to the {@code StyledDocument} of a {@code pane} as
+     * an <b>error</b>, that is, using the {@code Style} 'ErrorStyle'.
+     * <p>
+     * This method will create the style if the {@code JTextPane} doesn't
+     * already have it.</p>
+     *
+     * @param pane a {@code JTextPane} with a {@code StyledDocument}.
+     * @param fontName the name of the font to be used
+     * @param fontSize The fontSize to be used.
+     * @param s a {@code String}.
+     */
+    public static void appendAsError(JTextPane pane, String fontName, int fontSize, String s) {
+        if (pane.getStyle("ErrorStyle") == null) {
+            Style errorStyle = pane.addStyle("ErrorStyle", null);
+            StyleConstants.setForeground(errorStyle, Color.RED);
+            StyleConstants.setFontFamily(errorStyle, fontName);
+            StyleConstants.setFontSize(errorStyle, fontSize);
+        }
+
+        StyledDocument doc = (StyledDocument) pane.getDocument();
+        try {
+            emptyDoc(pane);
+            doc.insertString(doc.getLength(), s, pane.getStyle("ErrorStyle"));
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    public static void appendRed(JTextPane pane, String s) {
+        if (pane.getStyle("RedStyle") == null) {
+            Style messageStyle = pane.addStyle("RedStyle", null);
+            StyleConstants.setForeground(messageStyle, Color.RED);
+            StyleConstants.setFontFamily(messageStyle, "Segoe UI");
+            StyleConstants.setFontSize(messageStyle, 12);
+        }
+
+        StyledDocument doc = (StyledDocument) pane.getDocument();
+        try {
+            doc.insertString(doc.getLength(), s, pane.getStyle("RedStyle"));
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    public static void appendBold(JTextPane pane, String s) {
+        if (pane.getStyle("BoldStyle") == null) {
+            Style messageStyle = pane.addStyle("BoldStyle", null);
+            StyleConstants.setForeground(messageStyle, Color.BLACK);
+            StyleConstants.setBold(messageStyle, true);
+            StyleConstants.setFontFamily(messageStyle, "Segoe UI");
+            StyleConstants.setFontSize(messageStyle, 12);
+        }
+
+        StyledDocument doc = (StyledDocument) pane.getDocument();
+        try {
+            doc.insertString(doc.getLength(), s, pane.getStyle("BoldStyle"));
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    /**
+     * Appends a given string to the {@code StyledDocument} of a {@code pane} as
+     * a <b>message</b>, that is, using the {@code Style} 'MessageStyle'.
+     * <p>
+     * This method will create the style if the {@code JTextPane} doesn't
+     * already have it.</p>
+     *
+     * @param pane a {@code JTextPane} with a {@code StyledDocument}.
+     * @param fontName the name of the font to be used
+     * @param fontSize The size of the font to be used.
+     * @param s a {@code String}.
+     */
+    public static void appendAsMessage(JTextPane pane, String fontName, int fontSize,
+            String s) {
+        if (pane.getStyle("MessageStyle") == null) {
+            Style messageStyle = pane.addStyle("MessageStyle", null);
+            StyleConstants.setForeground(messageStyle, Color.BLACK);
+            StyleConstants.setFontFamily(messageStyle, fontName);
+            StyleConstants.setFontSize(messageStyle, fontSize);
+        }
+
+        StyledDocument doc = (StyledDocument) pane.getDocument();
+        try {
+            doc.insertString(doc.getLength(), s, pane.getStyle("MessageStyle"));
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    /**
+     * Empties the text contents of a given {@code JEditorPane}. We use the
+     * document in order to do this so a removal event is fired.
+     *
+     * @param pane The {@code JEditorPane} from which to remove text.
+     */
+    public static void emptyDoc(JEditorPane pane) {
+        Document doc = pane.getDocument();
+        try {
+            doc.remove(0, doc.getLength());
+        } catch (BadLocationException e) {
+        }
+    }
+
+    /**
+     * Replaces the Windows-specific line ending '\r\n' with the UNIX-specific
+     * '\n' to improve compatibility with operations that deal with text. This
+     * method is the equivalent of calling {@code s.replaceAll("\r\n", "\n")}
+     *
+     * @param s The {@code String}
+     *
+     * @return a normalised {@code String} in UNIX format.
+     */
+    public static String normaliseLineEndings(String s) {
+        return s.replaceAll("\r\n", "\n");
+    }
+
+    /**
+     * Splits a given string into lines comprised of 15 words each. Line breaks
+     * added to {@code message} by the user will be honoured and treated as
+     * paragraphs.
+     *
+     * @param message a string.
+     * @return a {@code String} split into lines.
+     */
+    public static String splitIntoLines(String message) {
+        String[] messageSplitLineBreak = message.split("\n");
+        StringBuilder mainBuilder = new StringBuilder();
+        for (int i = 0; i < messageSplitLineBreak.length; i++) {
+            String[] whiteSpaceSplit = messageSplitLineBreak[i].split(" ");
+            StringBuilder tempBuilder = new StringBuilder();
+            for (int j = 0; j < whiteSpaceSplit.length; j++) {
+                tempBuilder.append(whiteSpaceSplit[j]).append(" ");
+                if (j != 0 && j % 14 == 0
+                        && message.length() > tempBuilder.length() + mainBuilder.length()) {
+                    tempBuilder.append("\n");
+                }
+            }
+            mainBuilder.append(tempBuilder).append("\n");
+        }
+        return mainBuilder.toString();
+    }
+
+    /**
+     * Gets the length of a {@code SyntaxDocument} contained within a
+     * {@code JEditorPane}
+     *
+     * @param pane The {@code JEditorPane} that contains the document.
+     * @return The length of said document.
+     */
+    public static int getDocLength(JEditorPane pane) {
+        return ((SyntaxDocument) pane.getDocument()).getLength();
+    }
+
+    /**
+     * Transforms a table into a {@code String} representation of itself.
+     *
+     * @param table A {@code JTable}
+     * @param includeHeaders Whether to include the table's headers.
+     * @param commaDelimited Cells will be separated by commas (,). If
+     * {@code false} Tab '{@code \t}' will be used.
+     * @param saveWhole Whether to ignore selections and attempt to save the
+     * entire table.
+     * @return A {@code String} representation of the table compatible with
+     * table-based software such as Microsoft Excel.
+     */
+    public static String tableToString(JTable table, boolean includeHeaders, boolean commaDelimited, boolean saveWhole) {
+        if (saveWhole) {
+            table.setColumnSelectionInterval(1, table.getColumnCount() - 1);
+            table.setRowSelectionInterval(0, table.getRowCount() - 1);
+        }
+        int[] selectedColumns = table.getSelectedColumns();
+        int[] selectedRows = table.getSelectedRows();
+        StringBuilder builder = new StringBuilder();
+        if (includeHeaders) {
+            for (int i = 0; i < selectedColumns.length; i++) {
+                builder.append(table.getColumnName(selectedColumns[i]))
+                        .append(i < selectedColumns.length - 1
+                                ? (commaDelimited ? "," : "\t") : "");
+            }
+            builder.append("\r\n");
+        }
+
+        for (int rows = 0; rows < selectedRows.length; rows++) {
+            for (int columns = 0; columns < selectedColumns.length; columns++) {
+                builder.append(table.getModel().getValueAt(selectedRows[rows], selectedColumns[columns]))
+                        .append(columns < selectedColumns.length - 1
+                                ? (commaDelimited ? "," : "\t") : "");
+            }
+            builder.append("\r\n");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Prepends a given {@code String} prefix to a {@code SyntaxDocument} in a
+     * {@code JEditorPane}.
+     * <p>
+     * This method knows where to prepend the prefix by querying the
+     * {@code JEditorPane} for a selection start and selection end. If no
+     * selection is found, the method will prepend the prefix at the line that
+     * holds the caret.</p>
+     * <p>
+     * <b>Note:</b> this method triggers an insert update in the document.</p>
+     *
+     * @see TextUtils#removePrependedText(java.lang.String,
+     * javax.swing.JEditorPane)
+     * @param prefix a {@code String} to prepend.
+     * @param area the {@code JEditorPane} that contains the
+     * {@code SyntaxDocument}.
+     */
+    public static void prependToText(String prefix, JEditorPane area) {
+        if (area.getText().isEmpty()) {
+            return;
+        }
+
+        int affectedLines = 0;
+        int selectStart = area.getSelectionStart();
+        int selectEnd = area.getSelectionEnd();
+        String[] selectedLines = getSelectedLines(area);
+        StringBuilder commented = new StringBuilder();
+        for (String selectedLine : selectedLines) {
+            if (!selectedLine.startsWith("\n")) {
+                commented.append(prefix).append(selectedLine);
+                affectedLines++;
+            } else {
+                commented.append(selectedLine);
+            }
+        }
+
+        if (affectedLines == 0) {
+            area.select(selectStart, selectEnd); //restauramos seleccion original porque el método "getSelectedLines()" hace una selección interna
+            return;
+        }
+
+        area.replaceSelection(commented.toString());
+        area.select(selectStart + prefix.length(), selectEnd + (affectedLines * prefix.length()));
+    }
+
+    /**
+     * Removes a prepended prefix from a {@code JEditorPane}'s
+     * {@code SyntaxDocument}.
+     * <p>
+     * <b>Note:</b> this method triggers a remove update in the document.</p>
+     *
+     * @see TextUtils#prependToText(java.lang.String, javax.swing.JEditorPane)
+     * @param prefix The {@code String} to remove.
+     * @param area The {@code JEditorPane} that contains the
+     * {@code SyntaxDocument}
+     */
+    public static void removePrependedText(String prefix, JEditorPane area) {
+        if (area.getText().isEmpty()) {
+            return;
+        }
+
+        int affectedLines = 0;
+        int selectStart = area.getSelectionStart();
+        SyntaxDocument sDoc = (SyntaxDocument) area.getDocument();
+        int selectEnd = area.getSelectionEnd();
+        String[] selectedLines = getSelectedLines(area);
+        StringBuilder commented = new StringBuilder();
+        boolean firstLineCommented = false;
+        int lineCount = 0;
+        for (String selectedLine : selectedLines) {
+            if (selectedLine.startsWith(prefix)) {
+                if (lineCount == 0) {
+                    firstLineCommented = true;
+                }
+                commented.append(selectedLine.substring(prefix.length()));
+                affectedLines++;
+            } else {
+                commented.append(selectedLine);
+            }
+            lineCount++;
+        }
+
+        if (affectedLines == 0) {
+            area.select(selectStart, selectEnd); //restauramos seleccion original porque el método "getSelectedLines()" hace una selección interna
+            return;
+        }
+        area.replaceSelection(commented.toString());
+        area.select(selectStart, selectEnd);
+
+        //si la primera linea está comentada y el comienzo de la selección no es el comienzo de la linea, 
+        //va a hacer falta mover el comienzo de la selección para adelante, sino mantenemos el comienzo como estaba
+        area.select(firstLineCommented && sDoc.getLineStartOffset(selectStart - prefix.length()) != selectStart ? selectStart - prefix.length() : selectStart, selectEnd - (affectedLines * prefix.length()));
+    }
+
+    /**
+     * Devuelve todas las lineas seleccionadas. Por ejemplo, si un solo caracter
+     * en una linea es seleccionado, este método devolverá la linea entera.
+     *
+     * @param pane
+     * @return
+     */
+    public static String[] getSelectedLines(JEditorPane pane) {
+        SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
+        int selStart = sDoc.getLineStartOffset(pane.getSelectionStart());
+        int selEnd = sDoc.getLineEndOffset(pane.getSelectionEnd());
+        String[] selectedLines = new String[0];
+
+        try {
+            selectedLines = sDoc.getText(selStart, selEnd - selStart).split("(?<=\n)");
+            pane.select(selStart, selEnd);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        return selectedLines;
+    }
+
+    /**
+     * Removes all the <b>leading</b> whitespace in a string.
+     *
+     * @param untrimmed The string.
+     * @return a {@code String} without whitespace at the start.
+     */
+    public static String trimStart(String untrimmed) {
+        char[] chars = untrimmed.toCharArray();
+        int offset = 0;
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == ' ' || chars[i] == '\t') {
+                offset++;
+            } else {
+                break;
+            }
+        }
+        return untrimmed.substring(offset);
+    }
+
+    /**
+     * Checks whether a string contains a specified value.
+     *
+     * @param text The string to search.
+     * @param val The value to search for.
+     * @return {@code true} if the value is found within the string.
+     */
+    public static boolean containsIgnoreCase(String text, String val) {
+        return text.toLowerCase().contains(val.toLowerCase());
+    }
+
+    /**
+     * Checks if a specified string starts with a number.
+     *
+     * @param s a {@code String}.
+     * @return {@code true} if the char at index 0 is a number.
+     */
+    public static boolean startsWithNumber(String s) {
+        return Character.isDigit(s.charAt(0));
+    }
+
+    /**
+     * Converts a set of hours, minutes, and seconds into a {@code String} in
+     * time format.
+     *
+     * @param hrs The hours.
+     * @param mins The minutes.
+     * @param secs The seconds.
+     * @return A {@code String} in time format {@code hh:mm:ss}.
+     */
+    public static String toTimeFormat(int hrs, int mins, int secs) {
+        String secsToString = secs < 10 ? "0" + secs : "" + secs;
+        String minsToString = mins < 10 ? "0" + mins : "" + mins;
+        String hrsToString = hrs < 10 ? "0" + hrs : "" + hrs;
+        return hrsToString + ":" + minsToString + ":" + secsToString;
+    }
+}

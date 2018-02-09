@@ -1,11 +1,7 @@
 package com.sqless.sql.objects;
 
 import com.sqless.utils.SQLUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class represents a column in a table.

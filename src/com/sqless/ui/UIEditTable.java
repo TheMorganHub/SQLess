@@ -9,7 +9,10 @@ import com.sqless.sql.objects.SQLColumn;
 import com.sqless.sql.objects.SQLPrimaryKey;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.listeners.TableCellListener;
+import com.sqless.utils.DocStyler;
+import com.sqless.utils.MiscUtils;
 import com.sqless.utils.SQLUtils;
+import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -54,6 +59,7 @@ public class UIEditTable extends FrontPanel {
     private TableCellListener cellListener;
     private SQLPrimaryKey tablePK;
     private List<SQLRow> rows;
+    private DocStyler docStyler;
 
     public UIEditTable(JTabbedPane parentPane, SQLTable table) {
         super(parentPane);
@@ -62,12 +68,13 @@ public class UIEditTable extends FrontPanel {
         initComponents();
         rows = new ArrayList<>();
         tablePK = this.table.getPrimaryKey();
-        prepareTable();
+//        docStyler = new DocStyler(txtLog);
     }
 
     @Override
     public void onCreate() {
         splitPane.setDividerLocation((int) (parentPane.getHeight() * 0.75));
+        prepareTable();
     }
 
     public void prepareTable() {
@@ -75,9 +82,14 @@ public class UIEditTable extends FrontPanel {
         makeTableModel();
         cellListener = new TableCellListener(uiTable, actionEditTable);
         uiTable.getSelectionModel().addListSelectionListener(tableSelectionListener);
+    }
 
+    public void loadKeyBindings() {
         uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("TAB"), "ADD_ROW");
         uiTable.getActionMap().put("ADD_ROW", actionAddRowTab);
+
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "REFRESH_TABLE");
+        uiTable.getActionMap().put("REFRESH_TABLE", actionRefreshTable);
     }
 
     public void makeTableModel() {
@@ -180,6 +192,15 @@ public class UIEditTable extends FrontPanel {
         return false;
     }
 
+    public boolean tableHasChanges() {
+        for (SQLRow row : rows) {
+            if (row.isBrandNew() || row.hasUncommittedChanges()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private TableCellRenderer sqlCellRenderer = new DefaultTableCellRenderer() {
         @Override
         public Component getTableCellRendererComponent(JTable table1, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -276,6 +297,7 @@ public class UIEditTable extends FrontPanel {
                 }
             }
         });
+        loadKeyBindings();
         scrLog = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextPane();
 
@@ -344,7 +366,7 @@ public class UIEditTable extends FrontPanel {
             btnAddRow = UIUtils.newToolbarBtn(actionAddRow, "Add a new row", UIUtils.icon(this, "ADD_ROW"));
             btnDeleteRows = UIUtils.newToolbarBtn(actionDeleteRow, "Delete the selected row(s)", UIUtils.icon(this, "DELETE_ROWS"));
             btnSave = UIUtils.newToolbarBtn(actionSaveChanges, "Commit all changes", UIUtils.icon(this, "SAVE"));
-            btnRefresh = UIUtils.newToolbarBtn(null, "Reload the table to reflect external changes (F5)", UIUtils.icon(this, "REFRESH"));
+            btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Reload the table to reflect external changes (F5)", UIUtils.icon(this, "REFRESH"));
             toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddRow, btnDeleteRows, UIUtils.newSeparator(), btnRefresh};
         }
         return toolbarComponents;
@@ -403,12 +425,46 @@ public class UIEditTable extends FrontPanel {
         }
     };
 
+    /**
+     * Agrega una fila a la tabla. Este método inicializa un {@code Vector}
+     * vacío y lo agrega como fila al modelo de la tabla. También agrega un
+     * nuevo objeto {@code SQLRow} a la lista que contiene todas las filas.
+     * <br><br>
+     * Nota: las filas agregadas mediante este método aún no son committeadas en
+     * la base de datos.
+     *
+     * @see SQLRow#addToDatabase(int)
+     */
     public void doAddRow() {
         ((DefaultTableModel) uiTable.getModel()).addRow(new Vector<>());
         rows.add(new SQLRow());
         uiTable.setColumnSelectionInterval(0, 0);
         uiTable.setRowSelectionInterval(uiTable.getRowCount() - 1, uiTable.getRowCount() - 1);
+        UIUtils.scrollToBottom(scrTable);
     }
+
+    private Action actionRefreshTable = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tableHasChanges()) {
+                int opt = UIUtils.showYesNoOptionDialog("Actualizar la tabla", "Se han encontrado cambios no guardados en la tabla.\nSi refrescas ahora, esos cambios se perderán. ¿Deseas continuar?",
+                        JOptionPane.QUESTION_MESSAGE, false, null);
+                if (opt == 0) {
+                    doRefresh();
+                }
+            } else {
+                doRefresh();
+            }
+        }
+
+        void doRefresh() {
+            rows.clear();
+            table = new SQLTable(table);
+            table.loadColumns();
+            tablePK = table.getPrimaryKey();
+            prepareTable();
+        }
+    };
 
     private Action actionAddRow = new AbstractAction() {
         @Override
@@ -441,6 +497,15 @@ public class UIEditTable extends FrontPanel {
             uiTable.getCellEditor().stopCellEditing();
         }
         int[] selectedRows = uiTable.getSelectedRows();
+        if (selectedRows.length == 0) {
+            return;
+        }
+
+        int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
+        if (opt == 1) {
+            return;
+        }
+
         int lastDeleted = -1;
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int rowToDelete = selectedRows[i];
@@ -570,15 +635,14 @@ public class UIEditTable extends FrontPanel {
             SQLQuery updateQuery = new SQLUpdateQuery(createUpdateStatement()) {
                 @Override
                 public void onSuccess(int updateCount) {
-                    System.out.println(true);
-//                    SQLColumn sqlColumn = table.getColumn(column);
-//                    TextUtils.appendBold(txtLog, "[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ");
-//                    TextUtils.appendToDoc(txtLog, "UPDATE: ", false);
-//                    TextUtils.appendRed(txtLog, "'" + (sqlColumn.isTimeBased() ? SQLUtils.convertDateToValidSQLDate((Date) cellListener.getOldValue(), sqlColumn) : cellListener.getOldValue()) + "'");
-//                    TextUtils.appendToDoc(txtLog, " -> ", false);
-//                    TextUtils.appendRed(txtLog, "'" + (sqlColumn.isTimeBased() ? SQLUtils.convertDateToValidSQLDate((Date) value, sqlColumn) : value) + "'");
-//                    TextUtils.appendToDoc(txtLog, " at column ", false);
-//                    TextUtils.appendRed(txtLog, table.getColumn(column).getName() + "\n");
+                    for (Map.Entry<String, Object> entry : valuesForUpdate.entrySet()) {
+                        String col = entry.getKey();
+                        Object value = entry.getValue();
+                        DocStyler.of(txtLog).append("[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ", DocStyler.FontStyle.BOLD)
+                                .append("UPDATE: ", DocStyler.FontStyle.NORMAL)
+                                .append("'" + columnsAndValues.get(col) + "'", Color.RED).append(" -> ", Color.BLACK).append("'" + value + "'", Color.RED)
+                                .append(" at column ", Color.BLACK).append(col + "\n", Color.RED);
+                    }
                     queryResult = true;
                     commitNewValues();
                 }

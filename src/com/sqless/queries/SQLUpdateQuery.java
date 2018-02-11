@@ -39,14 +39,11 @@ public class SQLUpdateQuery extends SQLQuery {
             closeQuery();
         }
     }
-    
+
     /**
      * Called upon successful completion of a query. This method is empty by
      * default. Children that inherit from this class have the option to
-     * override it. <br><br>
-     * Note: overriding this method on children of this class that return a
-     * {@code ResultSet} will have no effect, instead please override
-     * {@link SQLQuery#onSuccess(java.sql.ResultSet)}.
+     * override it.
      *
      * @param updateCount for Update queries, the number of rows that were
      * updated by this query.

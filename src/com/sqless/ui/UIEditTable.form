@@ -85,7 +85,7 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="uiTable.setSortable(false);&#xa;uiTable.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable() {&#xd;&#xa;@Override&#xd;&#xa;protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,&#xd;&#xa;                                        int condition, boolean pressed) {&#xd;&#xa;    if (!ks.equals(KeyStroke.getKeyStroke(&quot;control S&quot;))) {&#xd;&#xa;        return super.processKeyBinding(ks, e, condition, pressed);&#xd;&#xa;    }&#xd;&#xa;return false;&#xd;&#xa;}&#xd;&#xa;&#xd;&#xa;};"/>
-                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;});"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;});&#xa;loadKeyBindings();"/>
               </AuxValues>
             </Component>
           </SubComponents>

@@ -12,7 +12,6 @@ import com.sqless.ui.listeners.TableCellListener;
 import com.sqless.utils.DocStyler;
 import com.sqless.utils.MiscUtils;
 import com.sqless.utils.SQLUtils;
-import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
 import java.awt.Component;
@@ -25,7 +24,6 @@ import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,7 +57,6 @@ public class UIEditTable extends FrontPanel {
     private TableCellListener cellListener;
     private SQLPrimaryKey tablePK;
     private List<SQLRow> rows;
-    private DocStyler docStyler;
 
     public UIEditTable(JTabbedPane parentPane, SQLTable table) {
         super(parentPane);
@@ -68,7 +65,6 @@ public class UIEditTable extends FrontPanel {
         initComponents();
         rows = new ArrayList<>();
         tablePK = this.table.getPrimaryKey();
-//        docStyler = new DocStyler(txtLog);
     }
 
     @Override

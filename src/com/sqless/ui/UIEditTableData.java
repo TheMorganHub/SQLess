@@ -26,8 +26,10 @@ import com.sqless.ui.listeners.TableCellListener;
 import com.sqless.utils.TextUtils;
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.sql.connection.SQLConnectionManager;
+import com.sqless.utils.DocStyler;
 import com.sqless.utils.MiscUtils;
 
+@Deprecated
 public class UIEditTableData extends javax.swing.JDialog {
 
     private SQLTable sqlTable;
@@ -975,10 +977,10 @@ public class UIEditTableData extends javax.swing.JDialog {
      */
     public void log(String message, boolean error) {
         if (error) {
-            TextUtils.appendAsError(txtLog, "Segoe UI", 12, "[" + MiscUtils.timeStamp() + "] "
-                    + message + "\n");
+            DocStyler.of(txtLog).set("[" + MiscUtils.timeStamp() + "] "
+                    + message + "\n", Color.RED);
         } else {
-            TextUtils.appendAsMessage(txtLog, "Segoe UI", 12, "[" + MiscUtils.timeStamp() + "] "
+            DocStyler.of(txtLog).set("[" + MiscUtils.timeStamp() + "] "
                     + message + "\n");
         }
         UIUtils.scrollToBottom(scrLog);

@@ -3,12 +3,8 @@ package com.sqless.utils;
 import java.awt.Color;
 import javax.swing.JEditorPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import jsyntaxpane.SyntaxDocument;
 
 /**
@@ -21,130 +17,6 @@ public class TextUtils {
 
     public static final Color DARK_GREY = new Color(0x777777);
     public static final Color BRIGHT_GREY = new Color(0xC4C4C4);
-    public static final Color DEAD_GREY = new Color(192, 192, 192);
-
-    /**
-     * Splits a given {@code String} in lines and adds each line to an array of
-     * {@code String}
-     *
-     * @param s a {@code String}
-     * @return a {@code String} array with the lines.
-     */
-    public static String[] getLines(String s) {
-        return s.contains("\r\n") ? s.split("(?<=\r\n)") : s.split("(?<=\n)");
-    }
-
-    public static void insertIntoDoc(JEditorPane pane, String s, boolean normaliseEndings) {
-        SyntaxDocument sDoc = (SyntaxDocument) pane.getDocument();
-
-        try {
-            sDoc.remove(0, sDoc.getLength());
-            sDoc.insertString(0, normaliseEndings ? normaliseLineEndings(s) : s, null);
-        } catch (BadLocationException ex) {
-            //Bad location
-        }
-    }
-
-    public static void appendToDoc(JTextPane pane, String s, boolean addLineBreak) {
-        if (pane.getStyle("NormalStyle") == null) {
-            Style errorStyle = pane.addStyle("NormalStyle", null);
-            StyleConstants.setFontFamily(errorStyle, "Segoe UI");
-            StyleConstants.setFontSize(errorStyle, 12);
-        }
-
-        StyledDocument doc = (StyledDocument) pane.getDocument();
-        try {
-            doc.insertString(doc.getLength(), s + (addLineBreak ? "\n" : ""), pane.getStyle("NormalStyle"));
-        } catch (BadLocationException ex) {
-        }
-    }
-
-    /**
-     * Appends a given string to the {@code StyledDocument} of a {@code pane} as
-     * an <b>error</b>, that is, using the {@code Style} 'ErrorStyle'.
-     * <p>
-     * This method will create the style if the {@code JTextPane} doesn't
-     * already have it.</p>
-     *
-     * @param pane a {@code JTextPane} with a {@code StyledDocument}.
-     * @param fontName the name of the font to be used
-     * @param fontSize The fontSize to be used.
-     * @param s a {@code String}.
-     */
-    public static void appendAsError(JTextPane pane, String fontName, int fontSize, String s) {
-        if (pane.getStyle("ErrorStyle") == null) {
-            Style errorStyle = pane.addStyle("ErrorStyle", null);
-            StyleConstants.setForeground(errorStyle, Color.RED);
-            StyleConstants.setFontFamily(errorStyle, fontName);
-            StyleConstants.setFontSize(errorStyle, fontSize);
-        }
-
-        StyledDocument doc = (StyledDocument) pane.getDocument();
-        try {
-            emptyDoc(pane);
-            doc.insertString(doc.getLength(), s, pane.getStyle("ErrorStyle"));
-        } catch (BadLocationException ex) {
-        }
-    }
-
-    public static void appendRed(JTextPane pane, String s) {
-        if (pane.getStyle("RedStyle") == null) {
-            Style messageStyle = pane.addStyle("RedStyle", null);
-            StyleConstants.setForeground(messageStyle, Color.RED);
-            StyleConstants.setFontFamily(messageStyle, "Segoe UI");
-            StyleConstants.setFontSize(messageStyle, 12);
-        }
-
-        StyledDocument doc = (StyledDocument) pane.getDocument();
-        try {
-            doc.insertString(doc.getLength(), s, pane.getStyle("RedStyle"));
-        } catch (BadLocationException ex) {
-        }
-    }
-
-    public static void appendBold(JTextPane pane, String s) {
-        if (pane.getStyle("BoldStyle") == null) {
-            Style messageStyle = pane.addStyle("BoldStyle", null);
-            StyleConstants.setForeground(messageStyle, Color.BLACK);
-            StyleConstants.setBold(messageStyle, true);
-            StyleConstants.setFontFamily(messageStyle, "Segoe UI");
-            StyleConstants.setFontSize(messageStyle, 12);
-        }
-
-        StyledDocument doc = (StyledDocument) pane.getDocument();
-        try {
-            doc.insertString(doc.getLength(), s, pane.getStyle("BoldStyle"));
-        } catch (BadLocationException ex) {
-        }
-    }
-
-    /**
-     * Appends a given string to the {@code StyledDocument} of a {@code pane} as
-     * a <b>message</b>, that is, using the {@code Style} 'MessageStyle'.
-     * <p>
-     * This method will create the style if the {@code JTextPane} doesn't
-     * already have it.</p>
-     *
-     * @param pane a {@code JTextPane} with a {@code StyledDocument}.
-     * @param fontName the name of the font to be used
-     * @param fontSize The size of the font to be used.
-     * @param s a {@code String}.
-     */
-    public static void appendAsMessage(JTextPane pane, String fontName, int fontSize,
-            String s) {
-        if (pane.getStyle("MessageStyle") == null) {
-            Style messageStyle = pane.addStyle("MessageStyle", null);
-            StyleConstants.setForeground(messageStyle, Color.BLACK);
-            StyleConstants.setFontFamily(messageStyle, fontName);
-            StyleConstants.setFontSize(messageStyle, fontSize);
-        }
-
-        StyledDocument doc = (StyledDocument) pane.getDocument();
-        try {
-            doc.insertString(doc.getLength(), s, pane.getStyle("MessageStyle"));
-        } catch (BadLocationException ex) {
-        }
-    }
 
     /**
      * Empties the text contents of a given {@code JEditorPane}. We use the
@@ -197,17 +69,6 @@ public class TextUtils {
             mainBuilder.append(tempBuilder).append("\n");
         }
         return mainBuilder.toString();
-    }
-
-    /**
-     * Gets the length of a {@code SyntaxDocument} contained within a
-     * {@code JEditorPane}
-     *
-     * @param pane The {@code JEditorPane} that contains the document.
-     * @return The length of said document.
-     */
-    public static int getDocLength(JEditorPane pane) {
-        return ((SyntaxDocument) pane.getDocument()).getLength();
     }
 
     /**
@@ -367,36 +228,6 @@ public class TextUtils {
     }
 
     /**
-     * Removes all the <b>leading</b> whitespace in a string.
-     *
-     * @param untrimmed The string.
-     * @return a {@code String} without whitespace at the start.
-     */
-    public static String trimStart(String untrimmed) {
-        char[] chars = untrimmed.toCharArray();
-        int offset = 0;
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == ' ' || chars[i] == '\t') {
-                offset++;
-            } else {
-                break;
-            }
-        }
-        return untrimmed.substring(offset);
-    }
-
-    /**
-     * Checks whether a string contains a specified value.
-     *
-     * @param text The string to search.
-     * @param val The value to search for.
-     * @return {@code true} if the value is found within the string.
-     */
-    public static boolean containsIgnoreCase(String text, String val) {
-        return text.toLowerCase().contains(val.toLowerCase());
-    }
-
-    /**
      * Checks if a specified string starts with a number.
      *
      * @param s a {@code String}.
@@ -404,21 +235,5 @@ public class TextUtils {
      */
     public static boolean startsWithNumber(String s) {
         return Character.isDigit(s.charAt(0));
-    }
-
-    /**
-     * Converts a set of hours, minutes, and seconds into a {@code String} in
-     * time format.
-     *
-     * @param hrs The hours.
-     * @param mins The minutes.
-     * @param secs The seconds.
-     * @return A {@code String} in time format {@code hh:mm:ss}.
-     */
-    public static String toTimeFormat(int hrs, int mins, int secs) {
-        String secsToString = secs < 10 ? "0" + secs : "" + secs;
-        String minsToString = mins < 10 ? "0" + mins : "" + mins;
-        String hrsToString = hrs < 10 ? "0" + hrs : "" + hrs;
-        return hrsToString + ":" + minsToString + ":" + secsToString;
     }
 }

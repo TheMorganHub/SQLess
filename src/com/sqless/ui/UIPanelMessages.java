@@ -1,14 +1,18 @@
 package com.sqless.ui;
 
+import com.sqless.utils.DocStyler;
 import com.sqless.utils.MiscUtils;
-import com.sqless.utils.TextUtils;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import javax.swing.JTextPane;
 
 public class UIPanelMessages extends javax.swing.JPanel {
+    
+    private DocStyler errorStyler;
 
     public UIPanelMessages() {
         initComponents();
+        errorStyler = DocStyler.of(txtMessagesArea, "Consolas", 14);
     }
 
     public JTextPane getMessagesArea() {
@@ -82,7 +86,7 @@ public class UIPanelMessages extends javax.swing.JPanel {
     }//GEN-LAST:event_menuItemClearMessagesActionPerformed
 
     public void appendError(String err) {
-        TextUtils.appendAsError(txtMessagesArea, "Consolas", 14, err);
+        errorStyler.set(err, Color.RED);
     }
 
     public void clear() {

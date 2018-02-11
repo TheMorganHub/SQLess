@@ -31,35 +31,138 @@ public class DocStyler {
         NORMAL, BOLD;
     }
 
-    private static final int DEFAULT_FONT_SIZE = 12;
+    private int fontSize;
+    private String fontName;
     private JTextPane pane;
-    private Style lastUsedStyle;
-    private final Style DEFAULT_STYLE;
+    private Style mainStyle;
 
     /**
-     * Inicializa un nuevo {@code DocStyler} para un {@code JTextPane} dado.
+     * Inicializa un nuevo {@code DocStyler} para un {@code JTextPane} dado y
+     * remueve cualquier estilo creado (si lo hay) por algún {@code DocStyler}
+     * anterior que actuó en ese panel.
      *
      * @param pane el {@code JTextPane} al cual se le aplicará el texto
      * formateado.
      */
-    private DocStyler(JTextPane pane) {
+    private DocStyler(JTextPane pane, String fontName, int fontSize) {
+        if (pane.getStyle("MAIN_STYLE") != null) {
+            pane.removeStyle("MAIN_STYLE");
+        }
+        mainStyle = pane.addStyle("MAIN_STYLE", null);
+        this.fontName = fontName;
+        this.fontSize = fontSize;
         this.pane = pane;
-        DEFAULT_STYLE = pane.addStyle("DEFAULT_STYLE", null);
-        StyleConstants.setForeground(DEFAULT_STYLE, Color.BLACK);
-        StyleConstants.setFontFamily(DEFAULT_STYLE, "Segoe UI");
-        StyleConstants.setFontSize(DEFAULT_STYLE, DEFAULT_FONT_SIZE);
+
+        loadDefaults();
+    }
+
+    /**
+     * Carga los valores default para la primera inicialización del estilo
+     * principal.
+     */
+    private void loadDefaults() {
+        StyleConstants.setForeground(mainStyle, Color.BLACK);
+        StyleConstants.setFontFamily(mainStyle, fontName);
+        StyleConstants.setFontSize(mainStyle, fontSize);
     }
 
     /**
      * Retorna un {@code DocStyler} listo para ser utilizado en el
-     * {@code JTextPane} dado.
+     * {@code JTextPane} dado utilizando valores default. La fuente será "Segoe
+     * UI" de tamaño 12.
      *
      * @param pane Un {@code JTextPane} al cual se le aplicará el texto
      * formateado.
      * @return Una nueva instancia de {@code DocStyler}.
      */
     public static DocStyler of(JTextPane pane) {
-        return new DocStyler(pane);
+        return new DocStyler(pane, "Segoe UI", 12);
+    }
+
+    /**
+     * Retorna un {@code DocStyler} listo para ser utilizado en el
+     * {@code JTextPane} dado utilizando valores por default para el tamaño de
+     * la letra. En este caso, el usuario otorga un nombre de fuente a utilizar.
+     *
+     * @param pane Un {@code JTextPane} al cual se le aplicará el texto
+     * formateado.
+     * @param fontName El nombre de la fuente a utilizar.
+     * @return Una nueva instancia de {@code DocStyler}.
+     */
+    public static DocStyler of(JTextPane pane, String fontName) {
+        return new DocStyler(pane, fontName, 12);
+    }
+
+    /**
+     * Retorna un {@code DocStyler} listo para ser utilizado en el
+     * {@code JTextPane} dado, utilizando un nombre de fuente y tamaño otorgado
+     * por la persona.
+     *
+     * @param pane Un {@code JTextPane} al cual se le aplicará el texto
+     * formateado.
+     * @param fontName El nombre de la fuente a utilizar.
+     * @param fontSize Una nueva instancia de {@code DocStyler}.
+     * @return Una nueva instnacia de {@code DocStyler}
+     */
+    public static DocStyler of(JTextPane pane, String fontName, int fontSize) {
+        return new DocStyler(pane, fontName, fontSize);
+    }
+
+    /**
+     * Remplaza el texto del panel manteniendo el estilo utilizado
+     * anteriormente.
+     *
+     * @param text El texto a setear.
+     * @return La misma instancia del {@code DocStyler}
+     * @see #append(java.lang.String)
+     */
+    public DocStyler set(String text) {
+        TextUtils.emptyDoc(pane);
+        return append(text);
+    }
+
+    /**
+     * Remplaza el texto del panel con el texto dado y utiliza el
+     * {@link FontStyle} dado.
+     *
+     * @param text El texto a setear.
+     * @param style El estilo de texto.
+     * @return La misma instancia del {@code DocStyler}
+     * @see #append(java.lang.String, com.sqless.utils.DocStyler.FontStyle)
+     */
+    public DocStyler set(String text, FontStyle style) {
+        TextUtils.emptyDoc(pane);
+        return append(text, style);
+    }
+
+    /**
+     * Remplaza el texto del panel con el texto dado y utiliza el {@code Color}
+     * dado.
+     *
+     * @param text El texto a setear.
+     * @param color El color de texto.
+     * @return La misma instancia del {@code DocStyler}
+     * @see #append(java.lang.String, java.awt.Color)
+     */
+    public DocStyler set(String text, Color color) {
+        TextUtils.emptyDoc(pane);
+        return append(text, color);
+    }
+
+    /**
+     * Remplaza el texto del panel con el {@link FontStyle} y {@code Color}
+     * dados.
+     *
+     * @param text El texto a setear.
+     * @param style El estilo de texto.
+     * @param color El color del texto.
+     * @return La misma instancia del {@code DocStyler}
+     * @see #append(java.lang.String, com.sqless.utils.DocStyler.FontStyle,
+     * java.awt.Color)
+     */
+    public DocStyler set(String text, FontStyle style, Color color) {
+        TextUtils.emptyDoc(pane);
+        return append(text, style, color);
     }
 
     /**
@@ -72,97 +175,74 @@ public class DocStyler {
      * @return La misma instancia del {@code DocStyler}
      */
     public DocStyler append(String text, FontStyle style, Color color) {
-        String newStyleName = createStyleName(style, color);
-        Style newStyle = pane.addStyle(newStyleName, null);
-        StyleConstants.setForeground(newStyle, color);
-        StyleConstants.setBold(newStyle, style == FontStyle.BOLD);
-        StyleConstants.setFontFamily(newStyle, "Segoe UI");
-        StyleConstants.setFontSize(newStyle, DEFAULT_FONT_SIZE);
-        appendWithStyle(text, newStyle);
+        StyleConstants.setForeground(mainStyle, color);
+        StyleConstants.setBold(mainStyle, style == FontStyle.BOLD);
+        appendWithStyle(text);
         return this;
     }
 
     /**
      * Lleva a cabo la acción de insertar el texto dado al final del panel.
-     * <br><br>
-     * Dada la naturaleza casi inmutable (su nombre) de un {@code Style},
-     * removemos el {@code Style} del panel inmediatamente luego de usarlo para
-     * evitar conflictos a futuro. De todas formas, el {@code Style} que
-     * acabamos de utilizar se guardará en memoria para uso/modificación futura.
      *
      * @param text El texto a agregar.
      * @param style El {@code Style} a utilizar.
      */
-    private void appendWithStyle(String text, Style style) {
+    private void appendWithStyle(String text) {
         StyledDocument doc = (StyledDocument) pane.getDocument();
         try {
-            doc.insertString(doc.getLength(), text, style);
-            lastUsedStyle = style;
-            pane.removeStyle(lastUsedStyle.getName());
+            doc.insertString(doc.getLength(), text, mainStyle);
         } catch (BadLocationException ex) {
         }
     }
 
     /**
      * Agrega un texto al final del panel manteniendo el estilo utilizado
-     * anteriormente. De no haberse utilizado ningún estilo, se hará uso del
-     * estilo default.
+     * anteriormente.
      *
      * @param text El texto a agregar.
      * @return La misma instancia del {@code DocStyler}
      */
     public DocStyler append(String text) {
-        appendWithStyle(text, lastUsedStyle == null ? DEFAULT_STYLE : lastUsedStyle);
+        appendWithStyle(text);
         return this;
     }
 
     /**
      * Agrega un texto al final del panel manteniendo el color del estilo
-     * anterior y cambiando sólamente el estilo de fuente. De no haberse
-     * utilizado ningún estilo, se utilizará el estilo de fuente dado y el color
-     * negro.
+     * anterior y cambiando sólamente el estilo de fuente.
      *
      * @param text El texto a agregar.
      * @param style El estilo de fuente a utilizar.
      * @return La misma instancia del {@code DocStyler}
      */
     public DocStyler append(String text, FontStyle style) {
-        if (lastUsedStyle != null) {
-            StyleConstants.setBold(lastUsedStyle, style == FontStyle.BOLD);
-            return append(text);
-        }
-        return append(text, style, Color.BLACK);
+        StyleConstants.setBold(mainStyle, style == FontStyle.BOLD);
+        appendWithStyle(text);
+        return this;
     }
 
     /**
      * Agrega un texto al final del panel manteniendo el estilo de fuente y
-     * cambiando sólamente el color. De no haberse utilizado ningún estilo, se
-     * utilizará el estilo de fuente {@code FontStyle.NORMAL} y el color dado.
+     * cambiando sólamente el color.
      *
      * @param text El texto a agregar.
      * @param color El color a utilizar.
      * @return La misma instancia del {@code DocStyler}
      */
     public DocStyler append(String text, Color color) {
-        if (lastUsedStyle != null) {
-            StyleConstants.setForeground(lastUsedStyle, color);
-            return append(text);
-        }
-        return append(text, FontStyle.NORMAL, color);
-    }
-
-    private String createStyleName(FontStyle style, Color color) {
-        return style.toString() + color.getRGB();
+        StyleConstants.setForeground(mainStyle, color);
+        appendWithStyle(text);
+        return this;
     }
 
     /**
-     * Resetea este {@code DocStyler}. Es decir, seteando como {@code null} al
-     * último estilo utilizado.
+     * Resetea este {@code DocStyler}.
      *
      * @return La misma instancia del {@code DocStyler}
+     * @see #loadDefaults()
      */
     public DocStyler reset() {
-        lastUsedStyle = null;
+        loadDefaults();
         return this;
     }
 

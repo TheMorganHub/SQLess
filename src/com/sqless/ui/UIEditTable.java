@@ -2,28 +2,18 @@ package com.sqless.ui;
 
 import com.sqless.ui.enumeditor.SQLSetCellEditor;
 import com.mysql.jdbc.Blob;
-import com.sqless.queries.SQLQuery;
-import com.sqless.queries.SQLSelectQuery;
-import com.sqless.queries.SQLUpdateQuery;
-import com.sqless.sql.objects.SQLColumn;
-import com.sqless.sql.objects.SQLPrimaryKey;
-import com.sqless.sql.objects.SQLTable;
+import com.sqless.queries.*;
+import com.sqless.sql.objects.*;
 import com.sqless.ui.listeners.TableCellListener;
-import com.sqless.utils.DocStyler;
-import com.sqless.utils.MiscUtils;
-import com.sqless.utils.SQLUtils;
-import com.sqless.utils.UIUtils;
+import com.sqless.utils.*;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,12 +32,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
+import javax.swing.SwingUtilities;
+import javax.swing.event.*;
+import javax.swing.table.*;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
@@ -134,7 +121,7 @@ public class UIEditTable extends FrontPanel {
                         } else if (column.getDataType().equals("year")) {
                             row.add(SQLUtils.parseSQLYear(rs.getString(i)));
                         } else if (column.isTimeBased()) {
-                            row.add(rs.getDate(i));
+                            row.add(SQLUtils.dateFromString(rs.getString(i), column));
                         } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
                             row.add(column.isNullable() ? rs.getString(i) : rs.getInt(i));
                         } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
@@ -172,6 +159,8 @@ public class UIEditTable extends FrontPanel {
                 uiColumn.setCellEditor(new DefaultCellEditor(UIUtils.makeComboBoxForEnumColumn(sqlColumn)));
             } else if (sqlColumn.getDataType().equals("set")) {
                 uiColumn.setCellEditor(new SQLSetCellEditor(SQLUtils.getEnumLikeValuesAsArray(sqlColumn.getEnumLikeValues())));
+            } else if (columnTypes[i] == String.class) {
+                uiColumn.setCellEditor(new StringCellEditor(new JTextField()));
             } else {
                 ((DefaultCellEditor) uiTable.getDefaultEditor(columnTypes[i])).setClickCountToStart(1);
             }
@@ -206,6 +195,8 @@ public class UIEditTable extends FrontPanel {
                 if (sqlColumn.isTimeBased()) {
                     component.setText(sqlColumn.getDataType().equals("date") ? SQLUtils.MYSQL_DATE_FORMAT.format(value) : SQLUtils.MYSQL_DATETIME_FORMAT.format(value));
                 }
+            } else {
+                component.setText("<html><span style=\"color:gray\">Null</span></html>");
             }
 
             SQLRow sqlRow = rows.get(row);
@@ -271,6 +262,11 @@ public class UIEditTable extends FrontPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popTable = new javax.swing.JPopupMenu();
+        menuItemDeleteRow = new javax.swing.JMenuItem();
+        menuItemSetNull = new javax.swing.JMenuItem();
+        popLog = new javax.swing.JPopupMenu();
+        menuItemClearLog = new javax.swing.JMenuItem();
         splitPane = new javax.swing.JSplitPane();
         UIUtils.flattenPane(splitPane);
         scrTable = new javax.swing.JScrollPane();
@@ -293,9 +289,44 @@ public class UIEditTable extends FrontPanel {
                 }
             }
         });
+        uiTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
+                    int r = uiTable.rowAtPoint(e.getPoint());
+                    if (r >= 0 && r < uiTable.getRowCount()) {
+                        int[] selectedRows = uiTable.getSelectedRows();
+                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r)) {
+                            uiTable.setRowSelectionInterval(r, r);
+                        }
+                    } else {
+                        uiTable.clearSelection();
+                    }
+
+                    int rowindex = uiTable.getSelectedRow();
+                    if (rowindex < 0) {
+                        return;
+                    }
+                    popTable.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
         loadKeyBindings();
         scrLog = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextPane();
+
+        menuItemDeleteRow.setAction(actionDeleteRow);
+        menuItemDeleteRow.setText("Delete row(s)");
+        popTable.add(menuItemDeleteRow);
+
+        menuItemSetNull.setAction(actionSetToNull);
+        menuItemSetNull.setText("Set to NULL");
+        popTable.add(menuItemSetNull);
+
+        menuItemClearLog.setAction(actionClearLog);
+        menuItemClearLog.setText("Clear");
+        popLog.add(menuItemClearLog);
 
         splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         splitPane.setContinuousLayout(true);
@@ -310,6 +341,7 @@ public class UIEditTable extends FrontPanel {
             }
         ));
         uiTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        uiTable.setColumnSelectionAllowed(true);
         uiTable.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         uiTable.setGridColor(new java.awt.Color(204, 204, 204));
         uiTable.setRowHeight(20);
@@ -324,6 +356,7 @@ public class UIEditTable extends FrontPanel {
         splitPane.setLeftComponent(scrTable);
 
         txtLog.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        txtLog.setComponentPopupMenu(popLog);
         scrLog.setViewportView(txtLog);
 
         splitPane.setRightComponent(scrLog);
@@ -344,6 +377,11 @@ public class UIEditTable extends FrontPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem menuItemClearLog;
+    private javax.swing.JMenuItem menuItemDeleteRow;
+    private javax.swing.JMenuItem menuItemSetNull;
+    private javax.swing.JPopupMenu popLog;
+    private javax.swing.JPopupMenu popTable;
     private javax.swing.JScrollPane scrLog;
     private javax.swing.JScrollPane scrTable;
     private javax.swing.JSplitPane splitPane;
@@ -379,10 +417,9 @@ public class UIEditTable extends FrontPanel {
         return menuItems;
     }
 
-    private ActionListener actionSaveChanges = e -> {
-        if (uiTable.getCellEditor() != null) {
-            uiTable.getCellEditor().stopCellEditing();
-        }
+    private ActionListener actionSaveChanges = e -> {        
+        UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
+        
         for (int i = 0; i < rows.size(); i++) {
             SQLRow row = rows.get(i);
             boolean success;
@@ -406,13 +443,17 @@ public class UIEditTable extends FrontPanel {
             int selectedColumn = uiTable.getSelectedColumn();
             int selectedRow = uiTable.getSelectedRow();
 
+            if (selectedColumn == -1 || selectedRow == -1) {
+                return;
+            }
+
             if (selectedRow == uiTable.getRowCount() - 1 && selectedColumn == uiTable.getColumnCount() - 1) {
                 actionAddRow.actionPerformed(e);
                 return;
             }
 
-            if (uiTable.getCellEditor() != null) {
-                uiTable.getCellEditor().stopCellEditing();
+            if (!UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP)) {
+                return;
             }
             int futureColumn = selectedColumn + 1 == uiTable.getColumnCount() ? 0 : selectedColumn + 1;
             int futureRow = futureColumn == 0 ? selectedRow + 1 : selectedRow;
@@ -462,11 +503,26 @@ public class UIEditTable extends FrontPanel {
         }
     };
 
+    private Action actionSetToNull = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Cols: " + Arrays.toString(uiTable.getSelectedColumns()));
+            System.out.println("Rows: " + Arrays.toString(uiTable.getSelectedRows()));
+        }
+    };
+
+    private Action actionClearLog = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            txtLog.setText("");
+        }
+    };
+
     private Action actionAddRow = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (uiTable.getCellEditor() != null) {
-                uiTable.getCellEditor().stopCellEditing();
+            if (!UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP)) {
+                return;
             }
 
             if (!rows.isEmpty()) {
@@ -488,34 +544,36 @@ public class UIEditTable extends FrontPanel {
         }
     };
 
-    private ActionListener actionDeleteRow = e -> {
-        if (uiTable.getCellEditor() != null) {
-            uiTable.getCellEditor().stopCellEditing();
-        }
-        int[] selectedRows = uiTable.getSelectedRows();
-        if (selectedRows.length == 0) {
-            return;
-        }
-
-        int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
-        if (opt == 1) {
-            return;
-        }
-
-        int lastDeleted = -1;
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            int rowToDelete = selectedRows[i];
-            SQLRow row = rows.get(rowToDelete);
-            if (row.delete(rowToDelete)) {
-                lastDeleted = rowToDelete;
-            } else {
-                break;
+    private Action actionDeleteRow = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.CANCEL);
+            
+            int[] selectedRows = uiTable.getSelectedRows();
+            if (selectedRows.length == 0) {
+                return;
             }
-        }
 
-        if (uiTable.getRowCount() > 0) {
-            int newSelectedRow = lastDeleted == 0 ? 0 : lastDeleted - 1;
-            uiTable.setRowSelectionInterval(newSelectedRow, newSelectedRow);
+            int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
+            if (opt == 1) {
+                return;
+            }
+
+            int lastDeleted = -1;
+            for (int i = selectedRows.length - 1; i >= 0; i--) {
+                int rowToDelete = selectedRows[i];
+                SQLRow row = rows.get(rowToDelete);
+                if (row.delete(rowToDelete)) {
+                    lastDeleted = rowToDelete;
+                } else {
+                    break;
+                }
+            }
+
+            if (uiTable.getRowCount() > 0) {
+                int newSelectedRow = lastDeleted >= uiTable.getRowCount() ? lastDeleted - 1 : lastDeleted;
+                uiTable.setRowSelectionInterval(newSelectedRow, newSelectedRow);
+            }
         }
     };
 
@@ -633,10 +691,12 @@ public class UIEditTable extends FrontPanel {
                 public void onSuccess(int updateCount) {
                     for (Map.Entry<String, Object> entry : valuesForUpdate.entrySet()) {
                         String col = entry.getKey();
+                        SQLColumn sqlColumn = table.getColumn(col);
                         Object value = entry.getValue();
+                        Object oldValue = sqlColumn.isTimeBased() ? SQLUtils.convertDateToValidSQLDate(columnsAndValues.get(col), sqlColumn) : columnsAndValues.get(col);
                         DocStyler.of(txtLog).append("[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ", DocStyler.FontStyle.BOLD)
                                 .append("UPDATE: ", DocStyler.FontStyle.NORMAL)
-                                .append("'" + columnsAndValues.get(col) + "'", Color.RED).append(" -> ", Color.BLACK).append("'" + value + "'", Color.RED)
+                                .append("'" + oldValue + "'", Color.RED).append(" -> ", Color.BLACK).append("'" + value + "'", Color.RED)
                                 .append(" at column ", Color.BLACK).append(col + "\n", Color.RED);
                     }
                     queryResult = true;
@@ -692,30 +752,10 @@ public class UIEditTable extends FrontPanel {
                 Object column = entry.getKey();
                 Object value = entry.getValue();
                 SQLColumn sqlColumn = table.getColumn(colCount++);
-                Object defaultVal = sqlColumn.getDefaultVal();
-                boolean valueWasNull = value == null;
-                if (valueWasNull) {
-                    //si el valor es nulo y la columna no tiene un valor default, SQLess hace lo posible para asignar un valor válido a la columna
-                    if (defaultVal == null) {
-                        if (sqlColumn.isTimeBased()) {
-                            value = SQLUtils.convertDateToValidSQLDate(new Date(), sqlColumn);
-                        } else if (sqlColumn.isStringBased()) {
-                            value = "";
-                        } else {
-                            value = "0";
-                        }
-                    } else {
-                        //si el valor es nulo y la columna tiene un valor default, usamos el valor default.
-                        //a tener en cuenta: si la columna es de tiempo y el defaultVal empieza con Current, asumimos que es un llamado a la función "CURRENT_TIMESTAMP", etc
-                        //y pasamos la fecha actual en formato String, esto nos permitirá pasar el valor sin problemas a continuación envuelto en ''
-                        value = sqlColumn.isTimeBased() && defaultVal.toString().startsWith("CURRENT") ? SQLUtils.convertDateToValidSQLDate(new Date(), sqlColumn) : defaultVal;
-                    }
-                } else {
-                    value = (sqlColumn.isTimeBased() ? SQLUtils.convertDateToValidSQLDate(value, sqlColumn) : value);
-                }
-                setValue(column.toString(), value);
+                Object formattedValue = sqlColumn.formatUserValue(value, false);
+                setValue(column.toString(), formattedValue);
                 sbCols.append("`").append(column).append("`").append(",");
-                sbValues.append("'").append(value).append("'").append(",");
+                sbValues.append(formattedValue != null ? "'" : "").append(formattedValue).append(formattedValue != null ? "'" : "").append(",");
             }
             sbCols.setLength(sbCols.length() - 1);
             sbCols.append(")");
@@ -730,11 +770,11 @@ public class UIEditTable extends FrontPanel {
                 SQLColumn column = table.getColumn(colCount);
                 Object value = entry.getValue();
                 if (column.isTimeBased()) {
-                    value = SQLUtils.dateFromString(value.toString(), column);
+                    value = value != null ? SQLUtils.dateFromString(value.toString(), column) : null;
                 } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
-                    value = Integer.parseInt(value.toString());
+                    value = value != null ? Integer.parseInt(value.toString()) : null;
                 } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
-                    value = Double.parseDouble(value.toString());
+                    value = value != null ? Double.parseDouble(value.toString()) : null;
                 }
                 uiTable.setValueAt(value, row, colCount++);
             }
@@ -751,6 +791,8 @@ public class UIEditTable extends FrontPanel {
                     isBrandNew = false;
                     queryResult = true;
                     refreshWithUi(row);
+                    DocStyler.of(txtLog).append("[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ", DocStyler.FontStyle.BOLD)
+                            .append("INSERT: ", DocStyler.FontStyle.NORMAL).append("PK -> ").append(Arrays.toString(pkValues) + "\n", Color.RED);
                 }
 
                 @Override

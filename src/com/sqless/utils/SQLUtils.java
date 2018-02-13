@@ -458,16 +458,40 @@ public class SQLUtils {
         return column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.format(date) : MYSQL_DATETIME_FORMAT.format(date);
     }
 
+    public static String convertDefaultToValidSQLDate(SQLColumn column) {
+        if (!column.isTimeBased()) {
+            throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
+        }
+        if (column.getDefaultVal() == null) {
+            return null;
+        }
+        String defaultVal = column.getDefaultVal();
+        return convertDateToValidSQLDate(!defaultVal.startsWith("CURRENT") ? new Date() : defaultVal, column);
+    }
+
+    public static String getSampleValueForColumn(SQLColumn column) {
+        String value;
+        if (column.isTimeBased()) {
+            value = SQLUtils.convertDateToValidSQLDate(new Date(), column);
+        } else if (column.isStringBased()) {
+            value = "";
+        } else {
+            value = "0";
+        }
+        return value;
+    }
+
     public static Date dateFromString(String dateString, SQLColumn column) {
         if (!column.isTimeBased()) {
             throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
         }
         Date parsedDate = null;
-        try {
-            parsedDate = column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.parse(dateString) : MYSQL_DATETIME_FORMAT.parse(dateString);
-        } catch (ParseException e) {
+        if (dateString != null) {
+            try {
+                parsedDate = column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.parse(dateString) : MYSQL_DATETIME_FORMAT.parse(dateString);
+            } catch (ParseException e) {
+            }
         }
-
         return parsedDate;
     }
 

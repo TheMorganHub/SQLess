@@ -134,7 +134,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
         return nonSupportedDataType;
     }
 
-    public void setUnsigned(boolean unsigned, boolean evaluateChanges) {        
+    public void setUnsigned(boolean unsigned, boolean evaluateChanges) {
         this.unsigned = unsigned;
         if (evaluateChanges) {
             evaluateUncommittedChanges();
@@ -449,6 +449,20 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
 
     public int getOrdinalPosition() {
         return ordinalPosition;
+    }
+
+    public Object formatUserValue(Object value, boolean willfullyNull) {
+        if (value == null) {
+            if (defaultVal != null) {
+                value = isTimeBased() ? SQLUtils.convertDefaultToValidSQLDate(this) : defaultVal;
+            } else {
+                value = isNullable() ? null : SQLUtils.getSampleValueForColumn(this);
+            }
+        } else {
+            value = isTimeBased() ? SQLUtils.convertDateToValidSQLDate(value, this) : value;
+        }
+
+        return value;
     }
 
     @Override

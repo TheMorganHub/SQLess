@@ -1,6 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <NonVisualComponents>
+    <Container class="javax.swing.JPopupMenu" name="popTable">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemDeleteRow">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionDeleteRow" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Delete row(s)"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemSetNull">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionSetToNull" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Set to NULL"/>
+          </Properties>
+        </MenuItem>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPopupMenu" name="popLog">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemClearLog">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionClearLog" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Clear"/>
+          </Properties>
+        </MenuItem>
+      </SubComponents>
+    </Container>
+  </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -64,6 +106,7 @@
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                   <TableColumnModel selectionModel="0"/>
                 </Property>
+                <Property name="columnSelectionAllowed" type="boolean" value="true"/>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="12" style="0"/>
                 </Property>
@@ -85,7 +128,7 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="uiTable.setSortable(false);&#xa;uiTable.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable() {&#xd;&#xa;@Override&#xd;&#xa;protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,&#xd;&#xa;                                        int condition, boolean pressed) {&#xd;&#xa;    if (!ks.equals(KeyStroke.getKeyStroke(&quot;control S&quot;))) {&#xd;&#xa;        return super.processKeyBinding(ks, e, condition, pressed);&#xd;&#xa;    }&#xd;&#xa;return false;&#xd;&#xa;}&#xd;&#xa;&#xd;&#xa;};"/>
-                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;});&#xa;loadKeyBindings();"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;});&#xa;uiTable.addMouseListener(new MouseAdapter() {&#xa;            @Override&#xa;            public void mouseReleased(MouseEvent e) {&#xa;                if (SwingUtilities.isRightMouseButton(e)) {&#xa;                    UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);&#xa;                    int r = uiTable.rowAtPoint(e.getPoint());&#xa;                    if (r &gt;= 0 &amp;&amp; r &lt; uiTable.getRowCount()) {&#xa;                        int[] selectedRows = uiTable.getSelectedRows();&#xa;                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r)) {&#xa;                            uiTable.setRowSelectionInterval(r, r);&#xa;                        }&#xa;                    } else {&#xa;                        uiTable.clearSelection();&#xa;                    }&#xa;&#xa;                    int rowindex = uiTable.getSelectedRow();&#xa;                    if (rowindex &lt; 0) {&#xa;                        return;&#xa;                    }&#xa;                    popTable.show(e.getComponent(), e.getX(), e.getY());&#xa;                }&#xa;            }&#xa;        });&#xa;loadKeyBindings();"/>
               </AuxValues>
             </Component>
           </SubComponents>
@@ -106,6 +149,9 @@
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="12" style="0"/>
+                </Property>
+                <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="popLog"/>
                 </Property>
               </Properties>
             </Component>

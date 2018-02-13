@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import static com.sqless.utils.MiscUtils.log;
 import java.net.URL;
+import javax.swing.table.TableCellEditor;
 
 /**
  * Helper class that contains methods useful for UI.
@@ -55,6 +56,10 @@ public class UIUtils {
     public static final Color DARK_GREEN = new Color(62, 137, 39);
     public static final Color COOL_GREEN = new Color(0x84DB66);
     public static final String ICONS_PATH = "/res/icons/";
+
+    public enum CellEdit {
+        STOP, CANCEL
+    }
 
     /**
      * Makes a split pane invisible. Only contained components are shown.
@@ -103,6 +108,31 @@ public class UIUtils {
                 table.packColumn(i, uiTableColumn.getPreferredWidth(), uiTableColumn.getPreferredWidth() + 15);
             }
         }
+    }
+
+    /**
+     * Para ({@link CellEdit#STOP}) o cancela ({@link CellEdit#CANCEL}) la
+     * edición de una celda.
+     *
+     * @param table la tabla que se está editando.
+     * @param action Qué acción se debe tomar. Si se cancela, a diferencia de
+     * parar, los cambios de edición se descartan.
+     * @return {@code true} si la acción de edición pudo pararse (STOP)
+     * exitosamente o si la acción es CANCEL. Si ninguna celda se está editando
+     * al momento de llamar a este método, se retornará {@code true}.
+     */
+    public static boolean interruptCellEdit(JTable table, CellEdit action) {
+        if (table.getCellEditor() != null) {
+            if (action == CellEdit.STOP) {
+                if (!table.getCellEditor().stopCellEditing()) {
+                    return false;
+                }
+            } else if (action == CellEdit.CANCEL) {
+                table.getCellEditor().cancelCellEditing();
+                return true;
+            }
+        }
+        return true;
     }
 
     public static JComboBox<String> makeComboBoxForEnumColumn(SQLColumn column) {

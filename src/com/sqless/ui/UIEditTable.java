@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.function.Predicate;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -193,7 +194,7 @@ public class UIEditTable extends FrontPanel {
             JLabel component = (JLabel) super.getTableCellRendererComponent(table1, value, isSelected, hasFocus, row, column);
             if (value != null) {
                 if (sqlColumn.isTimeBased()) {
-                    component.setText(sqlColumn.getDataType().equals("date") ? SQLUtils.MYSQL_DATE_FORMAT.format(value) : SQLUtils.MYSQL_DATETIME_FORMAT.format(value));
+                    component.setText(SQLUtils.convertDateToValidSQLDate(value, sqlColumn));
                 }
             } else {
                 component.setText("<html><span style=\"color:gray\">Null</span></html>");
@@ -265,6 +266,7 @@ public class UIEditTable extends FrontPanel {
         popTable = new javax.swing.JPopupMenu();
         menuItemDeleteRow = new javax.swing.JMenuItem();
         menuItemSetNull = new javax.swing.JMenuItem();
+        menuItemSetEmpty = new javax.swing.JMenuItem();
         popLog = new javax.swing.JPopupMenu();
         menuItemClearLog = new javax.swing.JMenuItem();
         splitPane = new javax.swing.JSplitPane();
@@ -295,9 +297,12 @@ public class UIEditTable extends FrontPanel {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
                     int r = uiTable.rowAtPoint(e.getPoint());
+                    int c = uiTable.columnAtPoint(e.getPoint());
                     if (r >= 0 && r < uiTable.getRowCount()) {
                         int[] selectedRows = uiTable.getSelectedRows();
-                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r)) {
+                        int[] selectedCols = uiTable.getSelectedColumns();
+                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r) || !MiscUtils.arrayContains(selectedCols, c)) {
+                            uiTable.setColumnSelectionInterval(c, c);
                             uiTable.setRowSelectionInterval(r, r);
                         }
                     } else {
@@ -319,10 +324,15 @@ public class UIEditTable extends FrontPanel {
         menuItemDeleteRow.setAction(actionDeleteRow);
         menuItemDeleteRow.setText("Delete row(s)");
         popTable.add(menuItemDeleteRow);
+        popTable.addSeparator();
 
         menuItemSetNull.setAction(actionSetToNull);
         menuItemSetNull.setText("Set to NULL");
         popTable.add(menuItemSetNull);
+
+        menuItemSetEmpty.setAction(actionSetToEmpty);
+        menuItemSetEmpty.setText("Empty string");
+        popTable.add(menuItemSetEmpty);
 
         menuItemClearLog.setAction(actionClearLog);
         menuItemClearLog.setText("Clear");
@@ -379,6 +389,7 @@ public class UIEditTable extends FrontPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem menuItemClearLog;
     private javax.swing.JMenuItem menuItemDeleteRow;
+    private javax.swing.JMenuItem menuItemSetEmpty;
     private javax.swing.JMenuItem menuItemSetNull;
     private javax.swing.JPopupMenu popLog;
     private javax.swing.JPopupMenu popTable;
@@ -417,9 +428,9 @@ public class UIEditTable extends FrontPanel {
         return menuItems;
     }
 
-    private ActionListener actionSaveChanges = e -> {        
+    private ActionListener actionSaveChanges = e -> {
         UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
-        
+
         for (int i = 0; i < rows.size(); i++) {
             SQLRow row = rows.get(i);
             boolean success;
@@ -503,11 +514,21 @@ public class UIEditTable extends FrontPanel {
         }
     };
 
+    private Action actionSetToEmpty = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SQLUtils.updateGroup(uiTable, table, rows, "", column -> {
+                return column.getDataType().equals("varchar");
+            });
+        }
+    };
+
     private Action actionSetToNull = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Cols: " + Arrays.toString(uiTable.getSelectedColumns()));
-            System.out.println("Rows: " + Arrays.toString(uiTable.getSelectedRows()));
+            SQLUtils.updateGroup(uiTable, table, rows, null, column -> {
+                return column.isNullable();
+            });
         }
     };
 
@@ -548,7 +569,7 @@ public class UIEditTable extends FrontPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.CANCEL);
-            
+
             int[] selectedRows = uiTable.getSelectedRows();
             if (selectedRows.length == 0) {
                 return;
@@ -587,7 +608,7 @@ public class UIEditTable extends FrontPanel {
         return "ui_edittable";
     }
 
-    private class SQLRow {
+    public class SQLRow {
 
         private boolean isBrandNew;
         private Map<String, Object> columnsAndValues;
@@ -621,15 +642,15 @@ public class UIEditTable extends FrontPanel {
          * new value. This is important, because PK values are used in WHERE
          * conditions to update the column.
          *
-         * @param column the index of the column to update.
+         * @param columnName the index of the column to update.
          * @param value the value to insert.
          */
-        public void setValue(String name, Object value) {
-            SQLColumn updatedColumn = table.getColumn(name);
+        public void setValue(String columnName, Object value) {
+            SQLColumn updatedColumn = table.getColumn(columnName);
             if (updatedColumn.isPK()) { //have to update PK values with new values
                 pkValues[tablePK.getIndexOfColumn(updatedColumn.getName())] = value;
             }
-            columnsAndValues.replace(name, value);
+            columnsAndValues.replace(columnName, value);
         }
 
         public void setValueForUpdate(int column, Object value) {
@@ -646,6 +667,14 @@ public class UIEditTable extends FrontPanel {
             } else {
                 valuesForUpdate.put(colName, value);
             }
+        }
+
+        public void setValueForUpdate(SQLColumn column, Object value) {
+            setValueForUpdate(column.getOrdinalPosition() - 1, value);
+        }
+
+        public Object getValue(String colName) {
+            return columnsAndValues.get(colName);
         }
 
         public boolean isBrandNew() {
@@ -678,11 +707,11 @@ public class UIEditTable extends FrontPanel {
         }
 
         /**
-         * Hace una operación de UPDATE en la base de datos. Ingresa el valor
-         * nuevo a la columna dada.
+         * Hace una operación de UPDATE en la base de datos. Es decir, todos los
+         * valores pendientes en {@code valuesForUpdate} serán puestos en la
+         * base de datos.
          *
-         * @param column el índice de la columna a actualizar.
-         * @param value el nuevo valor.
+         * @param row el numero de fila en la tabla visual
          * @return {@code true} si el UPDATE fue exitoso. De lo contario, falso.
          */
         public boolean update(int row) {
@@ -719,13 +748,16 @@ public class UIEditTable extends FrontPanel {
         }
 
         public String createUpdateStatement() {
+            if (valuesForUpdate == null) {
+                return null;
+            }
             String stmt = "UPDATE `" + table.getName() + "` SET ";
             StringBuilder stmtBuilder = new StringBuilder();
 
             for (Map.Entry<String, Object> entry : valuesForUpdate.entrySet()) {
                 String col = entry.getKey();
                 Object value = entry.getValue();
-                stmtBuilder.append("`").append(col).append("`").append("=").append("'").append(value).append("'").append(", ");
+                stmtBuilder.append("`").append(col).append("`").append("=").append(value != null ? "'" : "").append(value).append(value != null ? "'" : "").append(", ");
             }
             stmtBuilder.setLength(stmtBuilder.length() - 2); //remover coma
             stmtBuilder.append(" ").append(createWhereCondition());
@@ -752,7 +784,7 @@ public class UIEditTable extends FrontPanel {
                 Object column = entry.getKey();
                 Object value = entry.getValue();
                 SQLColumn sqlColumn = table.getColumn(colCount++);
-                Object formattedValue = sqlColumn.formatUserValue(value, false);
+                Object formattedValue = sqlColumn.formatUserValue(value);
                 setValue(column.toString(), formattedValue);
                 sbCols.append("`").append(column).append("`").append(",");
                 sbValues.append(formattedValue != null ? "'" : "").append(formattedValue).append(formattedValue != null ? "'" : "").append(",");
@@ -764,24 +796,33 @@ public class UIEditTable extends FrontPanel {
             return sbCols.append(" ").append(sbValues).toString();
         }
 
+        private String createDeleteStatement() {
+            return "DELETE FROM `" + table.getName() + "` " + createWhereCondition();
+        }
+
         public void refreshWithUi(int row) {
             int colCount = 0;
             for (Map.Entry<String, Object> entry : columnsAndValues.entrySet()) {
                 SQLColumn column = table.getColumn(colCount);
                 Object value = entry.getValue();
                 if (column.isTimeBased()) {
-                    value = value != null ? SQLUtils.dateFromString(value.toString(), column) : null;
+                    if (value != null && value instanceof String) {
+                        value = SQLUtils.dateFromString(value.toString(), column);
+                    }
                 } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
                     value = value != null ? Integer.parseInt(value.toString()) : null;
                 } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
                     value = value != null ? Double.parseDouble(value.toString()) : null;
                 }
+
                 uiTable.setValueAt(value, row, colCount++);
             }
         }
 
-        private String createDeleteStatement() {
-            return "DELETE FROM `" + table.getName() + "` " + createWhereCondition();
+        public void discardUpdate() {
+            if (valuesForUpdate != null) {
+                valuesForUpdate.clear();
+            }
         }
 
         public boolean addToDatabase(int row) {
@@ -804,7 +845,6 @@ public class UIEditTable extends FrontPanel {
                     }
                     System.out.println("Failure: " + getSql());
                     uiTable.setRowSelectionInterval(row, row);
-
                 }
             };
             insertQuery.exec();

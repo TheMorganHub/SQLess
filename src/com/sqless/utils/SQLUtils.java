@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.*;
+import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,8 +16,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JTable;
 
 /**
  * Utility class used to perform various tasks related to SQL database
@@ -452,9 +455,13 @@ public class SQLUtils {
         if (!column.isTimeBased()) {
             throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
         }
+        if (date == null) {
+            return null;
+        }
         if (!(date instanceof Date)) {
             return "" + date;
         }
+
         return column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.format(date) : MYSQL_DATETIME_FORMAT.format(date);
     }
 
@@ -490,9 +497,56 @@ public class SQLUtils {
             try {
                 parsedDate = column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.parse(dateString) : MYSQL_DATETIME_FORMAT.parse(dateString);
             } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         return parsedDate;
+    }
+
+    /**
+     * Lleva a cabo un UPDATE en las filas y columnas seleccionadas. Una celda
+     * recibirá el valor nuevo siempre y cuando se cumpla la condición dispuesta
+     * por el {@link Predicate} dado. Por ejemplo, si el {@code Predicate} dice
+     * que sólo las columnas que sean nullables van a ser updateadas, las
+     * columnas que no lo sean serán ignoradas. <br><br>
+     * Nota: independientemente del {@code Predicate} dado, si el valor nuevo es
+     * igual al valor viejo, esa celda no se incluirá en el UPDATE.
+     *
+     * @param uiTable una referencia a una {@code JTable} que contiene los
+     * valores que se van a actualizar.
+     * @param table una referencia a una {@link SQLTable} que contiene las
+     * columnas.
+     * @param rows la {@code List} que contiene a todas las {@code SQLRow}
+     * (filas con datos) de la tabla.
+     * @param value el valor nuevo.
+     * @param predicate sólamente las columnas que cumplan esa condición serán
+     * actualizadas.
+     */
+    public static void updateGroup(JTable uiTable, SQLTable table, List<UIEditTable.SQLRow> rows, Object value, Predicate<SQLColumn> predicate) {
+        int[] selectedCols = uiTable.getSelectedColumns();
+        int[] selectedRows = uiTable.getSelectedRows();
+        for (int i = 0; i < selectedRows.length; i++) {
+            UIEditTable.SQLRow row = rows.get(selectedRows[i]);
+            for (int j = 0; j < selectedCols.length; j++) {
+                SQLColumn column = table.getColumn(selectedCols[j]);
+                Object oldValue = row.getValue(column.getName());
+                if ((oldValue != null && !oldValue.equals(value) || value != null && !value.equals(oldValue)) && predicate.test(column)) {
+                    row.setValueForUpdate(column, value);
+                }
+            }
+            if (row.hasUncommittedChanges()) {
+                //llevamos a cabo el update en la DB en las filas seleccionadas
+                if (row.update(selectedRows[i])) { //si la update salió bien, refrescamos los valores en la tabla con el valor nuevo
+                    row.refreshWithUi(selectedRows[i]);
+                } else { //si algo salió mal, descartamos todos los valores nuevos
+                    for (int j = 0; j < selectedRows.length; j++) {
+                        rows.get(selectedRows[j]).discardUpdate();
+                    }
+                    break;
+                }
+            }
+
+        }
     }
 
 }

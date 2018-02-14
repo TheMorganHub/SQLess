@@ -451,7 +451,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
         return ordinalPosition;
     }
 
-    public Object formatUserValue(Object value, boolean willfullyNull) {
+    public Object formatUserValue(Object value) {
         if (value == null) {
             if (defaultVal != null) {
                 value = isTimeBased() ? SQLUtils.convertDefaultToValidSQLDate(this) : defaultVal;

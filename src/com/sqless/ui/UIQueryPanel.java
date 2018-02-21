@@ -96,7 +96,7 @@ public class UIQueryPanel extends FrontPanel {
 
     public void stopQuery() {
         if (query != null) {
-            query.closeQuery();
+            query.stopQuery();
             btnStop.setEnabled(false);
         }
     }
@@ -117,6 +117,10 @@ public class UIQueryPanel extends FrontPanel {
                 resultPanels.remove(i);
             }
         }
+    }
+
+    public void clearMessages() {
+        panelMessages.clear();
     }
 
     public void initMessagesPanel() {
@@ -159,16 +163,8 @@ public class UIQueryPanel extends FrontPanel {
         return resultPanels;
     }
 
-    public UIPanelResult getResultPanel(int i) {
-        return getResultPanels().get(i);
-    }
-
     public JEditorPane getSqlEditorPane() {
         return sqlEditorPane;
-    }
-
-    public UIPanelMessages getPanelMessages() {
-        return panelMessages;
     }
 
     public void setMessage(SQLUIQuery.Status STATUS, String s) {
@@ -180,6 +176,10 @@ public class UIQueryPanel extends FrontPanel {
             case SUCCESSFUL:
                 tabPane.setSelectedIndex(0);
                 panelMessages.clear();
+                break;
+            case STOPPED:
+                tabPane.setSelectedIndex(tabPane.getTabCount() - 1);
+                panelMessages.appendError("The query was interrupted.");
                 break;
         }
     }
@@ -333,8 +333,12 @@ public class UIQueryPanel extends FrontPanel {
         btnRun.doClick();
     }
 
-    public void disableStopBtn() {
-        btnStop.setEnabled(false);
+    public void enableStopBtn(boolean flag) {
+        btnStop.setEnabled(flag);
+    }
+
+    public void enableRunBtn(boolean flag) {
+        btnRun.setEnabled(flag);
     }
 
     private DropTarget fileDragNDrop = new DropTarget() {
@@ -484,14 +488,13 @@ public class UIQueryPanel extends FrontPanel {
         parentPane.setToolTipTextAt(getTabIndex(), getTabTitle());
     };
 
-    private ActionListener actionRunQuery = e -> {        
+    private ActionListener actionRunQuery = e -> {
         updateTimerLabel("00:00:00,000");
         clearResults();
         String toExec = sqlEditorPane.getSelectedText() != null ? sqlEditorPane.getSelectedText() : sqlEditorPane.getText();
         query = new SQLUIQuery(toExec, this);
         setQuery(query);
         query.exec();
-        btnStop.setEnabled(true);
     };
     private ActionListener actionStopQuery = (e) -> {
         stopQuery();

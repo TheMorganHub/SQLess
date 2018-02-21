@@ -1,8 +1,10 @@
 package com.sqless.queries;
 
+import com.mysql.jdbc.Blob;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
+import com.sqless.utils.SQLUtils;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,8 +49,12 @@ public class SQLUIQuery extends SQLQuery {
     @Override
     public void exec() {
         if (queryPanel != null) {
+            queryPanel.clearMessages();
+            queryStatus = Status.LOADING;
             queryPanel.updateStatusLabel(Status.LOADING);
             queryPanel.updateRowsLabel(0);
+            queryPanel.enableStopBtn(true);
+            queryPanel.enableRunBtn(false);
         }
 
         queryThread = new Thread(new Runnable() {
@@ -60,7 +66,6 @@ public class SQLUIQuery extends SQLQuery {
                 queryTimer.start();
                 try {
                     boolean hasResult;
-
                     int updateCount = 0;
                     hasResult = statement.execute(getSql());
                     while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
@@ -72,7 +77,7 @@ public class SQLUIQuery extends SQLQuery {
                     }
                     queryStatus = Status.SUCCESSFUL;
                 } catch (SQLException e) {
-                    queryStatus = Status.FAILED;
+                    queryStatus = queryStatus.equals(Status.STOPPED) ? Status.STOPPED : Status.FAILED;
                     errorMessage = e.getMessage();
                 } finally {
                     closeQuery();
@@ -81,7 +86,8 @@ public class SQLUIQuery extends SQLQuery {
                 if (queryPanel != null) {
                     queryTimer.stop();
                     EventQueue.invokeLater(() -> {
-                        queryPanel.disableStopBtn();
+                        queryPanel.enableStopBtn(false);
+                        queryPanel.enableRunBtn(true);
                         queryPanel.updateStatusLabel(queryStatus);
                         queryPanel.setMessage(queryStatus, errorMessage);
                     });
@@ -100,6 +106,11 @@ public class SQLUIQuery extends SQLQuery {
             }
         } catch (SQLException e) {
         }
+    }
+
+    public void stopQuery() {
+        closeQuery();
+        queryStatus = Status.STOPPED;
     }
 
     public synchronized void fillTable(ResultSet result) {
@@ -122,40 +133,39 @@ public class SQLUIQuery extends SQLQuery {
         private int columnCount;
         private String[] columnNames;
         private JXTable table;
-        private DefaultTableModel model;
         private int rowCount;
         private boolean packed;
+        private String[] typeNames;
 
         public TableFiller(ResultSet rs, JXTable table) {
             this.rs = rs;
             this.table = table;
-            this.model = (DefaultTableModel) table.getModel();
         }
 
         @Override
         protected Void doInBackground() {
-            ResultSetMetaData rsmd;
             try {
-                rsmd = rs.getMetaData();
-                columnCount = rsmd.getColumnCount();
-                columnNames = new String[columnCount + 1];
-                columnNames[0] = "#";
-                for (int i = 1; i <= columnCount; i++) {
-                    columnNames[i] = rsmd.getColumnName(i);
-                }
-                EventQueue.invokeLater(() -> {
-                    model.setRowCount(0);
-                    model.setColumnIdentifiers(columnNames);
-                });
+                table.setModel(makeModel(rs.getMetaData()));
 
                 while (!rs.isClosed() && rs.next()) {
                     Vector row = new Vector();
                     row.add("" + ++rowCount);
-                    for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-                        row.add(rs.getObject(columnIndex));
+                    for (int columnIndex = 1; columnIndex < columnCount; columnIndex++) {
+                        String columnType = typeNames[columnIndex];
+                        String cellValue = rs.getString(columnIndex);
+                        if (cellValue != null) {
+                            if (columnType.equalsIgnoreCase("year")) {
+                                cellValue = SQLUtils.parseSQLYear(cellValue);
+                            } else if (columnType.equalsIgnoreCase("blob")) {
+                                cellValue = SQLUtils.parseBlob((Blob) rs.getBlob(columnIndex));
+                            } else if (SQLUtils.dataTypeIsTimeBased(columnType)) {
+                                cellValue = cellValue.endsWith(".0") ? cellValue.substring(0, cellValue.length() - 2) : cellValue;
+                            }
+                        }
+                        row.add(cellValue);
                     }
                     if (rowCount % 1000 == 0) {
-                        Thread.sleep(15);
+                        Thread.sleep(15); //le permite a la UI refrescar
                     }
                     publish(row);
                 }
@@ -170,7 +180,7 @@ public class SQLUIQuery extends SQLQuery {
         @Override
         protected void process(List<Vector> chunks) {
             for (Vector row : chunks) {
-                model.addRow(row);
+                ((DefaultTableModel) table.getModel()).addRow(row);
             }
             if (rowCount % 5000 == 0) { //will update rows every 5000
                 queryPanel.updateRowsLabel(rowCount);
@@ -180,6 +190,28 @@ public class SQLUIQuery extends SQLQuery {
                 table.packAll();
                 packed = true;
             }
+        }
+
+        public DefaultTableModel makeModel(ResultSetMetaData rsmd) throws SQLException {
+            DefaultTableModel model = new DefaultTableModel();
+            UIPanelResult.NullSQLCellRenderer nullCellRenderer = new UIPanelResult.NullSQLCellRenderer();
+            columnCount = rsmd.getColumnCount() + 1;
+            columnNames = new String[columnCount];
+            columnNames[0] = "#";
+            typeNames = new String[columnCount];
+            for (int i = 1; i < columnCount; i++) {
+                columnNames[i] = rsmd.getColumnName(i);
+                typeNames[i] = rsmd.getColumnTypeName(i).toLowerCase();
+            }
+            EventQueue.invokeLater(() -> {
+                model.setRowCount(0);
+                model.setColumnIdentifiers(columnNames);
+                for (int i = 1; i < columnCount; i++) {
+                    table.getColumn(i).setCellRenderer(nullCellRenderer);
+                }
+            });
+
+            return model;
         }
 
         @Override

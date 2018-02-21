@@ -18,57 +18,57 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemCopyRowsWithHeaders">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="actionCopyRowsWithHeaders" type="code"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/res/icons/ui_client/COPYTABLEWITHHEADERS_ICON.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="With headers"/>
               </Properties>
-              <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="menuItemCopyRowsWithHeadersMouseReleased"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemCopyRows">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="actionCopyRows" type="code"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/res/icons/ui_client/COPYTABLEICON.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Without headers"/>
               </Properties>
-              <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="menuItemCopyRowsMouseReleased"/>
-              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemSelectRange">
           <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionSelectRange" type="code"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Select range..."/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemSelectRangeActionPerformed"/>
-          </Events>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemSelectAllTable">
           <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionSelectAll" type="code"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Select all"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemSelectAllTableActionPerformed"/>
-          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="popMenuTable.addSeparator();"/>
           </AuxValues>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemSaveTableAs">
           <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionSaveTableAs" type="code"/>
+            </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/res/icons/ui_client/SAVE_ICON.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Save table as..."/>
           </Properties>
-          <Events>
-            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="menuItemSaveTableAsMouseReleased"/>
-          </Events>
         </MenuItem>
       </SubComponents>
     </Container>
@@ -119,6 +119,9 @@
               <Table columnCount="0" rowCount="0"/>
             </Property>
             <Property name="autoResizeMode" type="int" value="0"/>
+            <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
+              <TableColumnModel selectionModel="0"/>
+            </Property>
             <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="popMenuTable"/>
             </Property>
@@ -137,9 +140,12 @@
               <Color blue="0" green="0" red="0" type="rgb"/>
             </Property>
             <Property name="showGrid" type="boolean" value="true"/>
+            <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+              <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+            </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="tableResult.getTableHeader().setReorderingAllowed(false);&#xd;&#xa;tableResult.setSortable(false);&#xd;&#xa;tableResult.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));&#xd;&#xa;        HighlightPredicate numberPredicate = new HighlightPredicate() {&#xd;&#xa;            @Override&#xd;&#xa;            public boolean isHighlighted(Component component, org.jdesktop.swingx.decorator.ComponentAdapter adapter) {&#xd;&#xa;                return adapter.column == 0;&#xd;&#xa;            }&#xd;&#xa;        };&#xd;&#xa;        ColorHighlighter highlighter = new ColorHighlighter(numberPredicate, TextUtils.BRIGHT_GREY, TextUtils.DARK_GREY);&#xd;&#xa;        tableResult.addHighlighter(highlighter);&#xd;&#xa;tableResult.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);&#xd;&#xa;tableResult.setCellSelectionEnabled(true);&#xd;&#xa;tableResult.getTableHeader().addMouseListener(new MouseAdapter() {&#xd;&#xa;            @Override&#xd;&#xa;            public void mousePressed(MouseEvent e) {&#xd;&#xa;                int clickedIndex = tableResult.columnAtPoint(e.getPoint());&#xd;&#xa;                if (clickedIndex == -1 || tableResult.getModel().getRowCount() == 0) {&#xd;&#xa;                    return;&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;                if (clickedIndex == 0) {&#xd;&#xa;                    actionSelectAll();&#xd;&#xa;                } else {&#xd;&#xa;                    tableResult.setColumnSelectionInterval(clickedIndex, clickedIndex);&#xd;&#xa;                    tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;            }&#xd;&#xa;        });"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="tableResult.getTableHeader().setReorderingAllowed(false);&#xd;&#xa;tableResult.setSortable(false);&#xd;&#xa;tableResult.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));&#xd;&#xa;        HighlightPredicate numberPredicate = new HighlightPredicate() {&#xd;&#xa;            @Override&#xd;&#xa;            public boolean isHighlighted(Component component, org.jdesktop.swingx.decorator.ComponentAdapter adapter) {&#xd;&#xa;                return adapter.column == 0;&#xd;&#xa;            }&#xd;&#xa;        };&#xd;&#xa;        ColorHighlighter highlighter = new ColorHighlighter(numberPredicate, TextUtils.BRIGHT_GREY, TextUtils.DARK_GREY);&#xd;&#xa;        tableResult.addHighlighter(highlighter);&#xd;&#xa;tableResult.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);&#xd;&#xa;tableResult.setCellSelectionEnabled(true);&#xd;&#xa;tableResult.getTableHeader().addMouseListener(new MouseAdapter() {&#xd;&#xa;            @Override&#xd;&#xa;            public void mousePressed(MouseEvent e) {&#xd;&#xa;                int clickedIndex = tableResult.columnAtPoint(e.getPoint());&#xd;&#xa;                if (clickedIndex == -1 || tableResult.getModel().getRowCount() == 0) {&#xd;&#xa;                    return;&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;                if (clickedIndex == 0) {&#xd;&#xa;                    actionSelectAll.actionPerformed(null);&#xd;&#xa;                } else {&#xd;&#xa;                    tableResult.setColumnSelectionInterval(clickedIndex, clickedIndex);&#xd;&#xa;                    tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;            }&#xd;&#xa;        });"/>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable() {&#xd;&#xa;      @Override public void changeSelection(&#xd;&#xa;          int rowIndex, int columnIndex, boolean toggle, boolean extend) {&#xd;&#xa;        if (convertColumnIndexToModel(columnIndex) == 0) {&#xd;&#xa;          return;&#xd;&#xa;        }&#xd;&#xa;        super.changeSelection(rowIndex, columnIndex, toggle, extend);&#xd;&#xa;      }&#xd;&#xa;    };"/>
           </AuxValues>
         </Component>

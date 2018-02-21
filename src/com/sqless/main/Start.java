@@ -3,7 +3,7 @@ package com.sqless.main;
 import com.sqless.ui.UIClient;
 import com.sqless.utils.UIUtils;
 
-public class Test {
+public class Start {
 
     public static void main(String[] args) {
         try {

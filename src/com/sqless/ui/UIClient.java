@@ -263,7 +263,7 @@ public class UIClient extends javax.swing.JFrame {
         toolbarDiagrama.setRollover(true);
         toolbarDiagrama.setName("toolbarDiagrama"); // NOI18N
 
-        btnDbManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_client/NUEVACONEXION_ICONO.png"))); // NOI18N
+        btnDbManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_client/DB_MANAGER_ICON.png"))); // NOI18N
         btnDbManager.setToolTipText("Database explorer");
         btnDbManager.setFocusable(false);
         btnDbManager.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -302,8 +302,8 @@ public class UIClient extends javax.swing.JFrame {
             pnlDiagramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDiagramLayout.createSequentialGroup()
                 .addComponent(toolbarDiagrama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrlDiagram, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE))
+                .addGap(1, 1, 1)
+                .addComponent(scrlDiagram, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE))
         );
 
         splitMain.setLeftComponent(pnlDiagram);

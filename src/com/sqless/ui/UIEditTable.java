@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.function.Predicate;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -117,8 +116,7 @@ public class UIEditTable extends FrontPanel {
                     for (int i = 1; i <= table.getColumnCount(); i++) {
                         SQLColumn column = table.getColumn(i - 1);
                         if (column.getDataType().equals("blob")) {
-                            Blob blob = (Blob) rs.getBlob(i);
-                            row.add(blob != null ? "BLOB (" + String.format("%.2f", (float) blob.length() / 1024) + " KB)" : null);
+                            row.add(SQLUtils.parseBlob((Blob) rs.getBlob(i)));
                         } else if (column.getDataType().equals("year")) {
                             row.add(SQLUtils.parseSQLYear(rs.getString(i)));
                         } else if (column.isTimeBased()) {

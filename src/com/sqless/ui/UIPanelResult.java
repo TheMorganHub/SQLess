@@ -8,11 +8,16 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -48,51 +53,31 @@ public class UIPanelResult extends javax.swing.JPanel {
 
         menuItemCopyCategory.setText("Copy");
 
+        menuItemCopyRowsWithHeaders.setAction(actionCopyRowsWithHeaders);
         menuItemCopyRowsWithHeaders.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_client/COPYTABLEWITHHEADERS_ICON.png"))); // NOI18N
         menuItemCopyRowsWithHeaders.setText("With headers");
-        menuItemCopyRowsWithHeaders.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                menuItemCopyRowsWithHeadersMouseReleased(evt);
-            }
-        });
         menuItemCopyCategory.add(menuItemCopyRowsWithHeaders);
 
+        menuItemCopyRows.setAction(actionCopyRows);
         menuItemCopyRows.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_client/COPYTABLEICON.png"))); // NOI18N
         menuItemCopyRows.setText("Without headers");
-        menuItemCopyRows.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                menuItemCopyRowsMouseReleased(evt);
-            }
-        });
         menuItemCopyCategory.add(menuItemCopyRows);
 
         popMenuTable.add(menuItemCopyCategory);
         popMenuTable.addSeparator();
 
+        menuItemSelectRange.setAction(actionSelectRange);
         menuItemSelectRange.setText("Select range...");
-        menuItemSelectRange.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemSelectRangeActionPerformed(evt);
-            }
-        });
         popMenuTable.add(menuItemSelectRange);
 
+        menuItemSelectAllTable.setAction(actionSelectAll);
         menuItemSelectAllTable.setText("Select all");
-        menuItemSelectAllTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemSelectAllTableActionPerformed(evt);
-            }
-        });
         popMenuTable.add(menuItemSelectAllTable);
         popMenuTable.addSeparator();
 
+        menuItemSaveTableAs.setAction(actionSaveTableAs);
         menuItemSaveTableAs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_client/SAVE_ICON.png"))); // NOI18N
         menuItemSaveTableAs.setText("Save table as...");
-        menuItemSaveTableAs.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                menuItemSaveTableAsMouseReleased(evt);
-            }
-        });
         popMenuTable.add(menuItemSaveTableAs);
 
         scrTableResult.setBorder(null);
@@ -138,7 +123,7 @@ public class UIPanelResult extends javax.swing.JPanel {
                 }
 
                 if (clickedIndex == 0) {
-                    actionSelectAll();
+                    actionSelectAll.actionPerformed(null);
                 } else {
                     tableResult.setColumnSelectionInterval(clickedIndex, clickedIndex);
                     tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);
@@ -159,56 +144,13 @@ public class UIPanelResult extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuItemCopyRowsWithHeadersMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuItemCopyRowsWithHeadersMouseReleased
-        actionCopyRows(true);
-    }//GEN-LAST:event_menuItemCopyRowsWithHeadersMouseReleased
-
-    private void menuItemCopyRowsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuItemCopyRowsMouseReleased
-        actionCopyRows(false);
-    }//GEN-LAST:event_menuItemCopyRowsMouseReleased
-
-    private void menuItemSelectRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSelectRangeActionPerformed
-        actionSelectRange();
-    }//GEN-LAST:event_menuItemSelectRangeActionPerformed
-
-    private void menuItemSelectAllTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSelectAllTableActionPerformed
-        actionSelectAll();
-    }//GEN-LAST:event_menuItemSelectAllTableActionPerformed
-
-    private void menuItemSaveTableAsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuItemSaveTableAsMouseReleased
-        actionSaveTableAs();
-    }//GEN-LAST:event_menuItemSaveTableAsMouseReleased
-
-    public void actionSelectAll() {
-        tableResult.setColumnSelectionInterval(1, tableResult.getColumnCount() - 1);
-        tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);
-    }
-    
-    public void actionSelectRange() {
-        if (tableResult.getRowCount() == 0) {
-            UIUtils.showErrorMessage("Not enough rows", "The number of rows must "
-                    + "be at least one in order to use this feature.", this);
-            return;
-        }
-        UISelectRange uISelectRange = new UISelectRange(tableResult.getRowCount());
-        int[] range = uISelectRange.showDialog();
-        if (range[0] > -1 && range[1] > -1) {
-            tableResult.setColumnSelectionInterval(1, tableResult.getColumnCount() - 1);
-            tableResult.setRowSelectionInterval(range[0], range[1]);
-        }
-    }
-
-    public void actionSaveTableAs() {
-        FileManager.getInstance().saveTableAs(tableResult);
-    }
-
     public void actionCopyRows(boolean includeHeaders) {
         int[] selectedRows = tableResult.getSelectedRows();
         int[] selectedColumns = tableResult.getSelectedColumns();
         if (selectedColumns == null || selectedRows == null) {
             return;
         }
-        UIClient.getInstance().setCursor(UIUtils.WAIT_CURSOR);
+        setCursor(UIUtils.WAIT_CURSOR);
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             String forClipboard;
 
@@ -223,7 +165,7 @@ public class UIPanelResult extends javax.swing.JPanel {
                 StringSelection selection = new StringSelection(forClipboard);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, selection);
-                UIClient.getInstance().setCursor(UIUtils.DEFAULT_CURSOR);
+                setCursor(UIUtils.DEFAULT_CURSOR);
             }
         };
         worker.execute();
@@ -237,10 +179,6 @@ public class UIPanelResult extends javax.swing.JPanel {
         return tableResult.getRowCount();
     }
 
-    public DefaultTableModel getTableModel() {
-        return (DefaultTableModel) getTable().getModel();
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu menuItemCopyCategory;
     private javax.swing.JMenuItem menuItemCopyRows;
@@ -252,4 +190,67 @@ public class UIPanelResult extends javax.swing.JPanel {
     private javax.swing.JScrollPane scrTableResult;
     private org.jdesktop.swingx.JXTable tableResult;
     // End of variables declaration//GEN-END:variables
+
+    private Action actionSelectAll = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            tableResult.setColumnSelectionInterval(1, tableResult.getColumnCount() - 1);
+            tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);
+        }
+    };
+
+    private Action actionSelectRange = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tableResult.getRowCount() == 0) {
+                UIUtils.showErrorMessage("Not enough rows", "The number of rows must "
+                        + "be at least one in order to use this feature.", null);
+                return;
+            }
+            UISelectRange uISelectRange = new UISelectRange(tableResult.getRowCount());
+            int[] range = uISelectRange.showDialog();
+            if (range[0] > -1 && range[1] > -1) {
+                tableResult.setColumnSelectionInterval(1, tableResult.getColumnCount() - 1);
+                tableResult.setRowSelectionInterval(range[0], range[1]);
+            }
+        }
+    };
+
+    private Action actionSaveTableAs = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            FileManager.getInstance().saveTableAs(tableResult);
+        }
+    };
+
+    private Action actionCopyRows = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            actionCopyRows(false);
+        }
+    };
+
+    private Action actionCopyRowsWithHeaders = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            actionCopyRows(true);
+        }
+    };
+
+    /**
+     * Un simple {@code TableCellRenderer} que colorea los valores null de una
+     * tabla en gris claro.
+     */
+    public static class NullSQLCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table1, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel component = (JLabel) super.getTableCellRendererComponent(table1, value, isSelected, hasFocus, row, column);
+            if (value == null) {
+                component.setText("<html><span style=\"color:gray\">Null</span></html>");
+            }
+            return component;
+        }
+    }
+
 }

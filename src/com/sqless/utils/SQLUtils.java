@@ -1,5 +1,6 @@
 package com.sqless.utils;
 
+import com.mysql.jdbc.Blob;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLSelectQuery;
 import java.sql.ResultSet;
@@ -40,7 +41,7 @@ public class SQLUtils {
      * Filtra la palabra clave 'DELIMITER' y todos los delimitadores que no sean
      * ';' asociados a esa palabra clave en la query dada ya que no es válida en
      * JDBC.<br>
-     * Por ejemplo: <br>
+     * Por ejemplo: <br><pre>
      * <code>
      * DELIMITER $$ <br>
      *
@@ -405,7 +406,11 @@ public class SQLUtils {
      * Por ejemplo {@code 2016-01-01} se transformará en {@code 2016}.
      */
     public static String parseSQLYear(String year) {
-        return year.contains("-") ? year.substring(0, year.indexOf("-")) : year;
+        return year != null && year.contains("-") ? year.substring(0, year.indexOf("-")) : year;
+    }
+
+    public static String parseBlob(Blob blob) throws SQLException {
+        return blob != null ? "BLOB (" + String.format("%.2f", (float) blob.length() / 1024) + " KB)" : null;
     }
 
     public static boolean dataTypeIsNumeric(String dataType) {

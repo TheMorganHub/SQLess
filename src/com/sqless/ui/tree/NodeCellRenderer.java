@@ -8,7 +8,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
 import static com.sqless.utils.UIUtils.icon;
-import javax.swing.Icon;
 
 /**
  * The class in charge of rendering each cell of the JTree.
@@ -72,7 +71,7 @@ public class NodeCellRenderer extends DefaultTreeCellRenderer implements TreeCel
                 setIcon(icon("jtree", "TRIGGER"));
                 break;
             case VIEW:
-                setIcon(icon("jtree", "VIEWS"));
+                setIcon(icon("jtree", "VIEW"));
                 break;
             case PROCEDURE:
                 setIcon(icon("jtree", "STORED_PROCEDURE"));

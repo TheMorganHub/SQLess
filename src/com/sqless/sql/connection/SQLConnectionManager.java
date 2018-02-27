@@ -4,7 +4,6 @@ import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIConnectionWizard;
 import com.sqless.sql.objects.SQLDatabase;
-import com.sqless.utils.SQLUtils;
 import java.awt.Frame;
 import java.net.InetAddress;
 import java.sql.Connection;
@@ -56,7 +55,7 @@ public class SQLConnectionManager {
         Connection newCon = null;
         try {
             DriverManager.setLoginTimeout(3);
-            newCon = DriverManager.getConnection("jdbc:mysql://" + hostName + "/" + connectedDB.getName()
+            newCon = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + connectedDB.getName()
                     + "?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true", username, password);
         } catch (SQLException e) {
         }
@@ -69,7 +68,7 @@ public class SQLConnectionManager {
             long start = System.currentTimeMillis();
 
             DriverManager.setLoginTimeout(3);
-            connection = DriverManager.getConnection("jdbc:mysql://" + hostName + "/" + dbName
+            connection = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + dbName
                     + "?zeroDateTimeBehavior=convertToNull", username, password);
 
             long elapsed = System.currentTimeMillis() - start;
@@ -128,7 +127,7 @@ public class SQLConnectionManager {
         closeConnection();
         connectToSavedHost(dbName, parent);
     }
-    
+
     /**
      * Tests a specified connection by attempting to connect to database
      * "master" in SQLServer using a temporary {@code Connection} object. If
@@ -143,7 +142,7 @@ public class SQLConnectionManager {
      * {@code false} otherwise.
      */
     public boolean testConnection(String username, String password, String hostName, String port, Frame parent) {
-        try (Connection testCon = DriverManager.getConnection("jdbc:mysql://" + hostName + "/mysql", username, password)) {
+        try (Connection testCon = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/mysql", username, password)) {
             DriverManager.setLoginTimeout(3);
             System.out.println("Testing connection at " + hostName + ":" + port + " as " + username);
             System.out.println("Test successful.");

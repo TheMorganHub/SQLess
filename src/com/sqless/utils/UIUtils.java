@@ -372,6 +372,10 @@ public class UIUtils {
         JOptionPane.showMessageDialog(parent, body, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public static void showWarning(String title, String body, java.awt.Component parent) {
+        JOptionPane.showMessageDialog(parent, TextUtils.splitIntoLines(body), title, JOptionPane.WARNING_MESSAGE);
+    }
+
     public static String showInputDialog(String title, String body, java.awt.Component parent) {
         return JOptionPane.showInputDialog(parent, TextUtils.splitIntoLines(body), title,
                 JOptionPane.QUESTION_MESSAGE);

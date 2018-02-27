@@ -82,7 +82,7 @@ public class UIQueryPanel extends FrontPanel {
         sqlEditorPane.setDropTarget(fileDragNDrop);
     }
 
-    public void initResultsPanel() {
+    private void initResultsPanel() {
         resultPanels = new ArrayList<>();
     }
 
@@ -101,13 +101,26 @@ public class UIQueryPanel extends FrontPanel {
         }
     }
 
-    public UIPanelResult addResultPanel() {
-        UIPanelResult panelResult = new UIPanelResult();
+    /**
+     * Agrega el {@code UIPanelResult} dado al panel, haciéndolo visible.
+     *
+     * @param panelResult
+     */
+    public void addResultPanel(UIPanelResult panelResult) {
         resultPanels.add(panelResult);
         tabPane.insertTab("Result_" + resultPanels.size(), null, panelResult, null, tabPane.getTabCount() == 0 ? 0 : tabPane.getTabCount() - 1);
         tabPane.setSelectedIndex(0);
+    }
 
-        return panelResult;
+    /**
+     * Inicializa un nuevo {@link UIPanelResult}. <br>
+     * Nota: el {@code UIPanelResult} no es agregado al QueryPanel.
+     *
+     * @return un nuevo panel de resultados.
+     * @see #addResultPanel(UIPanelResult)
+     */
+    public UIPanelResult newResultPanel() {
+        return new UIPanelResult();
     }
 
     public void clearResults() {

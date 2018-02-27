@@ -5,6 +5,7 @@ import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.SQLUtils;
+import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,13 +13,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXTable;
 
 public class SQLUIQuery extends SQLQuery {
@@ -40,7 +39,7 @@ public class SQLUIQuery extends SQLQuery {
             queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
             statement = queryConnection.createStatement();
             this.queryPanel = queryPanel;
-            queryTimer = new Timer(15, new ActionQueryTimer(queryPanel));
+            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -48,6 +47,7 @@ public class SQLUIQuery extends SQLQuery {
 
     @Override
     public void exec() {
+        long startTime = System.currentTimeMillis();
         if (queryPanel != null) {
             queryPanel.clearMessages();
             queryStatus = Status.LOADING;
@@ -55,6 +55,7 @@ public class SQLUIQuery extends SQLQuery {
             queryPanel.updateRowsLabel(0);
             queryPanel.enableStopBtn(true);
             queryPanel.enableRunBtn(false);
+            queryTimer.start();
         }
 
         queryThread = new Thread(new Runnable() {
@@ -63,7 +64,6 @@ public class SQLUIQuery extends SQLQuery {
 
             @Override
             public void run() {
-                queryTimer.start();
                 try {
                     boolean hasResult;
                     int updateCount = 0;
@@ -76,7 +76,7 @@ public class SQLUIQuery extends SQLQuery {
                         rowsTotalAffected += updateCount;
                     }
                     queryStatus = Status.SUCCESSFUL;
-                } catch (SQLException e) {
+                } catch (SQLException | InterruptedException e) {
                     queryStatus = queryStatus.equals(Status.STOPPED) ? Status.STOPPED : Status.FAILED;
                     errorMessage = e.getMessage();
                 } finally {
@@ -85,6 +85,10 @@ public class SQLUIQuery extends SQLQuery {
 
                 if (queryPanel != null) {
                     queryTimer.stop();
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    if (elapsed < 75) {
+                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceTime(elapsed);
+                    }
                     EventQueue.invokeLater(() -> {
                         queryPanel.enableStopBtn(false);
                         queryPanel.enableRunBtn(true);
@@ -105,25 +109,29 @@ public class SQLUIQuery extends SQLQuery {
                 queryConnection.close();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Interrumpe la query que se está corriendo actualmente. Este método se
+     * ejecuta en un Thread aparte ya que si la query tarda en cerrar, la UI se
+     * freezará. Una query puede tardar en cerrar si el ResultSet que devuelve
+     * es gigante.
+     */
     public void stopQuery() {
-        closeQuery();
-        queryStatus = Status.STOPPED;
+        Thread closeThread = new Thread(() -> {
+            closeQuery();
+            queryStatus = Status.STOPPED;
+        });
+        closeThread.start();
     }
 
-    public synchronized void fillTable(ResultSet result) {
-        UIPanelResult panelResult = queryPanel.addResultPanel();
-        currentTableFiller = new TableFiller(result, panelResult.getTable());
+    public synchronized void fillTable(ResultSet result) throws InterruptedException {
+        currentTableFiller = new TableFiller(result);
         currentTableFiller.execute();
-
-        while (!currentTableFiller.isDone()) {
-            try {
-                wait(); //pauses this thread until the tablefiller finishes
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SQLUIQuery.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        if (!currentTableFiller.isDone()) {
+            wait();
         }
     }
 
@@ -131,21 +139,25 @@ public class SQLUIQuery extends SQLQuery {
 
         private ResultSet rs;
         private int columnCount;
-        private String[] columnNames;
         private JXTable table;
         private int rowCount;
-        private boolean packed;
         private String[] typeNames;
+        static final int MAX_ROWS = 1000000;
+        private DefaultTableModel newTableModel;
+        private UIPanelResult uiPanelResult;
 
-        public TableFiller(ResultSet rs, JXTable table) {
+        public TableFiller(ResultSet rs) {
             this.rs = rs;
-            this.table = table;
+            uiPanelResult = queryPanel.newResultPanel();
+            this.table = uiPanelResult.getTable();
         }
 
         @Override
         protected Void doInBackground() {
             try {
-                table.setModel(makeModel(rs.getMetaData()));
+                if (!rs.isClosed()) {
+                    newTableModel = makeModel(rs.getMetaData());
+                }
 
                 while (!rs.isClosed() && rs.next()) {
                     Vector row = new Vector();
@@ -164,59 +176,48 @@ public class SQLUIQuery extends SQLQuery {
                         }
                         row.add(cellValue);
                     }
-                    if (rowCount % 1000 == 0) {
-                        Thread.sleep(15); //le permite a la UI refrescar
+                    newTableModel.addRow(row);
+                    if (rowCount == MAX_ROWS) {
+                        queryTimer.stop();
+                        UIUtils.showWarning("Número máximo de filas excedido", "El número máximo de filas (" + MAX_ROWS + ") que SQLess puede mostrar para esta query será excedido. "
+                                + "SQLess mostrará los resultados hasta ahora y pasará a la siguiente query en cola.", null);
+                        break;
                     }
-                    publish(row);
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-            } catch (InterruptedException ex) {
             }
 
             return null;
         }
 
-        @Override
-        protected void process(List<Vector> chunks) {
-            for (Vector row : chunks) {
-                ((DefaultTableModel) table.getModel()).addRow(row);
-            }
-            if (rowCount % 5000 == 0) { //will update rows every 5000
-                queryPanel.updateRowsLabel(rowCount);
-            }
-
-            if (!packed) { //attempts to pack the first time this method runs
-                table.packAll();
-                packed = true;
-            }
-        }
-
         public DefaultTableModel makeModel(ResultSetMetaData rsmd) throws SQLException {
             DefaultTableModel model = new DefaultTableModel();
-            UIPanelResult.NullSQLCellRenderer nullCellRenderer = new UIPanelResult.NullSQLCellRenderer();
             columnCount = rsmd.getColumnCount() + 1;
-            columnNames = new String[columnCount];
-            columnNames[0] = "#";
+            model.addColumn("#");
             typeNames = new String[columnCount];
             for (int i = 1; i < columnCount; i++) {
-                columnNames[i] = rsmd.getColumnName(i);
                 typeNames[i] = rsmd.getColumnTypeName(i).toLowerCase();
+                model.addColumn(rsmd.getColumnName(i));
             }
-            EventQueue.invokeLater(() -> {
-                model.setRowCount(0);
-                model.setColumnIdentifiers(columnNames);
-                for (int i = 1; i < columnCount; i++) {
-                    table.getColumn(i).setCellRenderer(nullCellRenderer);
-                }
-            });
-
             return model;
         }
 
         @Override
         protected void done() {
-            queryPanel.updateRowsLabel();
+            if (newTableModel != null) {
+                UIPanelResult.NullSQLCellRenderer nullCellRenderer = new UIPanelResult.NullSQLCellRenderer();
+                queryPanel.addResultPanel(uiPanelResult);
+                table.setModel(newTableModel);
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    TableColumn tableColumn = table.getColumn(i);
+                    tableColumn.setMinWidth(i == 0 ? 10 : 20);
+                    tableColumn.setPreferredWidth(i == 0 ? 25 : 100);
+                    tableColumn.setCellRenderer(nullCellRenderer);
+                }
+                queryPanel.updateRowsLabel();
+            }
+
             synchronized (SQLUIQuery.this) {
                 SQLUIQuery.this.notify();
             }
@@ -258,6 +259,11 @@ public class SQLUIQuery extends SQLQuery {
             int hours = diffTime;
 
             String time = String.format(TIME_FORMAT, hours, min, sec, mSecs);
+            queryPanel.updateTimerLabel(time);
+        }
+
+        public void forceTime(long ms) {
+            String time = String.format(TIME_FORMAT, 0, 0, 0, ms);
             queryPanel.updateTimerLabel(time);
         }
     }

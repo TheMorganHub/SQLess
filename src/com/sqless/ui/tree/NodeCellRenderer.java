@@ -91,7 +91,6 @@ public class NodeCellRenderer extends DefaultTreeCellRenderer implements TreeCel
     }
 
     boolean nodoEsForeignKey(TreeNodeSqless nodo) {
-        SQLColumn column = (SQLColumn) nodo.getUserObject();
-        return column.isFK();
+        return ((SQLColumn) nodo.getUserObject()).isFK();
     }
 }

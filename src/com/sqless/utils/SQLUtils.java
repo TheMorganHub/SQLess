@@ -205,10 +205,6 @@ public class SQLUtils {
         return tables;
     }
 
-    public static String renameObjectDefinition(SQLObject object, String newName) {
-        return object.getDefinition().replaceAll(object.getName(), newName);
-    }
-
     public static boolean isDefaultDatatype(String datatype) {
         for (String defaultType : DEFAULT_DATA_TYPES) {
             if (datatype.equalsIgnoreCase(defaultType)) {

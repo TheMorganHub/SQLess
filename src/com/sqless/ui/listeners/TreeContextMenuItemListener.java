@@ -1,12 +1,12 @@
 package com.sqless.ui.listeners;
 
+import com.sqless.sql.objects.SQLDroppable;
 import com.sqless.ui.tree.TreeContextMenuItem;
 import com.sqless.sql.objects.SQLSelectable;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.tree.TreeNodeSqless;
 import com.sqless.sql.objects.SQLTable;
-import com.sqless.sql.objects.SQLObject;
 import com.sqless.ui.UICreateTableSQLess;
 import com.sqless.ui.UIEditTable;
 import java.awt.event.MouseAdapter;
@@ -62,7 +62,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             return;
         }
 
-        client.createNewQueryPanelAndRun(((SQLObject) node.getUserObject()).getDropStatement());
+        client.createNewQueryPanelAndRun(((SQLDroppable) node.getUserObject()).getDropStatement());
     }
 
     public void doSelect(TreeNodeSqless node) {

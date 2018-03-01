@@ -8,7 +8,8 @@ import java.util.List;
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, SQLRenameable, Comparable<SQLColumn> {
+public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
+        SQLRenameable, SQLDroppable, SQLCreatable, Comparable<SQLColumn> {
 
     private SQLDataObject parentTable;
     /**
@@ -396,10 +397,6 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
 
     public boolean isDecimalBased() {
         return dataType.equals("decimal") || (numericScale != null && Integer.parseInt(numericScale) > 0);
-    }
-
-    public boolean isLast() {
-        return ordinalPosition == parentTable.getColumnCount();
     }
 
     public boolean isPK() {

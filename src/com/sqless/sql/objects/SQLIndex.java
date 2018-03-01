@@ -1,8 +1,6 @@
 package com.sqless.sql.objects;
 
-import com.sqless.utils.SQLUtils;
-
-public class SQLIndex extends SQLObject {
+public class SQLIndex extends SQLObject implements SQLDroppable {
 
     private String parentTable;
     private String indexType;

@@ -1,6 +1,6 @@
 package com.sqless.sql.objects;
 
-public class SQLView extends SQLDataObject {
+public class SQLView extends SQLDataObject implements SQLDroppable {
 
     public SQLView(String name) {
         super(name);

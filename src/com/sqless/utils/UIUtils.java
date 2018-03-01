@@ -40,7 +40,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import static com.sqless.utils.MiscUtils.log;
 import java.net.URL;
-import javax.swing.table.TableCellEditor;
 
 /**
  * Helper class that contains methods useful for UI.
@@ -225,37 +224,6 @@ public class UIUtils {
                     break;
             }
         });
-    }
-
-    /**
-     * Checks if a {@code JTree} is empty. A {@code JTree} is considered empty
-     * if its name is empty or if its child count is 0.
-     *
-     * @param tree a {@code JTree}
-     * @return
-     */
-    public static boolean treeIsEmpty(JTree tree) {
-        return tree.getModel().getRoot().toString().isEmpty()
-                || ((DefaultMutableTreeNode) ((DefaultTreeModel) tree.getModel()).getRoot())
-                        .getChildCount() == 0;
-    }
-
-    /**
-     * Sets the min width of all columns to {@code minWidth} and then packs the
-     * whole table.
-     *
-     * @param table the {@code JXTable}.
-     * @param minWidth The minimum width the columns will have.
-     */
-    public static void packAndSetMinWidths(JXTable table, int minWidth) {
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumn(i).setMinWidth(minWidth);
-        }
-        table.packAll();
-    }
-
-    public static void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message);
     }
 
     public static String getStringFromPasswordField(JPasswordField passwordField) {

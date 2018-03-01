@@ -7,8 +7,7 @@ public class TreeNodeSqless extends DefaultMutableTreeNode {
     public enum NodeType {
         DATABASE, TABLE, TABLE_COLUMN, INDEX, VIEW, VIEW_COLUMN, TRIGGER, FUNCTION, PROCEDURE,
         PARAMETER, DUMMY, CAT_TABLES, CAT_VIEWS, CAT_VIEWS_COLUMNS, CAT_FUNCTIONS,
-        CAT_COLUMNS, CAT_INDEXES, CAT_TRIGGERS, CAT_PROCEDURES,
-        CAT_PARAMETERS;
+        CAT_COLUMNS, CAT_INDEXES, CAT_TRIGGERS, CAT_PROCEDURES;
     }
 
     private NodeType type;
@@ -25,10 +24,6 @@ public class TreeNodeSqless extends DefaultMutableTreeNode {
 
     public NodeType getType() {
         return type;
-    }
-
-    public boolean isCategory() {
-        return type.toString().split("_")[0].equals("CAT");
     }
 
     public boolean isOfType(NodeType type) {

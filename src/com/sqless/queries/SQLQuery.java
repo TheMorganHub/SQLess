@@ -13,15 +13,8 @@ public abstract class SQLQuery {
         this.sql = SQLUtils.filterDelimiterKeyword(sql);
     }
 
-    public SQLQuery() {
-    }
-
     public String getSql() {
         return sql;
-    }
-
-    protected final void setSql(String sql) {
-        this.sql = SQLUtils.filterDelimiterKeyword(sql);
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.sqless.ui.listeners;
 
-import java.awt.Component;
 import java.awt.event.*;
 import javax.swing.*;
 import java.beans.*;

@@ -11,7 +11,6 @@ import com.sqless.utils.SQLUtils;
 public abstract class SQLObject {
 
     private String name;
-    private String definition;
 
     public SQLObject(String name) {
         this.name = name;
@@ -35,22 +34,8 @@ public abstract class SQLObject {
         return getName(false);
     }
 
-    public abstract String getDropStatement();
-
     public void rename(String newName) {
         name = newName;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public String getDefinition() {
-        return definition;
-    }
-    
-    public String getCreateStatement() {
-        return null;
     }
 
     @Override

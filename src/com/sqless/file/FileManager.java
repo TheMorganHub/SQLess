@@ -349,10 +349,6 @@ public class FileManager {
         }
     }
 
-    public List<File> getOpenedFiles() {
-        return openedFiles;
-    }
-
     public int getFilesCreatedThisSession() {
         return filesCreatedThisSession;
     }

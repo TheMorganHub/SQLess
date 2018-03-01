@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class SQLDatabase extends SQLObject {
+public class SQLDatabase extends SQLObject implements SQLDroppable {
 
     private List<SQLTable> tables;
     private List<SQLView> views;
@@ -64,7 +64,7 @@ public class SQLDatabase extends SQLObject {
 
     @Override
     public String getDropStatement() {
-        return "";
+        return "DROP DATABASE " + getName() + ";";
     }
 
     @Override

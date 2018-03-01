@@ -72,11 +72,12 @@ public class UIClient extends javax.swing.JFrame {
                 }
             }
 
+            @Override
             protected void done() {
                 splash.dispose();
                 setVisible(true);
 
-                UIDBExplorer uiConDB = new UIDBExplorer(UIClient.this);
+                UIDBExplorer uiConDB = new UIDBExplorer();
                 uiConDB.setVisible(true);
                 initSecondaryComponents();
             }
@@ -405,7 +406,7 @@ public class UIClient extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnDbManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDbManagerActionPerformed
-        (new UIDBExplorer(this)).setVisible(true);
+        (new UIDBExplorer()).setVisible(true);
     }//GEN-LAST:event_btnDbManagerActionPerformed
 
     private void btnRefreshJTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJTreeActionPerformed
@@ -426,7 +427,6 @@ public class UIClient extends javax.swing.JFrame {
                     selectedNode.add(UIUtils.dummyNode());
                     treeDiagram.collapsePath(path);
                     treeDiagram.expandPath(path); //this triggers the expand event so stuff under this node is loaded
-//                    treeDiagram.collapsePath(path);
                 }
             } else {
                 selectedNode.add(UIUtils.dummyNode());

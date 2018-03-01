@@ -121,10 +121,6 @@ public class TreeExpandListener implements TreeWillExpandListener {
                 throw new UnsupportedOperationException("Not implemented yet.");
             }
 
-            if (node.isOfType(CAT_PARAMETERS)) {
-                throw new UnsupportedOperationException("Not implemented yet.");
-            }
-
             if (node.isOfType(CAT_VIEWS)) {
                 if (UIUtils.nodeHasDummy(node)) {
                     SQLUtils.getConnectedDB().loadViews();

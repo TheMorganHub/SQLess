@@ -1,6 +1,6 @@
 package com.sqless.sql.objects;
 
-public class SQLForeignKey extends SQLObject implements SQLEditable {
+public class SQLForeignKey extends SQLObject implements SQLEditable, SQLDroppable, SQLCreatable {
 
     private String tableName;
     private String field;

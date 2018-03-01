@@ -505,7 +505,7 @@ public class UISettings extends javax.swing.JDialog {
      * {@code super.actionPerformed(null)} to notify this class of changes that
      * have occurred, and for the component to be added to the queue.
      */
-    class ActionAddToQueue implements ActionListener {
+    private class ActionAddToQueue implements ActionListener {
 
         private Component source;
 
@@ -539,7 +539,7 @@ public class UISettings extends javax.swing.JDialog {
      * Components that make use of {@code Document} within this form will have
      * use.
      */
-    class TextFieldChangeListener extends ActionAddToQueue implements DocumentListener {
+    private class TextFieldChangeListener extends ActionAddToQueue implements DocumentListener {
 
         public TextFieldChangeListener(Component source) {
             super(source);

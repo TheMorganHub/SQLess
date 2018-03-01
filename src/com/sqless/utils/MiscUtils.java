@@ -40,37 +40,8 @@ public class MiscUtils {
         return false;
     }
 
-    /**
-     * Constructs a {@code String} of a given length made of random characters
-     * from uppercase A-Z and numbers 0-9.
-     *
-     * @param length The length of the {@code String}.
-     * @return A randomised {@code String}.
-     */
-    public static String randomString(int length) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            if (random(0, 100) < 50) {
-                sb.append((char) random(65, 90));
-            } else {
-                sb.append(random(0, 9));
-            }
-        }
-        return sb.toString();
-    }
-
     public static Properties getSystemInfo() {
         return System.getProperties();
-    }
-
-    /**
-     * Returns a timestamp of the current time in {@code String} format.
-     *
-     * @return a timestamp as 'hh:mm:ss'.
-     */
-    public static String timeStamp() {
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-        return format.format(new Date(System.currentTimeMillis()));
     }
 
     /**
@@ -110,22 +81,6 @@ public class MiscUtils {
      */
     public static void simulateCtrlKeyEvent(Component receiver, int keyCode) {
         simulateKeyEvent(receiver, KeyEvent.VK_CONTROL, keyCode);
-    }
-
-    /**
-     * Calculates the maximum integer value in a list.
-     *
-     * @param list
-     * @return the maximum value.
-     */
-    public static int maxFromList(List<Integer> list) {
-        int max = 0;
-        for (Integer integer : list) {
-            if (integer > max) {
-                max = integer;
-            }
-        }
-        return max;
     }
 
     public static void log(String tag, Object txt) {

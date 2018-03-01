@@ -4,7 +4,8 @@ import com.sqless.utils.SQLUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable {
+public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable, 
+        SQLCreatable, SQLDroppable {
 
     private List<SQLForeignKey> foreignKeys;
     private List<SQLForeignKey> droppedFKs;

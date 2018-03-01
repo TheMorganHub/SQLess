@@ -28,7 +28,7 @@ public class UISelectRange extends javax.swing.JDialog {
         return new int[]{start - 1, end - 1};
     }
 
-    public void prepareUI() {
+    private void prepareUI() {
         SpinnerNumberModel startModel = (SpinnerNumberModel) spinnerStart.getModel();
         SpinnerNumberModel endModel = (SpinnerNumberModel) spinnerEnd.getModel();
         startModel.setMinimum(1);

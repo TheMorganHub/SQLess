@@ -167,7 +167,7 @@ public abstract class SQLDataObject extends SQLObject implements SQLSelectable {
 
     @Override
     public String getSelectStatement(int limit) {
-        return "SELECT * FROM `" + getName() + "`" + (limit == SQLSelectable.ALL ? "" : " LIMIT " + limit);
+        return "SELECT * FROM `" + SQLUtils.getConnectedDBName() + "`.`" + getName() + "`" + (limit == SQLSelectable.ALL ? "" : " LIMIT " + limit);
     }
 
 }

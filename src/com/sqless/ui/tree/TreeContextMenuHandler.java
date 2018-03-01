@@ -29,10 +29,6 @@ public class TreeContextMenuHandler {
         loadJTreeContextMenus();
     }
 
-    public boolean anyMenuIsVisible() {
-        return menu != null && menu.isVisible();
-    }
-
     public void loadJTreeContextMenus() {
         itemSets = new ArrayList<>();
 

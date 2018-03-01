@@ -33,9 +33,9 @@ public class UIDBExplorer extends javax.swing.JDialog {
             getResource("/res/icons/ui_dbexplorer/FAVOURITE_ICON.png"));
     private SessionSettings sessionSettings;
 
-    public UIDBExplorer(UIClient client) {
-        super(client, true);
-        this.client = client;
+    public UIDBExplorer() {
+        super(UIClient.getInstance(), true);
+        this.client = UIClient.getInstance();
         this.conManager = SQLConnectionManager.getInstance();
         this.sessionSettings = SessionSettings.getINSTANCE();
         initComponents();
@@ -414,7 +414,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
      */
     public void restoreDefaults() {
         txtNewDbName.setText("");
-        UIUtils.showMessage("Restore defaults", "Default options have been restored successfully.", getParent());
+        comboCharset.setSelectedItem("Default");
+        comboCollation.setSelectedItem("utf8_general_ci");
     }
 
     public void executeCreateScript() {

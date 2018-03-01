@@ -1,13 +1,14 @@
 package com.sqless.sql.objects;
 
-public class SQLTrigger extends SQLObject {
-    
+public class SQLTrigger extends SQLObject implements SQLDroppable {
+
     private String event;
     private String timing;
     private String statement;
-    
+
     /**
      * Constructor para un trigger.
+     *
      * @param name El nombre del trigger.
      * @param event El tipo de evento. INSERT, UPDATE, DELETE
      * @param timing En qué momento se dispara el trigger. BEFORE, AFTER.

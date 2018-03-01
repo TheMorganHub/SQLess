@@ -30,7 +30,7 @@ public class UserPreferencesLoader {
         userProperties = new Properties() {
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
             }
         };
     }
@@ -51,7 +51,7 @@ public class UserPreferencesLoader {
 
     /**
      * Stores the current properties in {@code userProperties} into a file
-     * {@link UserPreferencesLoader#SETTINGS_FILE} in XML format.
+     * {@link UserPreferencesLoader#SETTINGS_FILE}.
      */
     public void flushFile() {
         try (OutputStream output = new FileOutputStream(SETTINGS_FILE)) {

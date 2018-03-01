@@ -1,5 +1,7 @@
 package com.sqless.sql.connection;
 
+import com.sqless.queries.SQLQuery;
+import com.sqless.queries.SQLSelectQuery;
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIConnectionWizard;
@@ -10,7 +12,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * This class manages everything related to SQLess's connection with the SQLDB
@@ -30,26 +31,11 @@ public class SQLConnectionManager {
     private static final SQLConnectionManager INSTANCE = new SQLConnectionManager();
     private Connection connection;
     private SQLDatabase connectedDB;
-    private boolean loadedVersion;
-    private String version;
     private String username;
     private String password;
     private String hostName;
     private String port;
-
-    private SQLConnectionManager() {
-        loadSQLDrivers();
-    }
-
-    private void loadSQLDrivers() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            UIUtils.showErrorMessage("Problem loading drivers", "Could not load SQL Drivers", null);
-            System.err.println("Could not load SQL drivers: " + e.getMessage());
-            System.exit(1);
-        }
-    }
+    private String serverHostName;
 
     public Connection newQueryConnection() {
         Connection newCon = null;
@@ -156,36 +142,17 @@ public class SQLConnectionManager {
     }
 
     public String getServerHostname() {
-        String serverHostName = "";
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery("select @@hostname");
-            serverHostName = rs.next() ? rs.getString(1) : "UNAVAILABLE";
-        } catch (SQLException ex) {
+        if (serverHostName != null) {
+            return serverHostName;
         }
-
+        SQLQuery hostNameQuery = new SQLSelectQuery("SELECT @@hostname") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                serverHostName = rs.next() ? rs.getString(1) : "[Unavailable hostname]";
+            }
+        };
+        hostNameQuery.exec();
         return serverHostName;
-    }
-
-    private String loadVersion() {
-        if (loadedVersion) {
-            return version;
-        }
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT @@VERSION");
-            version = rs.next() ? rs.getString(1) : "";
-            loadedVersion = true;
-        } catch (SQLException ex) {
-            UIUtils.showErrorMessage("Error", "Could not retrieve version", null);
-        }
-        return version;
-    }
-
-    public String getMySQLVersion() {
-        return loadVersion().split("\n")[0];
-    }
-
-    public boolean clientIsLocalhost() {
-        return getClientHostname().equalsIgnoreCase(getServerHostname());
     }
 
     public String getClientHostname() {

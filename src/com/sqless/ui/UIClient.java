@@ -185,6 +185,9 @@ public class UIClient extends javax.swing.JFrame {
         menuSettings = new javax.swing.JMenuItem();
         submenuHelp = new javax.swing.JMenu();
         menuAbout = new javax.swing.JMenuItem();
+        submenuLogin = new javax.swing.JMenu();
+        menuLoginSQLess = new javax.swing.JMenuItem();
+        menuLoginGoogle = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SQLess - David Orquin, Tomás Casir, Valeria Fornieles");
@@ -363,6 +366,27 @@ public class UIClient extends javax.swing.JFrame {
         submenuHelp.add(menuAbout);
 
         barMenu.add(submenuHelp);
+        barMenu.add(Box.createHorizontalGlue());
+
+        submenuLogin.setText("Log in");
+        submenuLogin.setName("submenuLogin"); // NOI18N
+
+        menuLoginSQLess.setText("Log in (SQLess)");
+        menuLoginSQLess.setName("menuLoginSQLess"); // NOI18N
+        menuLoginSQLess.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLoginSQLessActionPerformed(evt);
+            }
+        });
+        submenuLogin.add(menuLoginSQLess);
+
+        menuLoginGoogle.setText("Log in (Google)");
+        menuLoginGoogle.setName("menuLoginGoogle"); // NOI18N
+        submenuLogin.add(menuLoginGoogle);
+
+        barMenu.add(Box.createHorizontalGlue());
+
+        barMenu.add(submenuLogin);
 
         setJMenuBar(barMenu);
 
@@ -465,6 +489,11 @@ public class UIClient extends javax.swing.JFrame {
     private void menuSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSettingsActionPerformed
         actionSettings();
     }//GEN-LAST:event_menuSettingsActionPerformed
+
+    private void menuLoginSQLessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoginSQLessActionPerformed
+        UILogin uiLogin = new UILogin();
+        uiLogin.setVisible(true);
+    }//GEN-LAST:event_menuLoginSQLessActionPerformed
 
     public void actionSettings() {
         UISettings uiSettings = new UISettings(this);
@@ -577,6 +606,8 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
+    private javax.swing.JMenuItem menuLoginGoogle;
+    private javax.swing.JMenuItem menuLoginSQLess;
     private javax.swing.JMenuItem menuNewFile;
     private javax.swing.JMenuItem menuOpen;
     private javax.swing.JMenuItem menuSettings;
@@ -585,6 +616,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JSplitPane splitMain;
     private javax.swing.JMenu submenuArchivo;
     private javax.swing.JMenu submenuHelp;
+    private javax.swing.JMenu submenuLogin;
     private javax.swing.JMenu submenuTools;
     private javax.swing.JTabbedPane tabPaneContent;
     private javax.swing.JToolBar toolbarDiagrama;

@@ -3,7 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/utils/UIUtils.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UICreateAccount.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UILogin.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/network/GetRequest.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UIClient.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/network/RestRequest.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/network/PostRequest.java</file>
         </group>
     </open-files>
 </project-private>

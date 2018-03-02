@@ -24,14 +24,11 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import org.jdesktop.swingx.JXTable;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -227,11 +224,7 @@ public class UIUtils {
     }
 
     public static String getStringFromPasswordField(JPasswordField passwordField) {
-        StringBuilder passwordBuilder = new StringBuilder();
-        for (char c : passwordField.getPassword()) {
-            passwordBuilder.append(c);
-        }
-        return passwordBuilder.toString();
+        return new String(passwordField.getPassword());
     }
 
     /**

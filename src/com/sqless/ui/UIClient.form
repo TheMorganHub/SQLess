@@ -61,6 +61,9 @@
             <Property name="text" type="java.lang.String" value="Help"/>
             <Property name="name" type="java.lang.String" value="submenuHelp" noResource="true"/>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="barMenu.add(Box.createHorizontalGlue());"/>
+          </AuxValues>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuAbout">
               <Properties>
@@ -70,6 +73,32 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuAboutActionPerformed"/>
               </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="submenuLogin">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Log in"/>
+            <Property name="name" type="java.lang.String" value="submenuLogin" noResource="true"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_LayoutCodePost" type="java.lang.String" value="barMenu.add(Box.createHorizontalGlue());"/>
+          </AuxValues>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="menuLoginSQLess">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Log in (SQLess)"/>
+                <Property name="name" type="java.lang.String" value="menuLoginSQLess" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuLoginSQLessActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuLoginGoogle">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Log in (Google)"/>
+                <Property name="name" type="java.lang.String" value="menuLoginGoogle" noResource="true"/>
+              </Properties>
             </MenuItem>
           </SubComponents>
         </Menu>

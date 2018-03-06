@@ -4,7 +4,7 @@ import com.sqless.utils.SQLUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable, 
+public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable,
         SQLCreatable, SQLDroppable {
 
     private List<SQLForeignKey> foreignKeys;
@@ -227,18 +227,14 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
 
     public String getRetrieveDetailedFKsStatement() {
         String connectedDb = SQLUtils.getConnectedDBName();
-        return "SELECT Const.CONSTRAINT_NAME, key_Usage.COLUMN_NAME, Const.TABLE_NAME, key_Usage.REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME,\n"
-                + "ref_Constraints.DELETE_RULE, ref_Constraints.UPDATE_RULE\n"
-                + "FROM information_schema.TABLE_CONSTRAINTS AS Const\n"
-                + "INNER JOIN information_schema.KEY_COLUMN_USAGE AS key_Usage\n"
-                + "ON Const.CONSTRAINT_NAME = key_Usage.CONSTRAINT_NAME\n"
-                + "INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS AS ref_Constraints\n"
-                + "ON ref_Constraints.CONSTRAINT_NAME = key_Usage.CONSTRAINT_NAME \n"
-                + "WHERE Const.TABLE_SCHEMA = '" + connectedDb + "'\n"
-                + "AND key_Usage.TABLE_SCHEMA = '" + connectedDb + "'\n"
-                + "AND Const.TABLE_NAME = '" + getName() + "'\n"
-                + "AND key_Usage.TABLE_NAME = '" + getName() + "'\n"
-                + "AND CONSTRAINT_TYPE = 'FOREIGN KEY'";
+        return "SELECT DISTINCT i.TABLE_NAME, i.CONSTRAINT_TYPE, i.CONSTRAINT_NAME, k.REFERENCED_TABLE_NAME, k.COLUMN_NAME, \n"
+                + "k.REFERENCED_COLUMN_NAME, r.UPDATE_RULE, r.DELETE_RULE\n"
+                + "FROM information_schema.TABLE_CONSTRAINTS i \n"
+                + "LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME\n"
+                + "LEFT JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_NAME = k.CONSTRAINT_NAME\n"
+                + "WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY' \n"
+                + "AND i.TABLE_SCHEMA = '" + connectedDb + "'\n"
+                + "AND i.TABLE_NAME = '" + getName() + "';";
     }
 
     @Override

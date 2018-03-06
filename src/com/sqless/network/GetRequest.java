@@ -1,6 +1,5 @@
 package com.sqless.network;
 
-import java.awt.EventQueue;
 import us.monoid.web.JSONResource;
 
 public class GetRequest extends RestRequest {
@@ -14,13 +13,7 @@ public class GetRequest extends RestRequest {
         Thread networkThread = new Thread(() -> {
             try {
                 JSONResource json = rest.json(url);
-                EventQueue.invokeLater(() -> {
-                    try {
-                        onSuccess(json);
-                    } catch (Exception e) {
-                        onFailure(e.getMessage());
-                    }
-                });
+                executePostExec(json);
             } catch (Exception e) {
                 onFailure(e.getMessage());
             }

@@ -1,6 +1,5 @@
 package com.sqless.network;
 
-import java.awt.EventQueue;
 import us.monoid.web.FormContent;
 import us.monoid.web.JSONResource;
 import us.monoid.web.Resty;
@@ -9,9 +8,9 @@ public class PostRequest extends RestRequest {
 
     private FormContent form;
 
-    public PostRequest(String url, String formData) {
+    public PostRequest(String url, String... formData) {
         super(url);
-        this.form = Resty.form(formData);
+        this.form = Resty.form(formData.length > 1 ? String.join("&", formData) : formData[0]);
     }
 
     @Override
@@ -19,15 +18,10 @@ public class PostRequest extends RestRequest {
         Thread networkThread = new Thread(() -> {
             try {
                 JSONResource json = rest.json(url, form);
-                EventQueue.invokeLater(() -> {
-                    try {
-                        onSuccess(json);
-                    } catch (Exception e) {
-                        onFailure(e.getMessage());
-                    }
-                });
+                executePostExec(json);
             } catch (Exception e) {
                 onFailure(e.getMessage());
+                e.printStackTrace();
             }
         });
         networkThread.start();

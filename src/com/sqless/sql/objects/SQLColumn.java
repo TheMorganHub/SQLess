@@ -493,7 +493,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
     @Override
     public String getCreateStatement() {
         return "`" + getUncommittedName() + "` " + dataType + getDataPrecision() + " " + (nullable ? "NULL" : "NOT NULL") + " "
-                + (autoincrement ? "AUTO INCREMENT " : "")
+                + (autoincrement ? "AUTO_INCREMENT " : "")
                 + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT " + (isStringBased() ? "'" + defaultVal + "'" : defaultVal));
     }
 

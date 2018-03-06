@@ -16,12 +16,17 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.file.FileManager;
+import com.sqless.network.PostRequest;
+import com.sqless.network.RestRequest;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
 import com.sqless.settings.UserPreferencesLoader;
 import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import com.sqless.userdata.User;
+import com.sqless.userdata.UserManager;
+import us.monoid.web.JSONResource;
 
 public class UIClient extends javax.swing.JFrame {
 
@@ -164,6 +169,8 @@ public class UIClient extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        submenuLoggedIn = new javax.swing.JMenu();
+        menuLogOut = new javax.swing.JMenuItem();
         toolbarTop = new javax.swing.JToolBar();
         btnNewQuery = new javax.swing.JButton();
         btnOpenFile = new javax.swing.JButton();
@@ -188,6 +195,13 @@ public class UIClient extends javax.swing.JFrame {
         submenuLogin = new javax.swing.JMenu();
         menuLoginSQLess = new javax.swing.JMenuItem();
         menuLoginGoogle = new javax.swing.JMenuItem();
+
+        submenuLoggedIn.setName("submenuLoggedIn"); // NOI18N
+
+        menuLogOut.setAction(actionLogOut);
+        menuLogOut.setText("Log out");
+        menuLogOut.setName("menuLogOut"); // NOI18N
+        submenuLoggedIn.add(menuLogOut);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SQLess - David Orquin, Tomás Casir, Valeria Fornieles");
@@ -371,13 +385,9 @@ public class UIClient extends javax.swing.JFrame {
         submenuLogin.setText("Log in");
         submenuLogin.setName("submenuLogin"); // NOI18N
 
+        menuLoginSQLess.setAction(actionLogIn);
         menuLoginSQLess.setText("Log in (SQLess)");
         menuLoginSQLess.setName("menuLoginSQLess"); // NOI18N
-        menuLoginSQLess.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuLoginSQLessActionPerformed(evt);
-            }
-        });
         submenuLogin.add(menuLoginSQLess);
 
         menuLoginGoogle.setText("Log in (Google)");
@@ -490,10 +500,19 @@ public class UIClient extends javax.swing.JFrame {
         actionSettings();
     }//GEN-LAST:event_menuSettingsActionPerformed
 
-    private void menuLoginSQLessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoginSQLessActionPerformed
-        UILogin uiLogin = new UILogin();
-        uiLogin.setVisible(true);
-    }//GEN-LAST:event_menuLoginSQLessActionPerformed
+    public void updateUIForUser() {
+        User user = UserManager.getInstance().getActiveUser();
+        if (user != null) {
+            updateMenuBarForUser(user);
+        }
+    }
+
+    private void updateMenuBarForUser(User user) {
+        barMenu.remove(submenuLogin);
+        submenuLoggedIn.setText(user.getUsername());
+        barMenu.add(submenuLoggedIn);
+        barMenu.revalidate();
+    }
 
     public void actionSettings() {
         UISettings uiSettings = new UISettings(this);
@@ -599,6 +618,29 @@ public class UIClient extends javax.swing.JFrame {
         return instance;
     }
 
+    private Action actionLogIn = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UILogin uiLogin = new UILogin();
+            uiLogin.setVisible(true);
+            User user = UserManager.getInstance().getActiveUser();
+            if (user != null) {
+                updateMenuBarForUser(user);
+            }
+        }
+    };
+
+    private Action actionLogOut = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UserManager.getInstance().logOut();
+            barMenu.remove(submenuLoggedIn);
+            barMenu.add(submenuLogin);
+            barMenu.revalidate();
+            barMenu.repaint();
+        }
+    };
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barMenu;
     private javax.swing.JButton btnDbManager;
@@ -606,6 +648,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
+    private javax.swing.JMenuItem menuLogOut;
     private javax.swing.JMenuItem menuLoginGoogle;
     private javax.swing.JMenuItem menuLoginSQLess;
     private javax.swing.JMenuItem menuNewFile;
@@ -616,6 +659,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JSplitPane splitMain;
     private javax.swing.JMenu submenuArchivo;
     private javax.swing.JMenu submenuHelp;
+    private javax.swing.JMenu submenuLoggedIn;
     private javax.swing.JMenu submenuLogin;
     private javax.swing.JMenu submenuTools;
     private javax.swing.JTabbedPane tabPaneContent;

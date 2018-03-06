@@ -2,21 +2,25 @@ package com.sqless.ui;
 
 import com.sqless.network.PostRequest;
 import com.sqless.network.RestRequest;
+import com.sqless.userdata.User;
+import com.sqless.userdata.UserManager;
 import com.sqless.utils.UIUtils;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 import us.monoid.web.JSONResource;
-import us.monoid.web.Resty;
 
 public class UILogin extends javax.swing.JDialog {
-
+    
     public UILogin() {
         super(UIClient.getInstance(), true);
         initComponents();
+    }
+    
+    public UILogin(String username) {
+        this();
+        txtUsername.setText(username);
+        txtPassword.requestFocus();
     }
 
     @SuppressWarnings("unchecked")
@@ -36,6 +40,7 @@ public class UILogin extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Log in to SQLess");
+        setResizable(false);
 
         lblSQLessLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSQLessLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/images/ui_login_create/SQLess_logo_mini.png"))); // NOI18N
@@ -114,7 +119,7 @@ public class UILogin extends javax.swing.JDialog {
                         .addComponent(btnLogin)
                         .addComponent(btnCancel))
                     .addComponent(hyperlinkCreateAcc, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(26, 26, 26))
+                .addContainerGap())
         );
 
         getRootPane().setDefaultButton(btnLogin);
@@ -135,7 +140,7 @@ public class UILogin extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void hyperlinkCreateAccMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_hyperlinkCreateAccMousePressed
         dispose();
         UICreateAccount createAccount = new UICreateAccount();
@@ -148,14 +153,16 @@ public class UILogin extends javax.swing.JDialog {
             String username = txtUsername.getText();
             String password = UIUtils.getStringFromPasswordField(txtPassword);
             btnLogin.setEnabled(false);
-            RestRequest loginAttempt = new PostRequest("http://localhost/WebService/Login.php", "username=" + username + "&password=" + password) {
+            RestRequest loginAttempt = new PostRequest("http://localhost/WebService/Login.php", "username=" + username, "password=" + password) {
                 @Override
                 public void onSuccess(JSONResource json) throws Exception {
                     btnLogin.setEnabled(true);
-                    boolean success = (boolean) json.get("login_status.success");
+                    boolean success = (boolean) json.get("login_status.success");                    
                     if (success) {
                         String token = (String) json.get("login_status.token");
-                        System.out.println(token);
+                        String username = (String) json.get("login_status.user_data.username");
+                        UserManager.getInstance().addNew(new User(username, token));
+                        dispose();
                     } else {
                         String err = (String) json.get("login_status.err");
                         lblStatus.setText(err);

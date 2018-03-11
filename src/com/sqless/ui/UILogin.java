@@ -153,7 +153,7 @@ public class UILogin extends javax.swing.JDialog {
             String username = txtUsername.getText();
             String password = UIUtils.getStringFromPasswordField(txtPassword);
             btnLogin.setEnabled(false);
-            RestRequest loginAttempt = new PostRequest("http://localhost/WebService/Login.php", "username=" + username, "password=" + password) {
+            RestRequest loginAttempt = new PostRequest("http://localhost/WebService/Login", "username=" + username, "password=" + password) {
                 @Override
                 public void onSuccess(JSONResource json) throws Exception {
                     btnLogin.setEnabled(true);

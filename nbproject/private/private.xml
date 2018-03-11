@@ -6,7 +6,8 @@
             <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UICreateAccount.java</file>
             <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UILogin.java</file>
             <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/ui/UIClient.java</file>
-            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/network/RestRequest.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/userdata/UserManager.java</file>
+            <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/settings/PreferenceLoader.java</file>
             <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/network/PostRequest.java</file>
             <file>file:/C:/Users/Morgan/Documents/NetBeansProjects/SQLess/src/com/sqless/userdata/User.java</file>
         </group>

@@ -27,7 +27,9 @@ public class PreferenceLoader {
     /**
      * The path that will contain keys and values for the application.
      */
-    private static final String PATH_SETTINGS = "settings";
+    public static final String PATH_SETTINGS = "settings";
+
+    public static final String PATH_PROFILE = "profile";
 
     /**
      * The {@code boolean} that will serve to signal if this is the first time
@@ -37,18 +39,17 @@ public class PreferenceLoader {
 
     public enum PrefKey {
         window_width, window_height, window_posX, window_posY,
-        split_Main_divider, window_state;
+        split_Main_divider, window_state, jwt_token;
     }
 
     private PreferenceLoader() {
         prefs = Preferences.userRoot().node(PATH);
         try {
-            if (!prefs.nodeExists(PATH_SETTINGS)) {
+            if (!prefs.nodeExists(PATH_SETTINGS) || !prefs.nodeExists(PATH_PROFILE)) {
                 System.out.println("PREPARING FOR FIRST TIME USE...");
                 performFirstTimeTasks();
             } else {
                 prefs = Preferences.userRoot().node(PATH + "/" + PATH_SETTINGS);
-                showPrefs();
             }
         } catch (BackingStoreException e) {
         }
@@ -61,40 +62,41 @@ public class PreferenceLoader {
      * least once for the future.
      */
     private void performFirstTimeTasks() {
-        prefs = Preferences.userRoot().node(PATH + "/" + PATH_SETTINGS);
         setDefaults();
         wasFirstTime = true;
-    }
-
-    public void showPrefs() {
-        for (PrefKey value : PrefKey.values()) {
-            System.out.println(value + ": " + get(value));
-        }
     }
 
     /**
      * Attempts to retrieve a preference.
      *
+     * @param path
      * @param key The type of preference to retrieve.
      * @return the value of said preference. {@code -1} if the key is invalid or
      * cannot be found.
      */
-    public String get(PrefKey key) {
+    public String get(String path, PrefKey key) {
+        prefs = Preferences.userRoot().node(PATH + "/" + path);
         return prefs.get(key.toString(), "-1");
     }
 
-    public int getAsInt(PrefKey key) {
-        return Integer.parseInt(get(key));
+    public int getAsInt(String path, PrefKey key) {
+        return Integer.parseInt(get(path, key));
     }
 
     /**
      * Stores a value in a preference identified by {@code PrefKey key}. If a
      * preference with the given key doesn't exist, this will create it.
      *
+     * @param path
      * @param key The {@code PrefKey} key that will identify the value.
      * @param value
      */
-    public void set(PrefKey key, String value) {
+    public void set(String path, PrefKey key, String value) {
+        if (path.equals(PATH_SETTINGS)) {
+            prefs = Preferences.userRoot().node(PATH + "/" + PATH_SETTINGS);
+        } else if (path.equals(PATH_PROFILE)) {
+            prefs = Preferences.userRoot().node(PATH + "/" + PATH_PROFILE);
+        }
         prefs.put(key.toString(), value);
     }
 
@@ -114,10 +116,10 @@ public class PreferenceLoader {
      * very first time the program is executed.
      */
     private void setDefaults() {
-        set(PrefKey.window_width, "1280");
-        set(PrefKey.window_height, "720");
-        set(PrefKey.split_Main_divider, "270");
-        set(PrefKey.window_state, "0");
+        set(PATH_SETTINGS, PrefKey.window_width, "1280");
+        set(PATH_SETTINGS, PrefKey.window_height, "720");
+        set(PATH_SETTINGS, PrefKey.split_Main_divider, "270");
+        set(PATH_SETTINGS, PrefKey.window_state, "0");
     }
 
     public static PreferenceLoader getInstance() {

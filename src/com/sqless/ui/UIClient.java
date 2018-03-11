@@ -16,8 +16,6 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.file.FileManager;
-import com.sqless.network.PostRequest;
-import com.sqless.network.RestRequest;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
@@ -26,7 +24,6 @@ import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
 import com.sqless.userdata.User;
 import com.sqless.userdata.UserManager;
-import us.monoid.web.JSONResource;
 
 public class UIClient extends javax.swing.JFrame {
 
@@ -98,25 +95,28 @@ public class UIClient extends javax.swing.JFrame {
     public void initSecondaryComponents() {
         installListenersToContentTabPane();
         initJTree();
+        UserManager.getInstance().authenticateStoredToken(e -> {
+            updateMenuBarForUser((User) e.getSource());
+        });
     }
 
     public void initPrefs() {
         //window state
-        int extendedState = prefLoader.getAsInt(window_state);
+        int extendedState = prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, window_state);
         setExtendedState(extendedState == Frame.ICONIFIED ? 0 : extendedState);
 
         //size
         if (extendedState != Frame.MAXIMIZED_BOTH) {
-            setSize(prefLoader.getAsInt(window_width), prefLoader.getAsInt(window_height));
+            setSize(prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, window_width), prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, window_height));
         }
 
         //position
         if (!prefLoader.wasFirstTime()) {
-            setLocation(prefLoader.getAsInt(window_posX), prefLoader.getAsInt(window_posY));
+            setLocation(prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, window_posX), prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, window_posY));
         }
 
         //dividers
-        splitMain.setDividerLocation(prefLoader.getAsInt(split_Main_divider));
+        splitMain.setDividerLocation(prefLoader.getAsInt(PreferenceLoader.PATH_SETTINGS, split_Main_divider));
     }
 
     public void initJTree() {
@@ -430,12 +430,12 @@ public class UIClient extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         SQLConnectionManager.getInstance().closeConnection();
 
-        prefLoader.set(window_width, "" + getSize().width);
-        prefLoader.set(window_height, "" + getSize().height);
-        prefLoader.set(window_posX, "" + getLocation().x);
-        prefLoader.set(window_posY, "" + getLocation().y);
-        prefLoader.set(split_Main_divider, "" + splitMain.getDividerLocation());
-        prefLoader.set(window_state, "" + getExtendedState());
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, window_width, "" + getSize().width);
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, window_height, "" + getSize().height);
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, window_posX, "" + getLocation().x);
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, window_posY, "" + getLocation().y);
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, split_Main_divider, "" + splitMain.getDividerLocation());
+        prefLoader.set(PreferenceLoader.PATH_SETTINGS, window_state, "" + getExtendedState());
         prefLoader.flush();
     }//GEN-LAST:event_formWindowClosing
 
@@ -500,14 +500,7 @@ public class UIClient extends javax.swing.JFrame {
         actionSettings();
     }//GEN-LAST:event_menuSettingsActionPerformed
 
-    public void updateUIForUser() {
-        User user = UserManager.getInstance().getActiveUser();
-        if (user != null) {
-            updateMenuBarForUser(user);
-        }
-    }
-
-    private void updateMenuBarForUser(User user) {
+    public void updateMenuBarForUser(User user) {
         barMenu.remove(submenuLogin);
         submenuLoggedIn.setText(user.getUsername());
         barMenu.add(submenuLoggedIn);
@@ -623,7 +616,7 @@ public class UIClient extends javax.swing.JFrame {
         public void actionPerformed(ActionEvent e) {
             UILogin uiLogin = new UILogin();
             uiLogin.setVisible(true);
-            User user = UserManager.getInstance().getActiveUser();
+            User user = UserManager.getInstance().getActive();
             if (user != null) {
                 updateMenuBarForUser(user);
             }

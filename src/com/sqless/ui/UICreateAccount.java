@@ -153,7 +153,12 @@ public class UICreateAccount extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent e) {
             String username = txtUsername.getText();
             String password = UIUtils.getStringFromPasswordField(txtPassword);
-            RestRequest confirmRequest = new PostRequest("http://localhost/WebService/CreateAccount.php", "username=" + username, "password=" + password) {
+            String repeatPassword = UIUtils.getStringFromPasswordField(txtPasswordRepeat);
+            if (!password.equals(repeatPassword)) {
+                lblStatus.setText("Las contraseñas dadas no son iguales");
+                return;
+            }
+            RestRequest confirmRequest = new PostRequest("http://localhost/WebService/createAccount", "username=" + username, "password=" + password) {
                 @Override
                 public void onSuccess(JSONResource json) throws Exception {
                     boolean success = (boolean) json.get("creation_status.success");

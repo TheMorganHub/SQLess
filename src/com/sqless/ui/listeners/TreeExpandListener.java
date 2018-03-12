@@ -8,6 +8,7 @@ import com.sqless.sql.objects.SQLColumn;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.sql.objects.SQLTrigger;
 import com.sqless.sql.objects.SQLDataObject;
+import com.sqless.sql.objects.SQLExecutable;
 import com.sqless.utils.SQLUtils;
 import com.sqless.sql.objects.SQLView;
 import javax.swing.JTree;
@@ -110,15 +111,25 @@ public class TreeExpandListener implements TreeWillExpandListener {
             }
 
             if (node.isOfType(CAT_PROCEDURES)) {
-                throw new UnsupportedOperationException("Not implemented yet.");
+                if (UIUtils.nodeHasDummy(node)) {
+                    SQLUtils.getConnectedDB().loadProcedures();
+                    for (SQLExecutable procedure : SQLUtils.getConnectedDB().getProcedures()) {
+                        TreeNodeSqless procedureNode = new TreeNodeSqless(procedure, PROCEDURE);
+                        node.add(procedureNode);
+                    }
+                    model.reload(node);
+                }
             }
 
             if (node.isOfType(CAT_FUNCTIONS)) {
-                throw new UnsupportedOperationException("Not implemented yet.");
-            }
-
-            if (node.isOfType(PROCEDURE) || node.isOfType(FUNCTION)) {
-                throw new UnsupportedOperationException("Not implemented yet.");
+                if (UIUtils.nodeHasDummy(node)) {
+                    SQLUtils.getConnectedDB().loadFunctions();
+                    for (SQLExecutable function : SQLUtils.getConnectedDB().getFunctions()) {
+                        TreeNodeSqless functionNode = new TreeNodeSqless(function, FUNCTION);
+                        node.add(functionNode);
+                    }
+                    model.reload(node);
+                }
             }
 
             if (node.isOfType(CAT_VIEWS)) {

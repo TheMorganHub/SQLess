@@ -13,6 +13,8 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
 
     private List<SQLTable> tables;
     private List<SQLView> views;
+    private List<SQLExecutable> functions;
+    private List<SQLExecutable> procedures;
 
     public SQLDatabase(String name) {
         super(name);
@@ -25,6 +27,14 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
     public void loadViews() {
         views = SQLUtils.getViews();
     }
+    
+    public void loadFunctions() {
+        functions = SQLUtils.getExecutables(SQLFunction.class);
+    }
+    
+    public void loadProcedures() {
+        procedures = SQLUtils.getExecutables(SQLProcedure.class);
+    }
 
     public List<SQLTable> getTables() {
         return tables;
@@ -32,6 +42,14 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
 
     public List<SQLView> getViews() {
         return views;
+    }
+
+    public List<SQLExecutable> getFunctions() {
+        return functions;
+    }
+
+    public List<SQLExecutable> getProcedures() {
+        return procedures;
     }
 
     /**

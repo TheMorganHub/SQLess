@@ -1,6 +1,7 @@
 package com.sqless.ui.listeners;
 
 import com.sqless.sql.objects.SQLDroppable;
+import com.sqless.sql.objects.SQLExecutable;
 import com.sqless.ui.tree.TreeContextMenuItem;
 import com.sqless.sql.objects.SQLSelectable;
 import com.sqless.utils.UIUtils;
@@ -9,6 +10,7 @@ import com.sqless.ui.tree.TreeNodeSqless;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UICreateTableSQLess;
 import com.sqless.ui.UIEditTable;
+import com.sqless.ui.UIExecuteCallable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.tree.TreePath;
@@ -70,7 +72,9 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     }
 
     public void doExecute(TreeNodeSqless node) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SQLExecutable executable = (SQLExecutable) node.getUserObject();
+        UIExecuteCallable uiExecuteCallable = new UIExecuteCallable(executable);
+        uiExecuteCallable.execute();
     }
 
     public void doModify(TreeNodeSqless node) {

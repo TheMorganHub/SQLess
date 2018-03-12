@@ -234,6 +234,50 @@ public class SQLUtils {
         return views;
     }
 
+    public static List<SQLExecutable> getExecutables(Class className) {
+        List<SQLExecutable> executables = new ArrayList<>();
+        SQLQuery getFunctionsQuery = new SQLSelectQuery("SHOW" + (className == SQLFunction.class ? " FUNCTION " : " PROCEDURE ") + "STATUS;") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                while (rs.next()) {
+                    String name = rs.getString("Name");
+                    executables.add(className == SQLFunction.class ? new SQLFunction(name) : new SQLProcedure(name));
+                }
+            }
+        };
+        getFunctionsQuery.exec();
+
+        if (!executables.isEmpty()) {
+            SQLQuery getParametersQuery = new SQLSelectQuery("SELECT SPECIFIC_NAME, PARAMETER_NAME, DATA_TYPE FROM information_schema.parameters\n"
+                    + "WHERE SPECIFIC_SCHEMA = '" + getConnectedDBName() + "' AND ROUTINE_TYPE = '" + (className == SQLFunction.class ? "FUNCTION" : "PROCEDURE") + "' AND PARAMETER_NAME IS NOT NULL") {
+                @Override
+                public void onSuccess(ResultSet rs) throws SQLException {
+                    String previousName = null;
+                    SQLExecutable executable = null;
+                    while (rs.next()) {
+                        String specificName = rs.getString("SPECIFIC_NAME");
+                        if (!specificName.equals(previousName)) {
+                            for (SQLExecutable e : executables) {
+                                if (e.getName().equals(specificName)) {
+                                    executable = e;
+                                    break;
+                                }
+                            }
+                        }
+                        String paramName = rs.getString("PARAMETER_NAME");
+                        String dataType = rs.getString("DATA_TYPE");
+                        if (executable != null) {
+                            executable.addParameter(new SQLParameter(paramName, dataType));
+                        }
+                        previousName = specificName;
+                    }
+                }
+            };
+            getParametersQuery.exec();
+        }
+        return executables;
+    }
+
     public static List<SQLColumn> getColumnData(SQLDataObject tableObject) {
         List<SQLColumn> columns = new ArrayList<>();
         SQLQuery getColumnDataQuery = new SQLSelectQuery(tableObject.getRetrieveColumnDataStatement()) {

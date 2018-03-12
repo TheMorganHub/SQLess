@@ -145,17 +145,17 @@ public class UIClient extends javax.swing.JFrame {
         TreeNodeSqless tables = new TreeNodeSqless("Tables", CAT_TABLES);
         TreeNodeSqless views = new TreeNodeSqless("Views", CAT_VIEWS);
         TreeNodeSqless functions = new TreeNodeSqless("Functions", CAT_FUNCTIONS);
-        TreeNodeSqless storedProcedures = new TreeNodeSqless("Stored Procedures", CAT_PROCEDURES);
+        TreeNodeSqless procedures = new TreeNodeSqless("Procedures", CAT_PROCEDURES);
         tables.add(UIUtils.dummyNode());
 
         views.add(UIUtils.dummyNode());
         functions.add(UIUtils.dummyNode());
-        storedProcedures.add(UIUtils.dummyNode());
+        procedures.add(UIUtils.dummyNode());
 
         root.add(tables);
         root.add(views);
         root.add(functions);
-        root.add(storedProcedures);
+        root.add(procedures);
 
         DefaultTreeModel model = (DefaultTreeModel) treeDiagram.getModel();
         model.setRoot(root);

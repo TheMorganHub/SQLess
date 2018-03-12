@@ -36,7 +36,7 @@ public class TreeContextMenuHandler {
         tableCategoriesContext.add(new TreeContextMenuItem("New table...", ContextItemFunctionality.CREATE));
 
         TreeMenuItemSet selectableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
-        selectableObjectContext.add(new TreeContextMenuItem("Select TOP 1000 Rows", ContextItemFunctionality.SELECT));
+        selectableObjectContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
 
         TreeMenuItemSet tableObjectContext = new TreeMenuItemSet(TABLE);
         tableObjectContext.add(new TreeContextMenuItem("New column...", ContextItemFunctionality.CREATE));

@@ -102,7 +102,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
         uiTable.getColumn(1).setHeaderValue("Columnas");
 
         lblNotice.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
-        lblNotice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_general/ATTENTION_ICON.png"))); // NOI18N
+        lblNotice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_general/ATTENTION_ICON.png"))); // NOI18N
         lblNotice.setText("Los cambios serán guardados en la base de datos al confirmar este diálogo");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -122,7 +122,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(toolbar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrPane, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+                .addComponent(scrPane, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblNotice)
                 .addGap(6, 6, 6))

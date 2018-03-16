@@ -88,7 +88,7 @@ public class UIAbout extends javax.swing.JDialog {
         setTitle("About SQLess");
 
         lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/images/ui_splash/SQLess_SPLASH.png"))); // NOI18N
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ui_splash/SQLess_SPLASH.png"))); // NOI18N
 
         txtInfo.setEditable(false);
         txtInfo.setContentType("text/html"); // NOI18N
@@ -121,7 +121,7 @@ public class UIAbout extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(lblLogo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClose)
                 .addContainerGap())

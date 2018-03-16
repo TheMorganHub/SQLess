@@ -61,6 +61,7 @@ public class UIClient extends javax.swing.JFrame {
                 }
 
                 SQLConnectionManager conManager = SQLConnectionManager.getInstance();
+                
                 publish("Connecting to DB engine at: " + conManager.getClientHostname());
 
                 conManager.setNewConnection("mysql", UIClient.this);

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.java.dev.javacc:javacc:4.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.javacc/javacc/4.1/915805643a5651cfe0e2db40c689c6dc211db97d/javacc-4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.javacc/javacc/4.1/6c1852f4e2d2709fbc2b8e107d2fb735933178fa/javacc-4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

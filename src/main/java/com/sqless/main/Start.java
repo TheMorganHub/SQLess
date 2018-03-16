@@ -13,7 +13,7 @@ public class Start {
             System.exit(0);
         }
         java.awt.EventQueue.invokeLater(() -> {
-            UIClient client = UIClient.getInstance();
+            UIClient client = UIClient.getInstance();            
         });
     }
 }

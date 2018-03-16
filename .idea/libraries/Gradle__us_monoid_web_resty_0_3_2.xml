@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: us.monoid.web:resty:0.3.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/us.monoid.web/resty/0.3.2/1c83ff064daf6ecf736cff3b0012ffbacabefd7c/resty-0.3.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/us.monoid.web/resty/0.3.2/8c9aa167072d3d1c51eabbe9d3d492b92b5c0e23/resty-0.3.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

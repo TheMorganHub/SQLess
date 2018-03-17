@@ -3,6 +3,7 @@ package com.sqless.userdata;
 import com.sqless.network.PostRequest;
 import com.sqless.network.RestRequest;
 import com.sqless.settings.PreferenceLoader;
+import com.sqless.utils.Callback;
 import com.sqless.utils.UIUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +43,7 @@ public class UserManager {
      * @param action La acción que se ejecutará si la autenticación del token
      * guardado contra el servidor es exitosa.
      */
-    public void authenticateStoredToken(ActionListener action) {
+    public void authenticateStoredToken(Callback<User> action) {
         if (active == null) {
             PreferenceLoader prefs = PreferenceLoader.getInstance();
             String userToken = prefs.get(PreferenceLoader.PATH_PROFILE, PreferenceLoader.PrefKey.jwt_token);
@@ -54,7 +55,7 @@ public class UserManager {
                         if (user_id != -1) {
                             active = new User(json.get("user_data.username").toString(), userToken);
                             System.out.println("User recovered from token: " + active.getUsername());
-                            action.actionPerformed(new ActionEvent(active, user_id, "TEST_SUCCESS"));
+                            action.exec(active);
                         } else {
                             UIUtils.showErrorMessage("Log in", "Tu sesión ha caducado. Por favor, haz log in de nuevo.", null);
                             prefs.set(PreferenceLoader.PATH_PROFILE, PreferenceLoader.PrefKey.jwt_token, "-1");

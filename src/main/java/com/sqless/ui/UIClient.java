@@ -1,5 +1,6 @@
 package com.sqless.ui;
 
+import com.google.api.services.plus.model.Person;
 import com.sqless.ui.tree.NodeCellEditor;
 import com.sqless.ui.tree.TreeNodeSqless;
 import com.sqless.ui.tree.NodeTreeModel;
@@ -16,12 +17,15 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.file.FileManager;
+import com.sqless.main.GoogleLogin;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
 import com.sqless.settings.UserPreferencesLoader;
 import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import com.sqless.userdata.GoogleUser;
+import com.sqless.userdata.GoogleUserManager;
 import com.sqless.userdata.User;
 import com.sqless.userdata.UserManager;
 
@@ -61,7 +65,7 @@ public class UIClient extends javax.swing.JFrame {
                 }
 
                 SQLConnectionManager conManager = SQLConnectionManager.getInstance();
-                
+
                 publish("Connecting to DB engine at: " + conManager.getClientHostname());
 
                 conManager.setNewConnection("mysql", UIClient.this);
@@ -96,8 +100,11 @@ public class UIClient extends javax.swing.JFrame {
     public void initSecondaryComponents() {
         installListenersToContentTabPane();
         initJTree();
-        UserManager.getInstance().authenticateStoredToken(e -> {
-            updateMenuBarForUser((User) e.getSource());
+        UserManager.getInstance().authenticateStoredToken(user -> {
+            updateMenuBarForUser(user);
+        });
+        GoogleUserManager.getInstance().authenticateStoredCredentials(user -> {
+            updateMenuBarForGoogleUser(user);
         });
     }
 
@@ -172,6 +179,8 @@ public class UIClient extends javax.swing.JFrame {
 
         submenuLoggedIn = new javax.swing.JMenu();
         menuLogOut = new javax.swing.JMenuItem();
+        submenuLoggedInGoogle = new javax.swing.JMenu();
+        menuLogOutGoogle = new javax.swing.JMenuItem();
         toolbarTop = new javax.swing.JToolBar();
         btnNewQuery = new javax.swing.JButton();
         btnOpenFile = new javax.swing.JButton();
@@ -203,6 +212,14 @@ public class UIClient extends javax.swing.JFrame {
         menuLogOut.setText("Log out");
         menuLogOut.setName("menuLogOut"); // NOI18N
         submenuLoggedIn.add(menuLogOut);
+
+        submenuLoggedInGoogle.setText("jMenu1");
+        submenuLoggedInGoogle.setName("submenuLoggedInGoogle"); // NOI18N
+
+        menuLogOutGoogle.setAction(actionLogOutGoogle);
+        menuLogOutGoogle.setText("Log out");
+        menuLogOutGoogle.setName("menuLogOutGoogle"); // NOI18N
+        submenuLoggedInGoogle.add(menuLogOutGoogle);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SQLess - David Orquin, Tomás Casir, Valeria Fornieles");
@@ -391,6 +408,7 @@ public class UIClient extends javax.swing.JFrame {
         menuLoginSQLess.setName("menuLoginSQLess"); // NOI18N
         submenuLogin.add(menuLoginSQLess);
 
+        menuLoginGoogle.setAction(actionLogInGoogle);
         menuLoginGoogle.setText("Log in (Google)");
         menuLoginGoogle.setName("menuLoginGoogle"); // NOI18N
         submenuLogin.add(menuLoginGoogle);
@@ -505,6 +523,13 @@ public class UIClient extends javax.swing.JFrame {
         barMenu.remove(submenuLogin);
         submenuLoggedIn.setText(user.getUsername());
         barMenu.add(submenuLoggedIn);
+        barMenu.revalidate();
+    }
+
+    public void updateMenuBarForGoogleUser(GoogleUser user) {
+        barMenu.remove(submenuLogin);
+        submenuLoggedInGoogle.setText(user.getNombre());
+        barMenu.add(submenuLoggedInGoogle);
         barMenu.revalidate();
     }
 
@@ -624,11 +649,33 @@ public class UIClient extends javax.swing.JFrame {
         }
     };
 
+    private Action actionLogInGoogle = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GoogleLogin login = new GoogleLogin(googleUser -> {
+                GoogleUserManager.getInstance().addNew(googleUser);
+                updateMenuBarForGoogleUser(googleUser);
+            });
+            login.start();
+        }
+    };
+
     private Action actionLogOut = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             UserManager.getInstance().logOut();
             barMenu.remove(submenuLoggedIn);
+            barMenu.add(submenuLogin);
+            barMenu.revalidate();
+            barMenu.repaint();
+        }
+    };
+
+    private Action actionLogOutGoogle = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GoogleUserManager.getInstance().logOut();
+            barMenu.remove(submenuLoggedInGoogle);
             barMenu.add(submenuLogin);
             barMenu.revalidate();
             barMenu.repaint();
@@ -643,6 +690,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
     private javax.swing.JMenuItem menuLogOut;
+    private javax.swing.JMenuItem menuLogOutGoogle;
     private javax.swing.JMenuItem menuLoginGoogle;
     private javax.swing.JMenuItem menuLoginSQLess;
     private javax.swing.JMenuItem menuNewFile;
@@ -654,6 +702,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JMenu submenuArchivo;
     private javax.swing.JMenu submenuHelp;
     private javax.swing.JMenu submenuLoggedIn;
+    private javax.swing.JMenu submenuLoggedInGoogle;
     private javax.swing.JMenu submenuLogin;
     private javax.swing.JMenu submenuTools;
     private javax.swing.JTabbedPane tabPaneContent;

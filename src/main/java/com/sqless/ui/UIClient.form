@@ -22,6 +22,27 @@
         </MenuItem>
       </SubComponents>
     </Container>
+    <Container class="javax.swing.JMenu" name="submenuLoggedInGoogle">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jMenu1"/>
+        <Property name="name" type="java.lang.String" value="submenuLoggedInGoogle" noResource="true"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="menuLogOutGoogle">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionLogOutGoogle" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Log out"/>
+            <Property name="name" type="java.lang.String" value="menuLogOutGoogle" noResource="true"/>
+          </Properties>
+        </MenuItem>
+      </SubComponents>
+    </Container>
     <Menu class="javax.swing.JMenuBar" name="barMenu">
       <Properties>
         <Property name="name" type="java.lang.String" value="barMenu" noResource="true"/>
@@ -116,6 +137,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuLoginGoogle">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="actionLogInGoogle" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Log in (Google)"/>
                 <Property name="name" type="java.lang.String" value="menuLoginGoogle" noResource="true"/>
               </Properties>

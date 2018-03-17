@@ -6,6 +6,7 @@ import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.TextUtils;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -403,6 +404,17 @@ public class FileManager {
      */
     public static boolean dirOrFileExists(String pathName) {
         return Files.exists(Paths.get(pathName));
+    }
+
+    public static void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles()) {
+                delete(c);
+            }
+        }
+        if (!f.delete()) {
+            throw new FileNotFoundException("Failed to delete file: " + f);
+        }
     }
 
 }

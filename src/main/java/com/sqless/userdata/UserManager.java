@@ -5,8 +5,6 @@ import com.sqless.network.RestRequest;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.utils.Callback;
 import com.sqless.utils.UIUtils;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import us.monoid.web.JSONResource;
 
 public class UserManager {
@@ -48,7 +46,7 @@ public class UserManager {
             PreferenceLoader prefs = PreferenceLoader.getInstance();
             String userToken = prefs.get(PreferenceLoader.PATH_PROFILE, PreferenceLoader.PrefKey.jwt_token);
             if (!userToken.equals("-1")) {
-                RestRequest testRequest = new PostRequest("http://localhost/WebService/tokentest", "token=" + userToken) {
+                RestRequest testRequest = new PostRequest("http://sqless.ddns.net:8080/ws/tokentest", "token=" + userToken) {
                     @Override
                     public void onSuccess(JSONResource json) throws Exception {
                         int user_id = Integer.parseInt(json.get("user_id").toString());

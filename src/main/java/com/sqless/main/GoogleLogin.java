@@ -1,6 +1,7 @@
 package com.sqless.main;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -13,8 +14,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.PlusScopes;
 import com.google.api.services.plus.model.Person;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.sqless.network.PostRequest;
+import com.sqless.network.RestRequest;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.Callback;
@@ -26,6 +27,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import us.monoid.json.JSONException;
+import us.monoid.json.JSONObject;
+import us.monoid.web.JSONResource;
 
 public class GoogleLogin {
 
@@ -121,6 +125,13 @@ public class GoogleLogin {
      */
     public Plus getPlusService() throws IOException {
         Credential credential = authorize();
+        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, "access_token=" + credential.getAccessToken()) {
+            @Override
+            public void onSuccess(JSONResource json) throws Exception {
+                //TODO
+            }
+        };
+        rest.exec();
         return new Plus.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
@@ -131,11 +142,11 @@ public class GoogleLogin {
             Plus service = getPlusService();
             Person mePerson = service.people().get("me").execute();
             ArrayList personEmails = (ArrayList) mePerson.get("emails");
-            JsonObject emailObj = new Gson().fromJson(personEmails.get(0).toString(), JsonObject.class);
+            JSONObject emailJson = new JSONObject(personEmails.get(0).toString());
             if (callback != null) {
-                callback.exec(new GoogleUser(mePerson.getId(), mePerson.getDisplayName(), emailObj.get("value").getAsString()));
+                callback.exec(new GoogleUser(mePerson.getId(), mePerson.getDisplayName(), emailJson.get("value").toString()));
             }
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             UIUtils.showErrorMessage("Log in OAuth2", "Hubo un error al hacer log in con Google", null);
             GoogleUserManager.getInstance().cleanUp();
             e.printStackTrace();

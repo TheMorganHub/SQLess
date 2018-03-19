@@ -9,6 +9,7 @@ public abstract class RestRequest {
 
     protected String url;
     protected Resty rest;
+    public static final String AUTH_URL = "http://sqless.ddns.net:8080/ws/auth_google";
 
     public RestRequest(String url) {
         this.rest = new Resty();

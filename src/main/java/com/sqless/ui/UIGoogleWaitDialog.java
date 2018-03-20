@@ -53,6 +53,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
     public void authenticateStoredCredentials() {
         if (GoogleUserManager.getInstance().credentialsExistLocally()) {
             lblDialog.setText("Autenticando credenciales Google locales...");
+            btnCancelar.setVisible(false);
 
             secondaryThread = new Thread(() -> {
                 GoogleUserManager.getInstance().authenticateStoredCredentials(user -> {

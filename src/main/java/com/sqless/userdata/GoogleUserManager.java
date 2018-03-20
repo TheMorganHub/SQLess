@@ -6,7 +6,6 @@ import com.sqless.ui.UIGoogleWaitDialog;
 import com.sqless.utils.Callback;
 import com.sqless.utils.UIUtils;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class GoogleUserManager {
 

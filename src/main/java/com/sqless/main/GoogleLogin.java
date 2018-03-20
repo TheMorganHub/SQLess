@@ -148,7 +148,6 @@ public class GoogleLogin {
                         .setApplicationName(APPLICATION_NAME)
                         .build();
                 Userinfoplus userinfo = oauth2.userinfo().get().execute();
-                //TODO cuando el token es invalido, no tiene que ejecutarse este callback
                 if (callback != null) {
                     callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
                 }
@@ -156,7 +155,6 @@ public class GoogleLogin {
 
             @Override
             public void onFailure(String message) {
-                System.out.println("A");
                 UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
                 if (waitDialog != null) {
                     waitDialog.cancel();

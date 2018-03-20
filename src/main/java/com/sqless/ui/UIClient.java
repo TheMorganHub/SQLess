@@ -16,7 +16,6 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.file.FileManager;
-import com.sqless.main.GoogleLogin;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
@@ -25,8 +24,6 @@ import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
-import java.awt.Cursor;
-import java.util.TimerTask;
 
 public class UIClient extends javax.swing.JFrame {
 

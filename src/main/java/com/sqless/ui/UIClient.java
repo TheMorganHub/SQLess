@@ -1,6 +1,5 @@
 package com.sqless.ui;
 
-import com.google.api.services.plus.model.Person;
 import com.sqless.ui.tree.NodeCellEditor;
 import com.sqless.ui.tree.TreeNodeSqless;
 import com.sqless.ui.tree.NodeTreeModel;
@@ -26,8 +25,8 @@ import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
-import com.sqless.userdata.User;
-import com.sqless.userdata.UserManager;
+import java.awt.Cursor;
+import java.util.TimerTask;
 
 public class UIClient extends javax.swing.JFrame {
 
@@ -100,12 +99,7 @@ public class UIClient extends javax.swing.JFrame {
     public void initSecondaryComponents() {
         installListenersToContentTabPane();
         initJTree();
-        UserManager.getInstance().authenticateStoredToken(user -> {
-            updateMenuBarForUser(user);
-        });
-        GoogleUserManager.getInstance().authenticateStoredCredentials(user -> {
-            updateMenuBarForGoogleUser(user);
-        });
+        new UIGoogleWaitDialog().authenticateStoredCredentials();
     }
 
     public void initPrefs() {
@@ -177,8 +171,6 @@ public class UIClient extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        submenuLoggedIn = new javax.swing.JMenu();
-        menuLogOut = new javax.swing.JMenuItem();
         submenuLoggedInGoogle = new javax.swing.JMenu();
         menuLogOutGoogle = new javax.swing.JMenuItem();
         toolbarTop = new javax.swing.JToolBar();
@@ -203,15 +195,7 @@ public class UIClient extends javax.swing.JFrame {
         submenuHelp = new javax.swing.JMenu();
         menuAbout = new javax.swing.JMenuItem();
         submenuLogin = new javax.swing.JMenu();
-        menuLoginSQLess = new javax.swing.JMenuItem();
         menuLoginGoogle = new javax.swing.JMenuItem();
-
-        submenuLoggedIn.setName("submenuLoggedIn"); // NOI18N
-
-        menuLogOut.setAction(actionLogOut);
-        menuLogOut.setText("Log out");
-        menuLogOut.setName("menuLogOut"); // NOI18N
-        submenuLoggedIn.add(menuLogOut);
 
         submenuLoggedInGoogle.setText("jMenu1");
         submenuLoggedInGoogle.setName("submenuLoggedInGoogle"); // NOI18N
@@ -403,11 +387,6 @@ public class UIClient extends javax.swing.JFrame {
         submenuLogin.setText("Log in");
         submenuLogin.setName("submenuLogin"); // NOI18N
 
-        menuLoginSQLess.setAction(actionLogIn);
-        menuLoginSQLess.setText("Log in (SQLess)");
-        menuLoginSQLess.setName("menuLoginSQLess"); // NOI18N
-        submenuLogin.add(menuLoginSQLess);
-
         menuLoginGoogle.setAction(actionLogInGoogle);
         menuLoginGoogle.setText("Log in (Google)");
         menuLoginGoogle.setName("menuLoginGoogle"); // NOI18N
@@ -518,13 +497,6 @@ public class UIClient extends javax.swing.JFrame {
     private void menuSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSettingsActionPerformed
         actionSettings();
     }//GEN-LAST:event_menuSettingsActionPerformed
-
-    public void updateMenuBarForUser(User user) {
-        barMenu.remove(submenuLogin);
-        submenuLoggedIn.setText(user.getUsername());
-        barMenu.add(submenuLoggedIn);
-        barMenu.revalidate();
-    }
 
     public void updateMenuBarForGoogleUser(GoogleUser user) {
         barMenu.remove(submenuLogin);
@@ -637,37 +609,11 @@ public class UIClient extends javax.swing.JFrame {
         return instance;
     }
 
-    private Action actionLogIn = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            UILogin uiLogin = new UILogin();
-            uiLogin.setVisible(true);
-            User user = UserManager.getInstance().getActive();
-            if (user != null) {
-                updateMenuBarForUser(user);
-            }
-        }
-    };
-
     private Action actionLogInGoogle = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            GoogleLogin login = new GoogleLogin(googleUser -> {
-                GoogleUserManager.getInstance().addNew(googleUser);
-                updateMenuBarForGoogleUser(googleUser);
-            });
-            login.start();
-        }
-    };
-
-    private Action actionLogOut = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            UserManager.getInstance().logOut();
-            barMenu.remove(submenuLoggedIn);
-            barMenu.add(submenuLogin);
-            barMenu.revalidate();
-            barMenu.repaint();
+            UIGoogleWaitDialog waitDialog = new UIGoogleWaitDialog();
+            waitDialog.waitForLogin();
         }
     };
 
@@ -689,10 +635,8 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
-    private javax.swing.JMenuItem menuLogOut;
     private javax.swing.JMenuItem menuLogOutGoogle;
     private javax.swing.JMenuItem menuLoginGoogle;
-    private javax.swing.JMenuItem menuLoginSQLess;
     private javax.swing.JMenuItem menuNewFile;
     private javax.swing.JMenuItem menuOpen;
     private javax.swing.JMenuItem menuSettings;
@@ -701,7 +645,6 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JSplitPane splitMain;
     private javax.swing.JMenu submenuArchivo;
     private javax.swing.JMenu submenuHelp;
-    private javax.swing.JMenu submenuLoggedIn;
     private javax.swing.JMenu submenuLoggedInGoogle;
     private javax.swing.JMenu submenuLogin;
     private javax.swing.JMenu submenuTools;

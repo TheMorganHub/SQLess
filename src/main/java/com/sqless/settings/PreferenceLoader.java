@@ -39,7 +39,7 @@ public class PreferenceLoader {
 
     public enum PrefKey {
         window_width, window_height, window_posX, window_posY,
-        split_Main_divider, window_state, jwt_token;
+        split_Main_divider, window_state;
     }
 
     private PreferenceLoader() {

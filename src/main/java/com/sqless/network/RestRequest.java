@@ -71,10 +71,10 @@ public abstract class RestRequest {
         EventQueue.invokeLater(() -> {
             try {
                 onSuccess(json);
-                int tokenStatus = Integer.parseInt(json.get("user_id").toString());
-                if (tokenStatus != -1) {
-                    onTokenSuccess(json);
-                }
+//                int tokenStatus = Integer.parseInt(json.get("user_id").toString());
+//                if (tokenStatus != -1) {
+//                    onTokenSuccess(json);
+//                }
             } catch (Exception e) {
                 onFailure(e.getMessage());
                 e.printStackTrace();

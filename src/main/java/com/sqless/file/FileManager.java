@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -404,6 +406,17 @@ public class FileManager {
      */
     public static boolean dirOrFileExists(String pathName) {
         return Files.exists(Paths.get(pathName));
+    }
+
+    public static boolean isDirEmpty(String path) {
+        try {
+            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path))) {
+                return !dirStream.iterator().hasNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void delete(File f) throws IOException {

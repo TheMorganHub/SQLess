@@ -1,7 +1,6 @@
 package com.sqless.main;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -11,11 +10,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.plus.Plus;
-import com.google.api.services.plus.PlusScopes;
-import com.google.api.services.plus.model.Person;
+import com.google.api.services.oauth2.Oauth2;
+import com.google.api.services.oauth2.Oauth2Scopes;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import com.sqless.network.PostRequest;
 import com.sqless.network.RestRequest;
+import com.sqless.ui.UIGoogleWaitDialog;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.Callback;
@@ -24,24 +24,34 @@ import com.sqless.utils.UIUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import us.monoid.json.JSONException;
-import us.monoid.json.JSONObject;
 import us.monoid.web.JSONResource;
 
 public class GoogleLogin {
 
     private Callback<GoogleUser> callback;
+    private UIGoogleWaitDialog waitDialog;
 
     public GoogleLogin(Callback<GoogleUser> callback) {
-        this();
+        initTransportAndStore();
         this.callback = callback;
     }
 
-    private GoogleLogin() {
-        initTransportAndStore();
+    /**
+     * Construye una nueva instancia de Log in. Se interactuará directamente con
+     * el {@link UIGoogleWaitDialog} dado en caso de que haya algún error de
+     * autenticación. Si no es necesaria la interacción entre esta clase y un
+     * {@code UIGoogleWaitDialog}, es recomendable utilizar el constructor
+     * normal.
+     *
+     * @param callback el callback que se ejecutará si la operación fue exitosa.
+     * @param waitDialog el {@code UIGoogleWaitDialog} que interactuará con esta
+     * clase en caso de error.
+     */
+    public GoogleLogin(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
+        this(callback);
+        this.waitDialog = waitDialog;
     }
 
     private void initTransportAndStore() {
@@ -66,10 +76,10 @@ public class GoogleLogin {
      * Directory to store user credentials for this application.
      */
     public static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/gplus.googleapis.com-java-quickstart");
+            System.getProperty("user.home"), ".credentials/sqless");
 
     /**
-     * Global instance of the {@link FileDataStoreFactory}.
+     * Instance of the {@link FileDataStoreFactory}.
      */
     private FileDataStoreFactory DATA_STORE_FACTORY;
 
@@ -80,7 +90,7 @@ public class GoogleLogin {
             = JacksonFactory.getDefaultInstance();
 
     /**
-     * Global instance of the HTTP transport.
+     * Instance of the HTTP transport.
      */
     private HttpTransport HTTP_TRANSPORT;
 
@@ -91,7 +101,7 @@ public class GoogleLogin {
      * ~/.credentials/people.googleapis.com-java-quickstart
      */
     private static final List<String> SCOPES
-            = Arrays.asList(PlusScopes.PLUS_ME, PlusScopes.USERINFO_PROFILE, PlusScopes.USERINFO_EMAIL);
+            = Arrays.asList(Oauth2Scopes.USERINFO_PROFILE, Oauth2Scopes.USERINFO_EMAIL);
 
     /**
      * Creates an authorized Credential object.
@@ -118,43 +128,56 @@ public class GoogleLogin {
     }
 
     /**
-     * Build and return an authorized G+ client service.
+     * Hace todo lo que se necesita para autorizar al usuario. Si la
+     * autorización fue exitosa, se hace una llamada al backend de SQLess con el
+     * access_token. Si esa llamada es exitosa, se ejecutará el callback dado y
+     * se le pasará como parámetro el objeto Oauth2 con todas las credenciales
+     * de usuario.
      *
-     * @return an authorized G+ client service
      * @throws IOException
      */
-    public Plus getPlusService() throws IOException {
+    public void startOauth2Service() throws IOException {
         Credential credential = authorize();
         RestRequest rest = new PostRequest(RestRequest.AUTH_URL, "access_token=" + credential.getAccessToken()) {
             @Override
             public void onSuccess(JSONResource json) throws Exception {
-                //TODO
+                //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
+                //no vamos a utilizar este JSON, ya que también necesitamos el nombre del usuario, y vamos a tener que hacer una llamada a la api de Google de todas maneras.
+                json.get("token_info");
+                Oauth2 oauth2 = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+                        .setApplicationName(APPLICATION_NAME)
+                        .build();
+                Userinfoplus userinfo = oauth2.userinfo().get().execute();
+                //TODO cuando el token es invalido, no tiene que ejecutarse este callback
+                if (callback != null) {
+                    callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                System.out.println("A");
+                UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
+                if (waitDialog != null) {
+                    waitDialog.cancel();
+                } else {
+                    GoogleUserManager.getInstance().logOut();
+                }
             }
         };
         rest.exec();
-        return new Plus.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
     }
 
     public void start() {
         try {
-            Plus service = getPlusService();
-            Person mePerson = service.people().get("me").execute();
-            ArrayList personEmails = (ArrayList) mePerson.get("emails");
-            JSONObject emailJson = new JSONObject(personEmails.get(0).toString());
-            if (callback != null) {
-                callback.exec(new GoogleUser(mePerson.getId(), mePerson.getDisplayName(), emailJson.get("value").toString()));
+            startOauth2Service();
+        } catch (IOException e) {
+            UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
+            if (waitDialog != null) {
+                waitDialog.cancel();
+            } else {
+                GoogleUserManager.getInstance().logOut();
             }
-        } catch (IOException | JSONException e) {
-            UIUtils.showErrorMessage("Log in OAuth2", "Hubo un error al hacer log in con Google", null);
-            GoogleUserManager.getInstance().cleanUp();
-            e.printStackTrace();
         }
     }
-
-    class Wrapper {
-
-    }
-
 }

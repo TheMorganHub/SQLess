@@ -2,26 +2,6 @@
 
 <Form version="1.9" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Container class="javax.swing.JMenu" name="submenuLoggedIn">
-      <Properties>
-        <Property name="name" type="java.lang.String" value="submenuLoggedIn" noResource="true"/>
-      </Properties>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
-        <Property name="useNullLayout" type="boolean" value="true"/>
-      </Layout>
-      <SubComponents>
-        <MenuItem class="javax.swing.JMenuItem" name="menuLogOut">
-          <Properties>
-            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="actionLogOut" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Log out"/>
-            <Property name="name" type="java.lang.String" value="menuLogOut" noResource="true"/>
-          </Properties>
-        </MenuItem>
-      </SubComponents>
-    </Container>
     <Container class="javax.swing.JMenu" name="submenuLoggedInGoogle">
       <Properties>
         <Property name="text" type="java.lang.String" value="jMenu1"/>
@@ -126,15 +106,6 @@
             <AuxValue name="JavaCodeGenerator_LayoutCodePost" type="java.lang.String" value="barMenu.add(Box.createHorizontalGlue());"/>
           </AuxValues>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="menuLoginSQLess">
-              <Properties>
-                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="actionLogIn" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Log in (SQLess)"/>
-                <Property name="name" type="java.lang.String" value="menuLoginSQLess" noResource="true"/>
-              </Properties>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuLoginGoogle">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">

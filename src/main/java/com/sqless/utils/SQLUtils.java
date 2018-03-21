@@ -301,7 +301,7 @@ public class SQLUtils {
                     newColumn.setCharacterSet(rs.getString("CHARACTER_SET_NAME"));
                     newColumn.setCollation(rs.getString("COLLATION_NAME"));
                     newColumn.setUnsigned(rs.getString("COLUMN_TYPE").endsWith("unsigned"), false);
-                    newColumn.setDateTimePrecision(rs.getString("DATETIME_PRECISION") != null);
+                    newColumn.setDateTimePrecision(dataTypeIsTimeBased(dataType));
                     newColumn.setOnUpdateCurrentTimeStamp(rs.getString("EXTRA").equalsIgnoreCase("ON UPDATE CURRENT_TIMESTAMP"));
                     newColumn.setAutoincrement(rs.getString("EXTRA").equals("auto_increment"), false);
                     if (newColumn.getDataType().equals("enum") || newColumn.getDataType().equals("set")) {

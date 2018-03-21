@@ -1,4 +1,4 @@
-package com.sqless.main;
+package com.sqless.network;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -13,8 +13,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.Oauth2Scopes;
 import com.google.api.services.oauth2.model.Userinfoplus;
-import com.sqless.network.PostRequest;
-import com.sqless.network.RestRequest;
 import com.sqless.ui.UIGoogleWaitDialog;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
@@ -101,7 +99,9 @@ public class GoogleLogin {
      * ~/.credentials/people.googleapis.com-java-quickstart
      */
     private static final List<String> SCOPES
-            = Arrays.asList(Oauth2Scopes.USERINFO_PROFILE, Oauth2Scopes.USERINFO_EMAIL);
+            = Arrays.asList(Oauth2Scopes.USERINFO_PROFILE, Oauth2Scopes.USERINFO_EMAIL, Oauth2Scopes.PLUS_ME);
+    
+    private GoogleAuthorizationCodeFlow flow;
 
     /**
      * Creates an authorized Credential object.
@@ -115,42 +115,37 @@ public class GoogleLogin {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+        flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(DATA_STORE_FACTORY)
                 .setAccessType("offline")
                 .build();
-
         Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 
         System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
 
-    /**
-     * Hace todo lo que se necesita para autorizar al usuario. Si la
-     * autorización fue exitosa, se hace una llamada al backend de SQLess con el
-     * access_token. Si esa llamada es exitosa, se ejecutará el callback dado y
-     * se le pasará como parámetro el objeto Oauth2 con todas las credenciales
-     * de usuario.
-     *
-     * @throws IOException
-     */
     public void startOauth2Service() throws IOException {
         Credential credential = authorize();
+        Oauth2 oauth2 = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        Userinfoplus userinfo = oauth2.userinfo().get().execute(); //esto actualiza el access token usando el refresh token si es necesario automáticamente
+        if (callback != null) {
+            callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
+        }
+        
+        OAuth2TokenRefreshService.startInstance(flow);
+        
+        //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
+        //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
+        //ejecute esta sección
         RestRequest rest = new PostRequest(RestRequest.AUTH_URL, "access_token=" + credential.getAccessToken()) {
             @Override
             public void onSuccess(JSONResource json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
-                //no vamos a utilizar este JSON, ya que también necesitamos el nombre del usuario, y vamos a tener que hacer una llamada a la api de Google de todas maneras.
                 json.get("token_info");
-                Oauth2 oauth2 = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-                Userinfoplus userinfo = oauth2.userinfo().get().execute();
-                if (callback != null) {
-                    callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
-                }
             }
 
             @Override
@@ -171,6 +166,7 @@ public class GoogleLogin {
             startOauth2Service();
         } catch (IOException e) {
             UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
+            e.printStackTrace();
             if (waitDialog != null) {
                 waitDialog.cancel();
             } else {

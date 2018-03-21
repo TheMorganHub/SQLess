@@ -1,6 +1,6 @@
 package com.sqless.ui;
 
-import com.sqless.main.GoogleLogin;
+import com.sqless.network.GoogleLogin;
 import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.UIUtils;
 

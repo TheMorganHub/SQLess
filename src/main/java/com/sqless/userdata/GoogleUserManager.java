@@ -1,7 +1,8 @@
 package com.sqless.userdata;
 
 import com.sqless.file.FileManager;
-import com.sqless.main.GoogleLogin;
+import com.sqless.network.GoogleLogin;
+import com.sqless.network.OAuth2TokenRefreshService;
 import com.sqless.ui.UIGoogleWaitDialog;
 import com.sqless.utils.Callback;
 import com.sqless.utils.UIUtils;
@@ -28,7 +29,7 @@ public class GoogleUserManager {
         return active;
     }
 
-    public void authenticateStoredCredentials(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog){
+    public void authenticateStoredCredentials(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
         if (active == null) {
             if (credentialsExistLocally()) {
                 GoogleLogin login = new GoogleLogin(person -> {
@@ -39,7 +40,7 @@ public class GoogleUserManager {
             }
         }
     }
-    
+
     public boolean credentialsExistLocally() {
         return FileManager.dirOrFileExists(GoogleLogin.CREDENTIALS_DIR.getPath()) && !FileManager.isDirEmpty(GoogleLogin.CREDENTIALS_DIR.getPath());
     }
@@ -53,6 +54,12 @@ public class GoogleUserManager {
     public void logOut() {
         active = null;
         cleanUp();
+        try {
+            OAuth2TokenRefreshService.getInstance().stop();
+        } catch (Exception e) {
+            System.err.println("OAuth2TokenRefreshService: ocurrió una excepción al intentar finalizar el servicio.");
+            e.printStackTrace();
+        }
     }
 
     public void cleanUp() {

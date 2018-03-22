@@ -15,10 +15,17 @@ import java.util.List;
  */
 public class TreeMenuItemSet {
 
-    private TreeNodeSqless.NodeType[] belongsTo;
+    private SQLessTreeNode.NodeType[] belongsTo;
     private List<TreeContextMenuItem> menuItems;
 
-    public TreeMenuItemSet(TreeNodeSqless.NodeType... belongsTo) {
+    /**
+     * Inicializa un nuevo set de menu items que aparecerán para nodos del tipo
+     * dado.
+     *
+     * @param belongsTo Los nodos del árbol para el cual aparecerán estos menu
+     * items.
+     */
+    public TreeMenuItemSet(SQLessTreeNode.NodeType... belongsTo) {
         this.belongsTo = belongsTo;
         menuItems = new ArrayList<>();
     }
@@ -42,7 +49,7 @@ public class TreeMenuItemSet {
      * @return a {@code NodeType} array with the nodes associated with this
      * {@code TreeMenuItemSet}.
      */
-    public TreeNodeSqless.NodeType[] belongsTo() {
+    public SQLessTreeNode.NodeType[] belongsTo() {
         return belongsTo;
     }
 

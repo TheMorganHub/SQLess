@@ -61,12 +61,6 @@ public class UISettings extends javax.swing.JDialog {
         btnBrowseDir = new javax.swing.JButton();
         btnRestoreDefaults = new javax.swing.JButton();
         btnOpen = new javax.swing.JButton();
-        pnlEditors = new javax.swing.JPanel();
-        pnlTableEditor = new javax.swing.JPanel();
-        chkDeprecatedTypes = new javax.swing.JCheckBox();
-        iLblRowsToDisplay = new javax.swing.JLabel();
-        spinnerRowsToDisplay = new javax.swing.JSpinner();
-        chkUncommittedRows = new javax.swing.JCheckBox();
         btnSave = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         btnApply = new javax.swing.JButton();
@@ -74,10 +68,13 @@ public class UISettings extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
 
+        tabSettings.setFocusable(false);
+
         pnlAuthentication.setBorder(javax.swing.BorderFactory.createTitledBorder("Authentication"));
         pnlAuthentication.setName("pnlAuthentication"); // NOI18N
 
         btnModifySettings.setText("Click here to manage your connection settings");
+        btnModifySettings.setFocusable(false);
         btnModifySettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnModifySettingsActionPerformed(evt);
@@ -103,6 +100,7 @@ public class UISettings extends javax.swing.JDialog {
 
         pnlDatabases.setBorder(javax.swing.BorderFactory.createTitledBorder("Databases"));
 
+        comboDatabases.setFocusable(false);
         comboDatabases.setName("Default.Database"); // NOI18N
         comboDatabases.addActionListener(new ActionAddToQueue(comboDatabases));
 
@@ -213,77 +211,8 @@ public class UISettings extends javax.swing.JDialog {
 
         tabSettings.addTab("Directories", pnlDirectories);
 
-        pnlTableEditor.setBorder(javax.swing.BorderFactory.createTitledBorder("Table data editor"));
-
-        chkDeprecatedTypes.setSelected(true);
-        chkDeprecatedTypes.setText("Prompt about deprecated types");
-        chkDeprecatedTypes.setName("Ask.DeprecatedTypes"); // NOI18N
-        chkDeprecatedTypes.addActionListener(new ActionAddToQueue(chkDeprecatedTypes));
-
-        iLblRowsToDisplay.setText("Rows to display:");
-
-        spinnerRowsToDisplay.setModel(new javax.swing.SpinnerNumberModel(100, 1, null, 1));
-        spinnerRowsToDisplay.setName("Editor.DisplayRows"); // NOI18N
-        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinnerRowsToDisplay.getEditor();
-        JTextField spinnerTextField = editor.getTextField();
-        spinnerTextField.getDocument().addDocumentListener(new TextFieldChangeListener(spinnerTextField));
-        spinnerTextField.setName("ROWS_TO_DISPLAY");
-
-        chkUncommittedRows.setSelected(true);
-        chkUncommittedRows.setText("Prompt about uncommitted rows on exit");
-        chkUncommittedRows.setName("Ask.UncommittedRows"); // NOI18N
-        chkUncommittedRows.addActionListener(new ActionAddToQueue(chkUncommittedRows));
-
-        javax.swing.GroupLayout pnlTableEditorLayout = new javax.swing.GroupLayout(pnlTableEditor);
-        pnlTableEditor.setLayout(pnlTableEditorLayout);
-        pnlTableEditorLayout.setHorizontalGroup(
-            pnlTableEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlTableEditorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlTableEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkUncommittedRows)
-                    .addGroup(pnlTableEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(pnlTableEditorLayout.createSequentialGroup()
-                            .addComponent(iLblRowsToDisplay)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(spinnerRowsToDisplay))
-                        .addComponent(chkDeprecatedTypes)))
-                .addContainerGap(293, Short.MAX_VALUE))
-        );
-        pnlTableEditorLayout.setVerticalGroup(
-            pnlTableEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlTableEditorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkDeprecatedTypes)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUncommittedRows)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
-                .addGroup(pnlTableEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(iLblRowsToDisplay)
-                    .addComponent(spinnerRowsToDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout pnlEditorsLayout = new javax.swing.GroupLayout(pnlEditors);
-        pnlEditors.setLayout(pnlEditorsLayout);
-        pnlEditorsLayout.setHorizontalGroup(
-            pnlEditorsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlEditorsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlTableEditor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlEditorsLayout.setVerticalGroup(
-            pnlEditorsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlEditorsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlTableEditor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(220, Short.MAX_VALUE))
-        );
-
-        tabSettings.addTab("Editors", pnlEditors);
-
         btnSave.setText("Save");
+        btnSave.setFocusable(false);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -291,6 +220,7 @@ public class UISettings extends javax.swing.JDialog {
         });
 
         btnCancel.setText("Cancel");
+        btnCancel.setFocusable(false);
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
@@ -299,6 +229,7 @@ public class UISettings extends javax.swing.JDialog {
 
         btnApply.setText("Apply");
         btnApply.setEnabled(false);
+        btnApply.setFocusable(false);
         btnApply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnApplyActionPerformed(evt);
@@ -377,17 +308,6 @@ public class UISettings extends javax.swing.JDialog {
                 field.setText((String) userPreferences.getProperty(field.getName()));
             }
         }
-        for (Component component : pnlTableEditor.getComponents()) {
-            if (component instanceof JCheckBox) {
-                JCheckBox chkBox = (JCheckBox) component;
-                chkBox.setSelected(Boolean.valueOf(userPreferences.getProperty(chkBox.getName())));
-            }
-            if (component instanceof JSpinner) {
-                JSpinner spinner = (JSpinner) component;
-                spinner.setValue(Integer.
-                        valueOf(userPreferences.getProperty("Editor.DisplayRows")));
-            }
-        }
 
         enableListeners = true;
     }
@@ -401,10 +321,23 @@ public class UISettings extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnModifySettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModifySettingsActionPerformed
-        UIConnectionWizard modifyConnection = new UIConnectionWizard(client, UIConnectionWizard.Task.MODIFY);
-        modifyConnection.setVisible(true);
-    }//GEN-LAST:event_btnModifySettingsActionPerformed
+    private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
+        commitSave();
+        btnApply.setEnabled(false);
+    }//GEN-LAST:event_btnApplyActionPerformed
+
+    private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
+        try {
+            Runtime.getRuntime().exec("explorer.exe /select," + userPreferences.getProperty("defaultSaveDir"));
+        } catch (IOException ex) {
+            UIUtils.showErrorMessage("Error", "Could not open directory", getParent());
+            System.err.println("Could not open directory.");
+        }
+    }//GEN-LAST:event_btnOpenActionPerformed
+
+    private void btnRestoreDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreDefaultsActionPerformed
+        txtDefaultSaveDir.setText((String) userPreferences.getDefaultFor("Default.SaveDir"));
+    }//GEN-LAST:event_btnRestoreDefaultsActionPerformed
 
     private void btnBrowseDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowseDirActionPerformed
         JFileChooser fc = new JFileChooser();
@@ -419,14 +352,10 @@ public class UISettings extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnBrowseDirActionPerformed
 
-    private void btnRestoreDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreDefaultsActionPerformed
-        txtDefaultSaveDir.setText((String) userPreferences.getDefaultFor("Default.SaveDir"));
-    }//GEN-LAST:event_btnRestoreDefaultsActionPerformed
-
-    private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
-        commitSave();
-        btnApply.setEnabled(false);
-    }//GEN-LAST:event_btnApplyActionPerformed
+    private void btnModifySettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModifySettingsActionPerformed
+        UIConnectionWizard modifyConnection = new UIConnectionWizard(client, UIConnectionWizard.Task.MODIFY);
+        modifyConnection.setVisible(true);
+    }//GEN-LAST:event_btnModifySettingsActionPerformed
 
     /**
      * Saves the settings that have been modified in this session into
@@ -458,15 +387,6 @@ public class UISettings extends javax.swing.JDialog {
         modifiedComponents.clear();
         userPreferences.flushFile();
     }
-
-    private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
-        try {
-            Runtime.getRuntime().exec("explorer.exe /select," + userPreferences.getProperty("defaultSaveDir"));
-        } catch (IOException ex) {
-            UIUtils.showErrorMessage("Error", "Could not open directory", getParent());
-            System.err.println("Could not open directory.");
-        }
-    }//GEN-LAST:event_btnOpenActionPerformed
 
     /**
      * Adds a recently modified component to the queue of components that
@@ -569,19 +489,13 @@ public class UISettings extends javax.swing.JDialog {
     private javax.swing.JButton btnOpen;
     private javax.swing.JButton btnRestoreDefaults;
     private javax.swing.JButton btnSave;
-    private javax.swing.JCheckBox chkDeprecatedTypes;
-    private javax.swing.JCheckBox chkUncommittedRows;
     private javax.swing.JComboBox<String> comboDatabases;
     private javax.swing.JLabel iLblDefaultDbs;
     private javax.swing.JLabel iLblDefaultSaveDir;
-    private javax.swing.JLabel iLblRowsToDisplay;
     private javax.swing.JPanel pnlAuthentication;
     private javax.swing.JPanel pnlConnection;
     private javax.swing.JPanel pnlDatabases;
     private javax.swing.JPanel pnlDirectories;
-    private javax.swing.JPanel pnlEditors;
-    private javax.swing.JPanel pnlTableEditor;
-    private javax.swing.JSpinner spinnerRowsToDisplay;
     private javax.swing.JTabbedPane tabSettings;
     private javax.swing.JTextField txtDefaultSaveDir;
     // End of variables declaration//GEN-END:variables

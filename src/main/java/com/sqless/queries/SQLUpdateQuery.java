@@ -26,6 +26,15 @@ public class SQLUpdateQuery extends SQLQuery {
         super(sql);
     }
 
+    /**
+     * @see SQLQuery#SQLQuery(java.lang.String, boolean)
+     * @param sql
+     * @param defaultErrorHandling
+     */
+    public SQLUpdateQuery(String sql, boolean defaultErrorHandling) {
+        super(sql, defaultErrorHandling);
+    }
+
     @Override
     public void exec() {
         try {
@@ -34,7 +43,11 @@ public class SQLUpdateQuery extends SQLQuery {
             int affectedRows = statement.executeUpdate(getSql());
             onSuccess(affectedRows);
         } catch (SQLException ex) {
-            onFailure(ex.getMessage());
+            if (defaultErrorHandling) {
+                onFaiureStandard(ex.getMessage());
+            } else {
+                onFailure(ex.getMessage());
+            }
         } finally {
             closeQuery();
         }

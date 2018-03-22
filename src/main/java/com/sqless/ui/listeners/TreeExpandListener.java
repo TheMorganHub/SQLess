@@ -2,7 +2,7 @@ package com.sqless.ui.listeners;
 
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
-import com.sqless.ui.tree.TreeNodeSqless;
+import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.sql.objects.SQLIndex;
 import com.sqless.sql.objects.SQLColumn;
 import com.sqless.sql.objects.SQLTable;
@@ -17,7 +17,7 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
-import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 
 /**
  * A listener that handles the action that has to happen BEFORE a JTree node is
@@ -36,7 +36,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
     @Override
     public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
         TreePath path = event.getPath();
-        TreeNodeSqless node = (TreeNodeSqless) event.getPath().getLastPathComponent();
+        SQLessTreeNode node = (SQLessTreeNode) event.getPath().getLastPathComponent();
         DefaultTreeModel model = (DefaultTreeModel) ((JTree) event.getSource()).getModel();
         client.setCursor(UIUtils.WAIT_CURSOR);
         try {
@@ -44,7 +44,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                 if (UIUtils.nodeHasDummy(node)) {
                     SQLUtils.getConnectedDB().loadTables();
                     for (SQLTable table : SQLUtils.getConnectedDB().getTables()) {
-                        TreeNodeSqless tableNode = new TreeNodeSqless(table, TABLE);
+                        SQLessTreeNode tableNode = new SQLessTreeNode(table, TABLE);
                         tableNode.add(UIUtils.dummyNode());
                         node.add(tableNode);
                         model.reload(node);
@@ -54,9 +54,9 @@ public class TreeExpandListener implements TreeWillExpandListener {
 
             if (node.isOfType(TABLE)) {
                 if (UIUtils.nodeHasDummy(node)) {
-                    TreeNodeSqless columnsNode = new TreeNodeSqless("Columns", CAT_COLUMNS);
-                    TreeNodeSqless indexesNode = new TreeNodeSqless("Indexes", CAT_INDEXES);
-                    TreeNodeSqless triggersNode = new TreeNodeSqless("Triggers", CAT_TRIGGERS);
+                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columns", CAT_COLUMNS);
+                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indexes", CAT_INDEXES);
+                    SQLessTreeNode triggersNode = new SQLessTreeNode("Triggers", CAT_TRIGGERS);
                     columnsNode.add(UIUtils.dummyNode());
                     indexesNode.add(UIUtils.dummyNode());
                     triggersNode.add(UIUtils.dummyNode());
@@ -74,7 +74,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                     SQLDataObject selectable = SQLUtils.getConnectedDB().getTableObjectByName(selectableName);
                     selectable.loadColumns();
                     for (SQLColumn column : selectable.getColumns()) {
-                        TreeNodeSqless columnNode = new TreeNodeSqless(column, TABLE_COLUMN);
+                        SQLessTreeNode columnNode = new SQLessTreeNode(column, TABLE_COLUMN);
                         node.add(columnNode);
                         columnNode.setAllowsChildren(false);
                     }
@@ -88,7 +88,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                     SQLDataObject selectable = SQLUtils.getConnectedDB().getTableObjectByName(selectableName);
                     selectable.loadIndexes();
                     for (SQLIndex index : selectable.getIndexes()) {
-                        TreeNodeSqless indexNode = new TreeNodeSqless(index, INDEX);
+                        SQLessTreeNode indexNode = new SQLessTreeNode(index, INDEX);
                         node.add(indexNode);
                         indexNode.setAllowsChildren(false);
                     }
@@ -102,7 +102,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                     SQLDataObject selectable = SQLUtils.getConnectedDB().getTableObjectByName(selectableName);
                     selectable.loadTriggers();
                     for (SQLTrigger trigger : selectable.getTriggers()) {
-                        TreeNodeSqless triggerNode = new TreeNodeSqless(trigger, TRIGGER);
+                        SQLessTreeNode triggerNode = new SQLessTreeNode(trigger, TRIGGER);
                         node.add(triggerNode);
                         triggerNode.setAllowsChildren(false);
                     }
@@ -114,7 +114,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                 if (UIUtils.nodeHasDummy(node)) {
                     SQLUtils.getConnectedDB().loadProcedures();
                     for (SQLExecutable procedure : SQLUtils.getConnectedDB().getProcedures()) {
-                        TreeNodeSqless procedureNode = new TreeNodeSqless(procedure, PROCEDURE);
+                        SQLessTreeNode procedureNode = new SQLessTreeNode(procedure, PROCEDURE);
                         node.add(procedureNode);
                     }
                     model.reload(node);
@@ -125,7 +125,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                 if (UIUtils.nodeHasDummy(node)) {
                     SQLUtils.getConnectedDB().loadFunctions();
                     for (SQLExecutable function : SQLUtils.getConnectedDB().getFunctions()) {
-                        TreeNodeSqless functionNode = new TreeNodeSqless(function, FUNCTION);
+                        SQLessTreeNode functionNode = new SQLessTreeNode(function, FUNCTION);
                         node.add(functionNode);
                     }
                     model.reload(node);
@@ -136,7 +136,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                 if (UIUtils.nodeHasDummy(node)) {
                     SQLUtils.getConnectedDB().loadViews();
                     for (SQLView view : SQLUtils.getConnectedDB().getViews()) {
-                        TreeNodeSqless viewNode = new TreeNodeSqless(view, VIEW);
+                        SQLessTreeNode viewNode = new SQLessTreeNode(view, VIEW);
                         viewNode.add(UIUtils.dummyNode());
                         node.add(viewNode);
                     }
@@ -146,9 +146,9 @@ public class TreeExpandListener implements TreeWillExpandListener {
 
             if (node.isOfType(VIEW)) {
                 if (UIUtils.nodeHasDummy(node)) {
-                    TreeNodeSqless columnsNode = new TreeNodeSqless("Columns", CAT_VIEWS_COLUMNS);
-                    TreeNodeSqless indexesNode = new TreeNodeSqless("Indexes", CAT_INDEXES);
-                    TreeNodeSqless triggersNode = new TreeNodeSqless("Triggers", CAT_TRIGGERS);
+                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columns", CAT_VIEWS_COLUMNS);
+                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indexes", CAT_INDEXES);
+                    SQLessTreeNode triggersNode = new SQLessTreeNode("Triggers", CAT_TRIGGERS);
                     columnsNode.add(UIUtils.dummyNode());
                     indexesNode.add(UIUtils.dummyNode());
                     triggersNode.add(UIUtils.dummyNode());
@@ -165,7 +165,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
                     SQLDataObject selectable = SQLUtils.getConnectedDB().getTableObjectByName(selectableName);
                     selectable.loadColumns();
                     for (SQLColumn column : selectable.getColumns()) {
-                        TreeNodeSqless columnNode = new TreeNodeSqless(column, VIEW_COLUMN);
+                        SQLessTreeNode columnNode = new SQLessTreeNode(column, VIEW_COLUMN);
                         node.add(columnNode);
                     }
                     model.reload(node);

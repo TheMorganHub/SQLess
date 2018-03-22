@@ -10,6 +10,15 @@ public class SQLSelectQuery extends SQLQuery {
         super(sql);
     }
 
+    /**
+     * @see SQLQuery#SQLQuery(java.lang.String, boolean)
+     * @param sql
+     * @param defaultErrorHandling 
+     */
+    public SQLSelectQuery(String sql, boolean defaultErrorHandling) {
+        super(sql, defaultErrorHandling);
+    }
+    
     @Override
     public void exec() {
         try {
@@ -17,7 +26,11 @@ public class SQLSelectQuery extends SQLQuery {
             ResultSet rs = statement.executeQuery(getSql());
             onSuccess(rs);
         } catch (SQLException e) {
-            onFailure(e.getMessage());
+            if (defaultErrorHandling) {
+                onFaiureStandard(e.getMessage());
+            } else {
+                onFailure(e.getMessage());
+            }  
         } finally {
             closeQuery();
         }

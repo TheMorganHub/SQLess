@@ -6,7 +6,7 @@ import java.util.List;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import com.sqless.ui.listeners.TreeContextMenuItemListener;
-import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 import static com.sqless.ui.tree.TreeContextMenuItem.*;
 
 /**
@@ -35,36 +35,39 @@ public class TreeContextMenuHandler {
         TreeMenuItemSet tableCategoriesContext = new TreeMenuItemSet(CAT_TABLES);
         tableCategoriesContext.add(new TreeContextMenuItem("New table...", ContextItemFunctionality.CREATE));
 
-        TreeMenuItemSet selectableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
-        selectableObjectContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
+        TreeMenuItemSet selectableContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
+        selectableContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
 
         TreeMenuItemSet tableObjectContext = new TreeMenuItemSet(TABLE);
-        tableObjectContext.add(new TreeContextMenuItem("New column...", ContextItemFunctionality.CREATE));
         tableObjectContext.add(new TreeContextMenuItem("Modify", ContextItemFunctionality.MODIFY));
         tableObjectContext.add(new TreeContextMenuItem("Edit rows", ContextItemFunctionality.EDIT));
+
+        TreeMenuItemSet columnTableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN);
+        columnTableObjectContext.add(new TreeContextMenuItem("Rename", ContextItemFunctionality.RENAME));
 
         TreeMenuItemSet executableContext = new TreeMenuItemSet(FUNCTION, PROCEDURE);
         executableContext.add(new TreeContextMenuItem("Execute", ContextItemFunctionality.EXECUTE));
 
         TreeMenuItemSet genericMenu = new TreeMenuItemSet(DATABASE, TABLE_COLUMN, TABLE, VIEW, VIEW_COLUMN, INDEX,
                 FUNCTION, PROCEDURE, TRIGGER);
-        genericMenu.add(new TreeContextMenuItem("Rename", ContextItemFunctionality.RENAME));
+
         genericMenu.add(new TreeContextMenuItem("Delete", ContextItemFunctionality.DROP));
 
-//        order menus from more specific to less specific so specific will have more priority
+//        el orden de agregado afecta la posición de los items. Los que se agregan primero van a aparecer primero.
         itemSets.add(tableCategoriesContext);
-        itemSets.add(selectableObjectContext);
+        itemSets.add(selectableContext);        
         itemSets.add(tableObjectContext);
         itemSets.add(executableContext);
+        itemSets.add(columnTableObjectContext);
         itemSets.add(genericMenu);
     }
 
-    public JPopupMenu getMenuForType(TreeNodeSqless.NodeType type) {
+    public JPopupMenu getMenuForType(SQLessTreeNode.NodeType type) {
         menu = new JPopupMenu();
         int typesFound = 0;
         for (TreeMenuItemSet itemSet : itemSets) {
-            TreeNodeSqless.NodeType[] nodeTypes = itemSet.belongsTo();
-            for (TreeNodeSqless.NodeType nodeType : nodeTypes) {
+            SQLessTreeNode.NodeType[] nodeTypes = itemSet.belongsTo();
+            for (SQLessTreeNode.NodeType nodeType : nodeTypes) {
                 if (type.equals(nodeType)) {
                     typesFound++;
 
@@ -94,7 +97,7 @@ public class TreeContextMenuHandler {
      * @param location The location as a {@code Point} in which this menu will
      * appear.
      */
-    public void showMenu(TreeNodeSqless.NodeType belongsTo, Point location) {
+    public void showMenu(SQLessTreeNode.NodeType belongsTo, Point location) {
         JPopupMenu menuToShow = getMenuForType(belongsTo);
         if (menuToShow != null) {
             menuToShow.show(treeDiagram, location.x, location.y);

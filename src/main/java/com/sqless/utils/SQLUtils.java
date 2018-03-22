@@ -234,9 +234,9 @@ public class SQLUtils {
         return views;
     }
 
-    public static List<SQLExecutable> getExecutables(Class className) {
+    public static List<SQLExecutable> getExecutables(Class<? extends SQLExecutable> className) {
         List<SQLExecutable> executables = new ArrayList<>();
-        SQLQuery getFunctionsQuery = new SQLSelectQuery("SHOW" + (className == SQLFunction.class ? " FUNCTION " : " PROCEDURE ") + "STATUS;") {
+        SQLQuery getFunctionsQuery = new SQLSelectQuery("SHOW" + (className == SQLFunction.class ? " FUNCTION " : " PROCEDURE ") + "STATUS WHERE Db = '" + getConnectedDBName() + "'") {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 while (rs.next()) {
@@ -276,6 +276,22 @@ public class SQLUtils {
             getParametersQuery.exec();
         }
         return executables;
+    }
+
+    public static int getTableAutoIncrement(SQLTable table) {
+        FinalValue<Integer> autoIncrement = new FinalValue<>();
+
+        SQLQuery getAutoIncrementQuery = new SQLSelectQuery("SELECT `AUTO_INCREMENT`\n"
+                + "FROM  INFORMATION_SCHEMA.TABLES\n"
+                + "WHERE TABLE_SCHEMA = '" + getConnectedDBName() + "'\n"
+                + "AND   TABLE_NAME   = '" + table.getName() + "'") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                autoIncrement.set(rs.next() ? rs.getInt("AUTO_INCREMENT") : 1);
+            }                    
+        };
+        getAutoIncrementQuery.exec();
+        return autoIncrement.get();
     }
 
     public static List<SQLColumn> getColumnData(SQLDataObject tableObject) {
@@ -454,7 +470,7 @@ public class SQLUtils {
     }
 
     public static boolean dataTypeIsNumeric(String dataType) {
-        return dataType.equals("tinyint") || dataType.equals("smallint")
+        return dataType.equals("bit") || dataType.equals("tinyint") || dataType.equals("smallint")
                 || dataType.equals("mediumint") || dataType.equals("int")
                 || dataType.equals("bigint") || dataType.equals("decimal");
     }

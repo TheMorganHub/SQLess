@@ -83,7 +83,7 @@ public class OAuth2TokenRefreshService {
 
     /**
      * Inicia la tarea programada de refrescar el token de acceso. Esta tarea se
-     * ejecutará después de 45 minutos de haber hecho log in y a partir de ahí
+     * ejecutará después de 50 minutos de haber hecho log in y a partir de ahí
      * cada 50 minutos. Los tokens de accesso de Google duran aproximadamente 60
      * minutos.
      */

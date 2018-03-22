@@ -3,7 +3,7 @@ package com.sqless.utils;
 import com.sqless.sql.objects.SQLColumn;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.FrontPanel;
-import com.sqless.ui.tree.TreeNodeSqless;
+import com.sqless.ui.tree.SQLessTreeNode;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -350,17 +350,17 @@ public class UIUtils {
      * @return {@code true} if the first child of the node is
      * {@code instanceof DummyNode}
      */
-    public static boolean nodeHasDummy(TreeNodeSqless node) {
-        if (node.getChildCount() > 0 && ((TreeNodeSqless) node.getChildAt(0))
-                .isOfType(TreeNodeSqless.NodeType.DUMMY)) {
+    public static boolean nodeHasDummy(SQLessTreeNode node) {
+        if (node.getChildCount() > 0 && ((SQLessTreeNode) node.getChildAt(0))
+                .isOfType(SQLessTreeNode.NodeType.DUMMY)) {
             node.remove(0);
             return true;
         }
         return false;
     }
 
-    public static TreeNodeSqless dummyNode() {
-        return new TreeNodeSqless();
+    public static SQLessTreeNode dummyNode() {
+        return new SQLessTreeNode();
     }
 
     public static JButton newToolbarBtn(ActionListener action, String title, String tooltip, ImageIcon icon) {

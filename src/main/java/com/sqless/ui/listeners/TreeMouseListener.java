@@ -1,7 +1,7 @@
 package com.sqless.ui.listeners;
 
 import com.sqless.ui.tree.TreeContextMenuHandler;
-import com.sqless.ui.tree.TreeNodeSqless;
+import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.utils.SQLUtils;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -31,7 +31,7 @@ public class TreeMouseListener extends MouseAdapter {
             if (SQLUtils.getConnectedDBName().equalsIgnoreCase("mysql")) {
                 return;
             }
-            TreeNodeSqless nodo = getNodeFromLocation(e.getPoint());
+            SQLessTreeNode nodo = getNodeFromLocation(e.getPoint());
             if (locationIsValid(e)) {
                 addSelectionPath(e.getPoint());
                 jTreeContextMenuHandler.showMenu(nodo.getType(), e.getPoint());
@@ -49,8 +49,8 @@ public class TreeMouseListener extends MouseAdapter {
                 .addSelectionPath(treeDiagram.getClosestPathForLocation(location.x, location.y));
     }
 
-    private TreeNodeSqless getNodeFromLocation(Point location) {
-        return (TreeNodeSqless) treeDiagram.getClosestPathForLocation(location.x, location.y)
+    private SQLessTreeNode getNodeFromLocation(Point location) {
+        return (SQLessTreeNode) treeDiagram.getClosestPathForLocation(location.x, location.y)
                 .getLastPathComponent();
     }
 }

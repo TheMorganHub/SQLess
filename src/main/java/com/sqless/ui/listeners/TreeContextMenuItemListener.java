@@ -1,12 +1,14 @@
 package com.sqless.ui.listeners;
 
+import com.sqless.queries.SQLQuery;
+import com.sqless.queries.SQLUpdateQuery;
 import com.sqless.sql.objects.SQLDroppable;
 import com.sqless.sql.objects.SQLExecutable;
 import com.sqless.ui.tree.TreeContextMenuItem;
 import com.sqless.sql.objects.SQLSelectable;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
-import com.sqless.ui.tree.TreeNodeSqless;
+import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UICreateTableSQLess;
 import com.sqless.ui.UIEditTable;
@@ -31,7 +33,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     @Override
     public void mouseReleased(MouseEvent e) {
         TreeContextMenuItem source = (TreeContextMenuItem) e.getSource();
-        TreeNodeSqless node = getCallingNode();
+        SQLessTreeNode node = getCallingNode();
         switch (source.getItemFunctionality()) {
             case SELECT:
                 doSelect(node);
@@ -57,27 +59,28 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         }
     }
 
-    public void doDrop(TreeNodeSqless node) {
+    public void doDrop(SQLessTreeNode node) {
         int confirmacion = UIUtils.showConfirmationMessage("Drop object",
                 "Would you like to permanently drop this object?", client);
         if (confirmacion != 0) {
             return;
         }
-
-        client.createNewQueryPanelAndRun(((SQLDroppable) node.getUserObject()).getDropStatement());
+        SQLQuery dropQuery = new SQLUpdateQuery(((SQLDroppable) node.getUserObject()).getDropStatement(), true);
+        dropQuery.exec();
+//        client.createNewQueryPanelAndRun(((SQLDroppable) node.getUserObject()).getDropStatement());
     }
 
-    public void doSelect(TreeNodeSqless node) {
+    public void doSelect(SQLessTreeNode node) {
         client.createNewQueryPanelAndRun(((SQLSelectable) node.getUserObject()).getSelectStatement(1000));
     }
 
-    public void doExecute(TreeNodeSqless node) {
+    public void doExecute(SQLessTreeNode node) {
         SQLExecutable executable = (SQLExecutable) node.getUserObject();
         UIExecuteCallable uiExecuteCallable = new UIExecuteCallable(executable);
         uiExecuteCallable.execute();
     }
 
-    public void doModify(TreeNodeSqless node) {
+    public void doModify(SQLessTreeNode node) {
         switch (node.getType()) {
             case TABLE:
                 SQLTable table = (SQLTable) node.getUserObject();
@@ -88,34 +91,38 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         }
     }
 
-    public void doEdit(TreeNodeSqless node) {
+    public void doEdit(SQLessTreeNode node) {
         switch (node.getType()) {
             case TABLE:
                 SQLTable table = (SQLTable) node.getUserObject();
                 UIEditTable uiEditTable = new UIEditTable(client.getTabPaneContent(), table);
-                client.sendToNewTab(uiEditTable);
+                if (uiEditTable.tableAllowsModifications()) {
+                    client.sendToNewTab(uiEditTable);
+                } else {
+                    UIUtils.showErrorMessage("Edit rows", "Para usar esta funcionalidad, la tabla debe tener una columna marcada como primary key.", null);
+                }
                 break;
         }
     }
 
-    public void doCreate(TreeNodeSqless node) {
+    public void doCreate(SQLessTreeNode node) {
         switch (node.getType()) {
             case CAT_TABLES:
                 UICreateTableSQLess uiCreateTable = new UICreateTableSQLess(client.getTabPaneContent(), null);
                 uiCreateTable.prepararUI();
-                UIClient.getInstance().sendToNewTab(uiCreateTable);
+                client.sendToNewTab(uiCreateTable);
                 break;
             case TABLE: //create column
                 break;
         }
     }
 
-    public void doRename(TreeNodeSqless node) {
+    public void doRename(SQLessTreeNode node) {
         client.getTree().setEditable(true);
         client.getTree().startEditingAtPath(new TreePath(node.getPath()));
     }
 
-    private TreeNodeSqless getCallingNode() {
-        return (TreeNodeSqless) client.getTree().getSelectionPath().getLastPathComponent();
+    private SQLessTreeNode getCallingNode() {
+        return (SQLessTreeNode) client.getTree().getSelectionPath().getLastPathComponent();
     }
 }

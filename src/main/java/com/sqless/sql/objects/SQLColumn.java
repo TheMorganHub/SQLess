@@ -367,7 +367,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
     }
 
     public boolean isTimeBased() {
-        return dateTimePrecision || dataType.equals("date");
+        return dateTimePrecision || SQLUtils.dataTypeIsTimeBased(dataType);
     }
 
     /**

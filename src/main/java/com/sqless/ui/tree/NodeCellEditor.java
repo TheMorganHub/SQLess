@@ -21,7 +21,7 @@ public class NodeCellEditor extends DefaultTreeCellEditor {
 
     @Override
     public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
-        TreeNodeSqless node = (TreeNodeSqless) value;
+        SQLessTreeNode node = (SQLessTreeNode) value;
         SQLObject nodeObject = (SQLObject) node.getUserObject();
         super.getTreeCellEditorComponent(tree, value, isSelected, expanded, leaf, row);
         DefaultTextField txtField = (DefaultTextField) editingComponent;
@@ -31,7 +31,7 @@ public class NodeCellEditor extends DefaultTreeCellEditor {
 
     @Override
     protected void determineOffset(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
-        TreeNodeSqless node = (TreeNodeSqless) value;
+        SQLessTreeNode node = (SQLessTreeNode) value;
         if (renderer != null) {
             switch (node.getType()) {
                 case DATABASE:

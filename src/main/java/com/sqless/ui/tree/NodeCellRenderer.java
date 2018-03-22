@@ -6,7 +6,7 @@ import java.awt.Component;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 import static com.sqless.utils.UIUtils.icon;
 
 /**
@@ -19,7 +19,7 @@ public class NodeCellRenderer extends DefaultTreeCellRenderer implements TreeCel
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
-        TreeNodeSqless node = (TreeNodeSqless) value;
+        SQLessTreeNode node = (SQLessTreeNode) value;
 
         switch (node.getType()) {
             case DATABASE:
@@ -86,11 +86,11 @@ public class NodeCellRenderer extends DefaultTreeCellRenderer implements TreeCel
         return this;
     }
 
-    boolean nodoEsPrimaryKey(TreeNodeSqless nodo) {
+    boolean nodoEsPrimaryKey(SQLessTreeNode nodo) {
         return ((SQLColumn) nodo.getUserObject()).isPK();
     }
 
-    boolean nodoEsForeignKey(TreeNodeSqless nodo) {
+    boolean nodoEsForeignKey(SQLessTreeNode nodo) {
         return ((SQLColumn) nodo.getUserObject()).isFK();
     }
 }

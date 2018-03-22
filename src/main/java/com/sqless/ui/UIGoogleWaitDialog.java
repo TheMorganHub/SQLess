@@ -86,6 +86,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
         lblDialog.setText("Esperando a Google...");
 
         btnCancelar.setText("Cancelar");
+        btnCancelar.setFocusable(false);
         btnCancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelarActionPerformed(evt);

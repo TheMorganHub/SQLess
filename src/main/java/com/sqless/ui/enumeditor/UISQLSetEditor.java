@@ -27,7 +27,7 @@ public class UISQLSetEditor extends javax.swing.JPanel {
             sb.append(selectedValue).append(",");
         }
         panelInnerPopUp = null;
-        return sb.substring(0, sb.length() - 1);
+        return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : sb.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ public class UISQLSetEditor extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         add(txtEnumValues, gridBagConstraints);
 
-        btnShowPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/res/icons/ui_general/COMBOBOX_ARROW_ICON.png"))); // NOI18N
+        btnShowPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_general/COMBOBOX_ARROW_ICON.png"))); // NOI18N
         btnShowPopup.setBorder(null);
         btnShowPopup.setMargin(new java.awt.Insets(1, 2, 1, 2));
         btnShowPopup.addActionListener(new java.awt.event.ActionListener() {

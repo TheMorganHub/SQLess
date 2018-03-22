@@ -104,11 +104,6 @@ public class UserPreferencesLoader {
             case "Default.SaveDir":
                 FileManager.createDirIfNotExists(USER_DIR + "\\Saves");
                 return USER_DIR + "\\Saves";
-            case "Ask.DeprecatedTypes":
-            case "Ask.UncommittedRows":
-                return "true";
-            case "Editor.DisplayRows":
-                return "100";
             case "Default.Database":
                 return "N/A";
         }

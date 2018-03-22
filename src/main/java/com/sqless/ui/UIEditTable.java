@@ -54,6 +54,17 @@ public class UIEditTable extends FrontPanel {
         tablePK = this.table.getPrimaryKey();
     }
 
+    /**
+     * Evalúa si la tabla dada en el constructor de esta clase está capacitada
+     * para ser modificada por esta UI. Si la tabla no tiene una PK, la tabla no
+     * podrá ser modificada por esta UI.
+     *
+     * @return
+     */
+    public boolean tableAllowsModifications() {
+        return !tablePK.isEmpty();
+    }
+
     @Override
     public void onCreate() {
         splitPane.setDividerLocation((int) (parentPane.getHeight() * 0.75));
@@ -77,28 +88,12 @@ public class UIEditTable extends FrontPanel {
 
     public void makeTableModel() {
         List<SQLColumn> columns = table.getColumns();
-        Class<?>[] types = new Class<?>[columns.size()];
         String[] columnNames = new String[columns.size()];
         for (int i = 0; i < columns.size(); i++) {
             SQLColumn column = columns.get(i);
             columnNames[i] = column.getName();
-            if (column.isTimeBased()) {
-                types[i] = Date.class;
-            } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
-                //si es Integer, los campos Null van a aparecer como "0", es por eso que si es nullable, le asignamos la clase String a la columna
-                types[i] = column.isNullable() ? String.class : Integer.class;
-            } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
-                types[i] = Double.class;
-            } else {
-                types[i] = String.class;
-            }
         }
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return types[columnIndex];
-            }
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return !columns.get(column).getDataType().equals("blob");
@@ -106,7 +101,7 @@ public class UIEditTable extends FrontPanel {
         };
         uiTable.setModel(model);
 
-        setUpCellEditors(types);
+        setUpCellEditors();
 
         SQLQuery querySelect = new SQLSelectQuery(table.getSelectStatement(200)) {
             @Override
@@ -121,10 +116,6 @@ public class UIEditTable extends FrontPanel {
                             row.add(SQLUtils.parseSQLYear(rs.getString(i)));
                         } else if (column.isTimeBased()) {
                             row.add(SQLUtils.dateFromString(rs.getString(i), column));
-                        } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
-                            row.add(column.isNullable() ? rs.getString(i) : rs.getInt(i));
-                        } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
-                            row.add(rs.getDouble(i));
                         } else {
                             row.add(rs.getString(i));
                         }
@@ -139,7 +130,6 @@ public class UIEditTable extends FrontPanel {
                 UIUtils.showErrorMessage("Edit table", "Hubo un error al traer los datos de la tabla "
                         + table.getName() + " desde la base de datos.\n" + errMessage, null);
             }
-
         };
         querySelect.exec();
 
@@ -147,7 +137,7 @@ public class UIEditTable extends FrontPanel {
         UIUtils.enhanceTableColumns(uiTable, table);
     }
 
-    private void setUpCellEditors(Class<?>[] columnTypes) {
+    private void setUpCellEditors() {
         for (int i = 0; i < table.getColumnCount(); i++) {
             SQLColumn sqlColumn = table.getColumn(i);
             TableColumn uiColumn = uiTable.getColumn(i);
@@ -158,11 +148,11 @@ public class UIEditTable extends FrontPanel {
                 uiColumn.setCellEditor(new DefaultCellEditor(UIUtils.makeComboBoxForEnumColumn(sqlColumn)));
             } else if (sqlColumn.getDataType().equals("set")) {
                 uiColumn.setCellEditor(new SQLSetCellEditor(SQLUtils.getEnumLikeValuesAsArray(sqlColumn.getEnumLikeValues())));
-            } else if (columnTypes[i] == String.class) {
-                uiColumn.setCellEditor(new StringCellEditor(new JTextField()));
             } else {
-                ((DefaultCellEditor) uiTable.getDefaultEditor(columnTypes[i])).setClickCountToStart(1);
+                uiColumn.setCellEditor(new StringCellEditor(new JTextField()));
+                ((DefaultCellEditor) uiTable.getDefaultEditor(String.class)).setClickCountToStart(1);
             }
+
             uiColumn.setCellRenderer(sqlCellRenderer);
         }
     }
@@ -482,16 +472,39 @@ public class UIEditTable extends FrontPanel {
      * @see SQLRow#addToDatabase(int)
      */
     public void doAddRow() {
-        ((DefaultTableModel) uiTable.getModel()).addRow(new Vector<>());
-        rows.add(new SQLRow());
+        Vector data = createVectorWithDefaults();
+        ((DefaultTableModel) uiTable.getModel()).addRow(data);
+        SQLRow newRow = new SQLRow(data);
+        newRow.setBrandNew(true);
+        rows.add(newRow);
         uiTable.setColumnSelectionInterval(0, 0);
         uiTable.setRowSelectionInterval(uiTable.getRowCount() - 1, uiTable.getRowCount() - 1);
         UIUtils.scrollToBottom(scrTable);
     }
 
+    public Vector createVectorWithDefaults() {
+        Vector vect = new Vector();
+        int autoIncrement = SQLUtils.getTableAutoIncrement(table);
+        for (SQLColumn column : table.getColumns()) {
+            Object defaultVal = column.getDefaultVal();
+            Object value = defaultVal;
+            if (defaultVal != null) {
+                if (column.isTimeBased()) {
+                    value = defaultVal.toString().startsWith("CURRENT") ? SQLUtils.convertDateToValidSQLDate(new Date(), column) : defaultVal;
+                }
+            }
+            if (column.isAutoincrement()) {
+                value = autoIncrement;
+            }
+            vect.add(value);
+        }
+        return vect;
+    }
+
     private Action actionRefreshTable = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
             if (tableHasChanges()) {
                 int opt = UIUtils.showYesNoOptionDialog("Actualizar la tabla", "Se han encontrado cambios no guardados en la tabla.\nSi refrescas ahora, esos cambios se perderán. ¿Deseas continuar?",
                         JOptionPane.QUESTION_MESSAGE, false, null);
@@ -508,7 +521,7 @@ public class UIEditTable extends FrontPanel {
             table = new SQLTable(table);
             table.loadColumns();
             tablePK = table.getPrimaryKey();
-            prepareTable();
+            makeTableModel();
         }
     };
 
@@ -677,6 +690,10 @@ public class UIEditTable extends FrontPanel {
 
         public boolean isBrandNew() {
             return isBrandNew;
+        }
+
+        public void setBrandNew(boolean flag) {
+            this.isBrandNew = flag;
         }
 
         public boolean hasUncommittedChanges() {
@@ -866,6 +883,7 @@ public class UIEditTable extends FrontPanel {
 
                 @Override
                 public void onFailure(String errMessage) {
+                    System.out.println(getSql());
                     UIUtils.showErrorMessage("Delete row(s)", "Could not remove row " + row + ".\n" + errMessage, null);
                     queryResult = false;
                 }

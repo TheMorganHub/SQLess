@@ -26,13 +26,13 @@ public class NodeTreeModel extends DefaultTreeModel {
 
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
-        TreeNodeSqless aNode = (TreeNodeSqless) path.getLastPathComponent();
+        SQLessTreeNode aNode = (SQLessTreeNode) path.getLastPathComponent();
 
         aNode.setUserObject(aNode.getUserObject());
         rename(aNode, (SQLRenameable) aNode.getUserObject(), newValue.toString());
     }
 
-    public void rename(TreeNodeSqless node, SQLRenameable sqlObj, String newName) {
+    public void rename(SQLessTreeNode node, SQLRenameable sqlObj, String newName) {
         SQLQuery renameQuery = new SQLUpdateQuery(sqlObj.getRenameStatement(newName)) {
             @Override
             public void onSuccess(int updateCount) {

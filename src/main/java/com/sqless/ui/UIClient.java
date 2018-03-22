@@ -1,7 +1,7 @@
 package com.sqless.ui;
 
 import com.sqless.ui.tree.NodeCellEditor;
-import com.sqless.ui.tree.TreeNodeSqless;
+import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.ui.tree.NodeTreeModel;
 import com.sqless.ui.tree.NodeCellRenderer;
 import com.sqless.ui.tree.TreeContextMenuHandler;
@@ -21,7 +21,7 @@ import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
 import com.sqless.settings.UserPreferencesLoader;
 import static com.sqless.settings.PreferenceLoader.PrefKey.*;
-import static com.sqless.ui.tree.TreeNodeSqless.NodeType.*;
+import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
 
@@ -140,11 +140,11 @@ public class UIClient extends javax.swing.JFrame {
     }
 
     public void createJTree() {
-        TreeNodeSqless root = new TreeNodeSqless(SQLUtils.getConnectedDB(), DATABASE);
-        TreeNodeSqless tables = new TreeNodeSqless("Tables", CAT_TABLES);
-        TreeNodeSqless views = new TreeNodeSqless("Views", CAT_VIEWS);
-        TreeNodeSqless functions = new TreeNodeSqless("Functions", CAT_FUNCTIONS);
-        TreeNodeSqless procedures = new TreeNodeSqless("Procedures", CAT_PROCEDURES);
+        SQLessTreeNode root = new SQLessTreeNode(SQLUtils.getConnectedDB(), DATABASE);
+        SQLessTreeNode tables = new SQLessTreeNode("Tables", CAT_TABLES);
+        SQLessTreeNode views = new SQLessTreeNode("Views", CAT_VIEWS);
+        SQLessTreeNode functions = new SQLessTreeNode("Functions", CAT_FUNCTIONS);
+        SQLessTreeNode procedures = new SQLessTreeNode("Procedures", CAT_PROCEDURES);
         tables.add(UIUtils.dummyNode());
 
         views.add(UIUtils.dummyNode());
@@ -161,7 +161,7 @@ public class UIClient extends javax.swing.JFrame {
     }
 
     public void clearJTree() {
-        treeDiagram.setModel(new DefaultTreeModel(new TreeNodeSqless()));
+        treeDiagram.setModel(new DefaultTreeModel(new SQLessTreeNode()));
     }
 
     @SuppressWarnings("unchecked")
@@ -270,7 +270,7 @@ public class UIClient extends javax.swing.JFrame {
         scrlDiagram.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         scrlDiagram.setName("scrlDiagram"); // NOI18N
 
-        treeDiagram.setModel(new NodeTreeModel(new com.sqless.ui.tree.TreeNodeSqless()));
+        treeDiagram.setModel(new NodeTreeModel(new com.sqless.ui.tree.SQLessTreeNode()));
         treeDiagram.setMinimumSize(new java.awt.Dimension(270, 0));
         treeDiagram.setName("treeDiagram"); // NOI18N
         treeDiagram.setRowHeight(18);
@@ -299,11 +299,9 @@ public class UIClient extends javax.swing.JFrame {
         btnRefreshJTree.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnRefreshJTree.setName("btnRefreshJTree"); // NOI18N
         btnRefreshJTree.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnRefreshJTree.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefreshJTreeActionPerformed(evt);
-            }
-        });
+        actionRefreshJTree.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("F5"));
+        btnRefreshJTree.getActionMap().put("REFRESH_TREE", actionRefreshJTree);
+        btnRefreshJTree.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) actionRefreshJTree.getValue(Action.ACCELERATOR_KEY), "REFRESH_TREE");
         toolbarDiagrama.add(btnRefreshJTree);
 
         javax.swing.GroupLayout pnlDiagramLayout = new javax.swing.GroupLayout(pnlDiagram);
@@ -437,34 +435,6 @@ public class UIClient extends javax.swing.JFrame {
     private void btnDbManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDbManagerActionPerformed
         (new UIDBExplorer()).setVisible(true);
     }//GEN-LAST:event_btnDbManagerActionPerformed
-
-    private void btnRefreshJTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJTreeActionPerformed
-        TreePath path = treeDiagram.getSelectionPath();
-        if (path == null) {
-            return;
-        }
-        if (((TreeNodeSqless) path.getLastPathComponent()).isRoot()) {
-            createJTree();
-            return;
-        }
-        TreeNodeSqless selectedNode = ((TreeNodeSqless) treeDiagram.getLastSelectedPathComponent());
-
-        if (selectedNode.getAllowsChildren()) {
-            if (selectedNode.getChildCount() > 0) {
-                if (!((TreeNodeSqless) selectedNode.getChildAt(0)).isOfType(DUMMY)) {
-                    selectedNode.removeAllChildren();
-                    selectedNode.add(UIUtils.dummyNode());
-                    treeDiagram.collapsePath(path);
-                    treeDiagram.expandPath(path); //this triggers the expand event so stuff under this node is loaded
-                }
-            } else {
-                selectedNode.add(UIUtils.dummyNode());
-                treeDiagram.collapsePath(path);
-                treeDiagram.expandPath(path); //this triggers the expand event so stuff under this node is loaded
-                treeDiagram.collapsePath(path);
-            }
-        }
-    }//GEN-LAST:event_btnRefreshJTreeActionPerformed
 
     private void menuNewFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuNewFileActionPerformed
         sendToNewTab(new UIQueryPanel(tabPaneContent, ""));
@@ -622,6 +592,37 @@ public class UIClient extends javax.swing.JFrame {
             barMenu.add(submenuLogin);
             barMenu.revalidate();
             barMenu.repaint();
+        }
+    };
+
+    private Action actionRefreshJTree = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            TreePath path = treeDiagram.getSelectionPath();
+            if (path == null) {
+                return;
+            }
+            if (((SQLessTreeNode) path.getLastPathComponent()).isRoot()) {
+                createJTree();
+                return;
+            }
+            SQLessTreeNode selectedNode = ((SQLessTreeNode) treeDiagram.getLastSelectedPathComponent());
+
+            if (selectedNode.getAllowsChildren()) {
+                if (selectedNode.getChildCount() > 0) {
+                    if (!((SQLessTreeNode) selectedNode.getChildAt(0)).isOfType(DUMMY)) {
+                        selectedNode.removeAllChildren();
+                        selectedNode.add(UIUtils.dummyNode());
+                        treeDiagram.collapsePath(path);
+                        treeDiagram.expandPath(path); //this triggers the expand event so stuff under this node is loaded
+                    }
+                } else {
+                    selectedNode.add(UIUtils.dummyNode());
+                    treeDiagram.collapsePath(path);
+                    treeDiagram.expandPath(path); //this triggers the expand event so stuff under this node is loaded
+                    treeDiagram.collapsePath(path);
+                }
+            }
         }
     };
 

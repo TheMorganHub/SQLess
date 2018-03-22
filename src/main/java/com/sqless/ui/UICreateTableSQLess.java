@@ -86,7 +86,7 @@ public class UICreateTableSQLess extends FrontPanel {
         pnlExtraSettings.add(new UIColumnExtrasPanel());
     }
 
-    public void prepararUI() {
+    public void prepararUI() {        
         DefaultSyntaxKit.initKit();
         sqlPane.setContentType("text/sql");
         sqlPane.setComponentPopupMenu(null);

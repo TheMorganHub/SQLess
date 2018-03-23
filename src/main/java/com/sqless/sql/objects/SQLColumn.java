@@ -1,14 +1,16 @@
 package com.sqless.sql.objects;
 
+import com.sqless.utils.DataTypeUtils;
 import com.sqless.utils.SQLUtils;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a column in a table.
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable, 
+public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
         SQLRenameable, SQLDroppable, SQLCreatable, Comparable<SQLColumn> {
 
     private SQLDataObject parentTable;
@@ -58,7 +60,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
             SQLDataObject parentTable) {
         super(name);
         this.dataType = dataType;
-        if (!SQLUtils.isDefaultDatatype(dataType)) {
+        if (!DataTypeUtils.isDefaultDatatype(dataType)) {
             nonSupportedDataType = dataType;
         }
         this.length = charMaxLength;
@@ -311,13 +313,21 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
         this.dataType = dataType;
         length = dataType.equals("varchar") ? "255" : null;
 
-        numericPrecision = SQLUtils.dataTypeIsNumeric(dataType) ? "10" : null;
-        numericScale = dataType.equals("decimal") ? "2" : null;
-        dateTimePrecision = SQLUtils.dataTypeIsTimeBased(dataType);
-        unsigned = dataType.equals("tinyint") || dataType.equals("smallint") || dataType.equals("mediumint");
+        if (DataTypeUtils.dataTypeIsStringBased(dataType)) {
+            if (collation == null || characterSet == null) {
+                Map<String, String> charsetAndCollation = SQLUtils.getDbCollationAndCharSetName();
+                collation = charsetAndCollation.get("collation");
+                characterSet = charsetAndCollation.get("charset");
+            }
+        }
+
+        numericPrecision = DataTypeUtils.dataTypeIsNumeric(dataType) ? "10" : null;
+        numericScale = DataTypeUtils.dataTypeIsDecimal(dataType) ? "2" : null;
+        dateTimePrecision = DataTypeUtils.dataTypeIsTimeBased(dataType);
+        unsigned = DataTypeUtils.dataTypeCanBeUnsigned(dataType);
         onUpdateCurrentTimeStamp = dataType.equals("timestamp");
 
-        if (autoincrement && !SQLUtils.dataTypeIsNumeric(dataType)) {
+        if (autoincrement && !DataTypeUtils.dataTypeIsNumeric(dataType)) {
             autoincrement = false;
         }
     }
@@ -367,7 +377,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
     }
 
     public boolean isTimeBased() {
-        return dateTimePrecision || SQLUtils.dataTypeIsTimeBased(dataType);
+        return dateTimePrecision || DataTypeUtils.dataTypeIsTimeBased(dataType);
     }
 
     /**
@@ -448,15 +458,32 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
         return ordinalPosition;
     }
 
+    /**
+     * Transforma el valor dado en un valor listo para ser agregado a la base de
+     * datos. Es en este método en donde SQLess busca evitar que se inserten
+     * valores nulos en columnas que no acepten null, trayendo un valor
+     * "ejemplo" desde
+     * {@link SQLUtils#getSampleValueForColumn(com.sqless.sql.objects.SQLColumn)}.
+     * Si la columna acepta valores nulos, el valor nulo se mantendrá. Por otro
+     * lado, si el valor no es nulo y la columna es basada en tiempo, se llamará
+     * a
+     * {@link DataTypeUtils#convertDateToValidSQLDate(java.lang.Object, com.sqless.sql.objects.SQLColumn)}
+     * para convertir ese valor de tiempo a formato de fecha de SQL compatible
+     * con esa columna para hacer el insert.
+     *
+     * @param value el valor a transformar.
+     * @return un valor transformado, o null si el valor original es nulo y la
+     * columna acepta valores nulos. Si el valor es nulo y la columna no acepta
+     * valores nulos, se tomará un valor de
+     * {@link SQLUtils#getSampleValueForColumn(com.sqless.sql.objects.SQLColumn)}.
+     */
     public Object formatUserValue(Object value) {
         if (value == null) {
-            if (defaultVal != null) {
-                value = isTimeBased() ? SQLUtils.convertDefaultToValidSQLDate(this) : defaultVal;
-            } else {
+            if (defaultVal == null) {
                 value = isNullable() ? null : SQLUtils.getSampleValueForColumn(this);
             }
         } else {
-            value = isTimeBased() ? SQLUtils.convertDateToValidSQLDate(value, this) : value;
+            value = isTimeBased() ? DataTypeUtils.convertDateToValidSQLDate(value, this) : value;
         }
 
         return value;

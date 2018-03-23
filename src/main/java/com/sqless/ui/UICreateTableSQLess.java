@@ -8,6 +8,7 @@ import com.sqless.sql.objects.SQLForeignKey;
 import com.sqless.sql.objects.SQLPrimaryKey;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.listeners.TableCellListener;
+import com.sqless.utils.DataTypeUtils;
 import com.sqless.utils.SQLUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
@@ -24,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -86,7 +88,7 @@ public class UICreateTableSQLess extends FrontPanel {
         pnlExtraSettings.add(new UIColumnExtrasPanel());
     }
 
-    public void prepararUI() {        
+    public void prepararUI() {
         DefaultSyntaxKit.initKit();
         sqlPane.setContentType("text/sql");
         sqlPane.setComponentPopupMenu(null);
@@ -100,7 +102,7 @@ public class UICreateTableSQLess extends FrontPanel {
         uiTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         uiTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JCheckBox(PK_ICON)));
         uiTable.getColumnModel().getColumn(0).setCellRenderer(pkCellRenderer);
-        DefaultCellEditor comboboxEditor = new DefaultCellEditor(UIUtils.createEditableComboBox(SQLUtils.DEFAULT_DATA_TYPES));
+        DefaultCellEditor comboboxEditor = new DefaultCellEditor(UIUtils.createEditableComboBox(DataTypeUtils.DEFAULT_DATA_TYPES));
         uiTable.getColumnModel().getColumn(2).setCellEditor(comboboxEditor);
         for (int i = 0; i < uiTable.getColumnModel().getColumnCount(); i++) {
             ((DefaultCellEditor) uiTable.getDefaultEditor(uiTable.getColumnClass(i))).setClickCountToStart(1);
@@ -217,6 +219,9 @@ public class UICreateTableSQLess extends FrontPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popMenu = new javax.swing.JPopupMenu();
+        menuItemInsert = new javax.swing.JMenuItem();
+        menuItemDelete = new javax.swing.JMenuItem();
         tabbedpane = new javax.swing.JTabbedPane();
         pnlCampos = new javax.swing.JPanel();
         scrTable = new javax.swing.JScrollPane();
@@ -239,6 +244,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 }
             }
         });
+        uiTable.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popMenu, uiTable));
         pnlExtraSettings = new javax.swing.JPanel();
         pnlFKs = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -256,6 +262,14 @@ public class UICreateTableSQLess extends FrontPanel {
         pnlSQL = new javax.swing.JPanel();
         scrSQL = new javax.swing.JScrollPane();
         sqlPane = new javax.swing.JEditorPane();
+
+        menuItemInsert.setAction(actionInsertCampo);
+        menuItemInsert.setText("Insertar fila aquí");
+        popMenu.add(menuItemInsert);
+
+        menuItemDelete.setAction(actionDeleteCampo);
+        menuItemDelete.setText("Eliminar fila(s)");
+        popMenu.add(menuItemDelete);
 
         setMinimumSize(new java.awt.Dimension(590, 505));
 
@@ -525,7 +539,7 @@ public class UICreateTableSQLess extends FrontPanel {
                     refreshPnlExtras();
                     break;
                 case 3:
-                    if (!colEditada.getDataType().equals("enum") && !colEditada.getDataType().equals("set")
+                    if (!colEditada.getDataType().startsWith("enum") && !colEditada.getDataType().startsWith("set")
                             && !colEditada.getDataType().equals("text") && !colEditada.getDataType().equals("year")
                             && !colEditada.isTimeBased()) {
                         colEditada.setLength(cellChangeListener.getNewValue().toString());
@@ -782,10 +796,13 @@ public class UICreateTableSQLess extends FrontPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem menuItemDelete;
+    private javax.swing.JMenuItem menuItemInsert;
     private javax.swing.JPanel pnlCampos;
     private javax.swing.JPanel pnlExtraSettings;
     private javax.swing.JPanel pnlFKs;
     private javax.swing.JPanel pnlSQL;
+    private javax.swing.JPopupMenu popMenu;
     private javax.swing.JScrollPane scrSQL;
     private javax.swing.JScrollPane scrTable;
     private javax.swing.JEditorPane sqlPane;
@@ -937,57 +954,62 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private ActionListener actionInsertCampo = e -> {
-        if (columnList.isEmpty()) {
-            return;
-        }
-
-        int rowSeleccionada = uiTable.getSelectedRow();
-
-        if (!columnList.get(rowSeleccionada).getUncommittedName().isEmpty()) {
-            if (uiTable.getCellEditor() != null) {
-                uiTable.getCellEditor().stopCellEditing();
+    private Action actionInsertCampo = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (columnList.isEmpty()) {
+                return;
             }
 
-            sqlTable.insertColumn(rowSeleccionada, new SQLColumn(""));
+            int rowSeleccionada = uiTable.getSelectedRow();
 
-            getTableModel().insertRow(rowSeleccionada, new Object[5]);
-            uiTable.setRowSelectionInterval(rowSeleccionada, rowSeleccionada);
+            if (!columnList.get(rowSeleccionada).getUncommittedName().isEmpty()) {
+                if (uiTable.getCellEditor() != null) {
+                    uiTable.getCellEditor().stopCellEditing();
+                }
 
-            syncRowWithList(rowSeleccionada);
-            boldTitleLabel();
+                sqlTable.insertColumn(rowSeleccionada, new SQLColumn(""));
+
+                getTableModel().insertRow(rowSeleccionada, new Object[5]);
+                uiTable.setRowSelectionInterval(rowSeleccionada, rowSeleccionada);
+
+                syncRowWithList(rowSeleccionada);
+                boldTitleLabel();
+            }
         }
     };
 
-    private ActionListener actionDeleteCampo = e -> {
-        if (columnList.isEmpty()) {
-            return;
-        }
-        if (uiTable.getCellEditor() != null) {
-            uiTable.getCellEditor().cancelCellEditing();
-        }
-        int[] selectedRowsIndexes = uiTable.getSelectedRows();
-        int selRowStart = selectedRowsIndexes[0];
-        int selRowEnd = selectedRowsIndexes[selectedRowsIndexes.length - 1];
-        for (int i = selectedRowsIndexes.length - 1; i >= 0; i--) {
-            if (sqlTable.columnIsPK(columnList.get(selectedRowsIndexes[i]))) {
-                sqlTable.getPrimaryKey().removeColumn(columnList.get(selectedRowsIndexes[i]));
+    private Action actionDeleteCampo = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (columnList.isEmpty()) {
+                return;
             }
-            if (!columnList.get(selectedRowsIndexes[i]).isBrandNew()) {
-                sqlTable.getDroppedColumns().add(columnList.get(selectedRowsIndexes[i]));
+            if (uiTable.getCellEditor() != null) {
+                uiTable.getCellEditor().cancelCellEditing();
             }
-            sqlTable.removeColumn(selectedRowsIndexes[i]);
-            getTableModel().removeRow(selectedRowsIndexes[i]);
-        }
-        if (uiTable.getRowCount() > 0) {
-            //si la fila a remover fue la última en la tabla, seleccionamos la que ahora es última
-            if (selRowStart == uiTable.getRowCount()) {
-                uiTable.setRowSelectionInterval(selRowStart - 1, selRowStart - 1);
-            } else { //de lo contrario, seleccionamos la que nos cae de arriba, que ahora va a ocupar el lugar de la removida
-                uiTable.setRowSelectionInterval(selRowStart, selRowStart);
+            int[] selectedRowsIndexes = uiTable.getSelectedRows();
+            int selRowStart = selectedRowsIndexes[0];
+            for (int i = selectedRowsIndexes.length - 1; i >= 0; i--) {
+                if (sqlTable.columnIsPK(columnList.get(selectedRowsIndexes[i]))) {
+                    sqlTable.getPrimaryKey().removeColumn(columnList.get(selectedRowsIndexes[i]));
+                }
+                if (!columnList.get(selectedRowsIndexes[i]).isBrandNew()) {
+                    sqlTable.getDroppedColumns().add(columnList.get(selectedRowsIndexes[i]));
+                }
+                sqlTable.removeColumn(selectedRowsIndexes[i]);
+                getTableModel().removeRow(selectedRowsIndexes[i]);
             }
+            if (uiTable.getRowCount() > 0) {
+                //si la fila a remover fue la última en la tabla, seleccionamos la que ahora es última
+                if (selRowStart == uiTable.getRowCount()) {
+                    uiTable.setRowSelectionInterval(selRowStart - 1, selRowStart - 1);
+                } else { //de lo contrario, seleccionamos la que nos cae de arriba, que ahora va a ocupar el lugar de la removida
+                    uiTable.setRowSelectionInterval(selRowStart, selRowStart);
+                }
+            }
+            boldTitleLabel();
         }
-        boldTitleLabel();
     };
 
     private ActionListener actionMoveColumns = e -> {

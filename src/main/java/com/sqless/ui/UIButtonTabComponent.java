@@ -106,6 +106,7 @@ public class UIButtonTabComponent extends JPanel {
             addActionListener(this);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfTabComponent(UIButtonTabComponent.this);
             if (i != -1) {

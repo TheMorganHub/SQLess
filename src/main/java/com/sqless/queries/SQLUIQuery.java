@@ -4,7 +4,7 @@ import com.mysql.jdbc.Blob;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
-import com.sqless.utils.SQLUtils;
+import com.sqless.utils.DataTypeUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -167,10 +167,10 @@ public class SQLUIQuery extends SQLQuery {
                         String cellValue = rs.getString(columnIndex);
                         if (cellValue != null) {
                             if (columnType.equalsIgnoreCase("year")) {
-                                cellValue = SQLUtils.parseSQLYear(cellValue);
+                                cellValue = DataTypeUtils.parseSQLYear(cellValue);
                             } else if (columnType.equalsIgnoreCase("blob")) {
-                                cellValue = SQLUtils.parseBlob((Blob) rs.getBlob(columnIndex));
-                            } else if (SQLUtils.dataTypeIsTimeBased(columnType)) {
+                                cellValue = DataTypeUtils.parseBlob((Blob) rs.getBlob(columnIndex));
+                            } else if (DataTypeUtils.dataTypeIsTimeBased(columnType)) {
                                 cellValue = cellValue.endsWith(".0") ? cellValue.substring(0, cellValue.length() - 2) : cellValue;
                             }
                         }

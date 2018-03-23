@@ -50,7 +50,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
         toolbar.add(UIUtils.newToolbarBtn(actionMoveUp, null, UIUtils.icon("ui_createtable/ui_movecolumns", "MOVER_ARRIBA")));
         toolbar.add(UIUtils.newToolbarBtn(actionMoveDown, null, UIUtils.icon("ui_createtable/ui_movecolumns", "MOVER_ABAJO")));
         toolbar.add(UIUtils.newToolbarBtn(actionAlphabetically, "Las columnas serán ordenadas alfabeticamente", UIUtils.icon("ui_createtable/ui_movecolumns", "ALPHABETICALLY")));
-        toolbar.add(UIUtils.newToolbarBtn(actionKeysFirst, "Las columnas que sean primary/foreign key irán primero", UIUtils.icon("ui_createtable/ui_movecolumns", "KEYS_FIRST")));        
+        toolbar.add(UIUtils.newToolbarBtn(actionKeysFirst, "Las columnas que sean primary/foreign key irán primero", UIUtils.icon("ui_createtable/ui_movecolumns", "KEYS_FIRST")));
         toolbar.add(UIUtils.newSeparator());
         toolbar.add(UIUtils.newToolbarBtn(actionConfirm, "Confirmar cambios", UIUtils.icon("ui_createtable", "SAVE")));
     }
@@ -195,7 +195,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
         table.replaceColumns(sortedCols);
         fillTable();
     };
-    
+
     private ActionListener actionAlphabetically = e -> {
         table.getColumns().sort(SQLColumn::compareTo);
         for (int i = 0; i < table.getColumns().size(); i++) { //actualizamos la ordinal position de cada col
@@ -236,7 +236,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
         } else {
             for (SQLColumn column : table.getColumns()) {
                 if (column.positionChanged()) {
-                    result = 1;                    
+                    result = 1;
                 }
             }
             dispose();

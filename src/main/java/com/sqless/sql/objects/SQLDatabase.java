@@ -27,11 +27,11 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
     public void loadViews() {
         views = SQLUtils.getViews();
     }
-    
+
     public void loadFunctions() {
         functions = SQLUtils.getExecutables(SQLFunction.class);
     }
-    
+
     public void loadProcedures() {
         procedures = SQLUtils.getExecutables(SQLProcedure.class);
     }
@@ -83,6 +83,11 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
     @Override
     public String getDropStatement() {
         return "DROP DATABASE " + getName() + ";";
+    }
+
+    public String getCharsetAndCollationStatement() {
+        return "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA\n"
+                + "WHERE schema_name = '" + getName() + "'";
     }
 
     @Override

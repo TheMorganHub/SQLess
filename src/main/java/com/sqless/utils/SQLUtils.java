@@ -1,6 +1,5 @@
 package com.sqless.utils;
 
-import com.mysql.jdbc.Blob;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLSelectQuery;
 import java.sql.ResultSet;
@@ -31,11 +30,7 @@ import javax.swing.JTable;
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class SQLUtils {
-
-    public static final SimpleDateFormat MYSQL_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public static final SimpleDateFormat MYSQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final String[] DEFAULT_DATA_TYPES = {"int", "decimal", "datetime", "varchar"};
+public class SQLUtils {    
 
     /**
      * Filtra la palabra clave 'DELIMITER' y todos los delimitadores que no sean
@@ -205,15 +200,6 @@ public class SQLUtils {
         return tables;
     }
 
-    public static boolean isDefaultDatatype(String datatype) {
-        for (String defaultType : DEFAULT_DATA_TYPES) {
-            if (datatype.equalsIgnoreCase(defaultType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static List<SQLView> getViews() {
         List<SQLView> views = new ArrayList<>();
         SQLQuery getViewsQuery = new SQLSelectQuery("SHOW FULL TABLES IN " + getConnectedDBName() + " WHERE TABLE_TYPE LIKE 'VIEW'") {
@@ -288,7 +274,7 @@ public class SQLUtils {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 autoIncrement.set(rs.next() ? rs.getInt("AUTO_INCREMENT") : 1);
-            }                    
+            }
         };
         getAutoIncrementQuery.exec();
         return autoIncrement.get();
@@ -317,7 +303,7 @@ public class SQLUtils {
                     newColumn.setCharacterSet(rs.getString("CHARACTER_SET_NAME"));
                     newColumn.setCollation(rs.getString("COLLATION_NAME"));
                     newColumn.setUnsigned(rs.getString("COLUMN_TYPE").endsWith("unsigned"), false);
-                    newColumn.setDateTimePrecision(dataTypeIsTimeBased(dataType));
+                    newColumn.setDateTimePrecision(DataTypeUtils.dataTypeIsTimeBased(dataType));
                     newColumn.setOnUpdateCurrentTimeStamp(rs.getString("EXTRA").equalsIgnoreCase("ON UPDATE CURRENT_TIMESTAMP"));
                     newColumn.setAutoincrement(rs.getString("EXTRA").equals("auto_increment"), false);
                     if (newColumn.getDataType().equals("enum") || newColumn.getDataType().equals("set")) {
@@ -334,6 +320,22 @@ public class SQLUtils {
         };
         getColumnDataQuery.exec();
         return columns;
+    }
+
+    public static Map<String, String> getDbCollationAndCharSetName() {
+        Map<String, String> collationAndCharset = new HashMap<>();
+        SQLQuery tableCollationQuery = new SQLSelectQuery(getConnectedDB().getCharsetAndCollationStatement()) {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                if (rs.next()) {
+                    collationAndCharset.put("collation", rs.getString("COLLATION_NAME"));
+                    collationAndCharset.put("charset", rs.getString("character_set_name"));
+                }
+            }
+        };
+        tableCollationQuery.exec();
+
+        return collationAndCharset;
     }
 
     public static List<SQLIndex> getIndexes(SQLDataObject tableObject) {
@@ -453,43 +455,6 @@ public class SQLUtils {
         return name;
     }
 
-    /**
-     * Remueve el mes y el año "01-01" que (por alguna razón) viene al llamar
-     * {@link ResultSet#getString(int)} a una columna de tipo {@code year}.
-     *
-     * @param year Un String con formato {@code ####-##-##}.
-     * @return un String compatible con el tipo de dato {@code year} de MySQL.
-     * Por ejemplo {@code 2016-01-01} se transformará en {@code 2016}.
-     */
-    public static String parseSQLYear(String year) {
-        return year != null && year.contains("-") ? year.substring(0, year.indexOf("-")) : year;
-    }
-
-    public static String parseBlob(Blob blob) throws SQLException {
-        return blob != null ? "BLOB (" + String.format("%.2f", (float) blob.length() / 1024) + " KB)" : null;
-    }
-
-    public static boolean dataTypeIsNumeric(String dataType) {
-        return dataType.equals("bit") || dataType.equals("tinyint") || dataType.equals("smallint")
-                || dataType.equals("mediumint") || dataType.equals("int")
-                || dataType.equals("bigint") || dataType.equals("decimal");
-    }
-
-    public static boolean dataTypeIsInteger(String dataType) {
-        return dataType.equals("tinyint") || dataType.equals("smallint")
-                || dataType.equals("mediumint") || dataType.equals("int")
-                || dataType.equals("bigint");
-    }
-
-    public static boolean dataTypeIsDecimal(String dataType) {
-        return dataType.equals("float") || dataType.equals("decimal") || dataType.equals("double") || dataType.equals("numeric");
-    }
-
-    public static boolean dataTypeIsTimeBased(String dataType) {
-        return dataType.equals("date") || dataType.equals("datetime")
-                || dataType.equals("time") || dataType.equals("timestamp");
-    }
-
     public static String getConnectedDBName() {
         return getConnectedDB().getName();
     }
@@ -498,49 +463,10 @@ public class SQLUtils {
         return SQLConnectionManager.getInstance().getConnectedDB();
     }
 
-    /**
-     * Converts the given object into a {@code String} that conforms with the
-     * SQL {@code date} or {@code datetime} data types depending on the one from
-     * the column given. <br>
-     * Example: if given {@code Thu Jul 20 00:00:00 ART 2017}, this method will
-     * convert that to {@code 2017-07-20 00:00:00}.
-     *
-     *
-     * @param date a {@code Date} object to be converted.
-     * @param column a {@code SQLColumn} from which to take the data type.
-     * @return A formatted {@code String} compatible with MySQL date datatypes.
-     * @throws IllegalArgumentException if the column given is of a data type
-     * that doesn't display time.
-     */
-    public static String convertDateToValidSQLDate(Object date, SQLColumn column) {
-        if (!column.isTimeBased()) {
-            throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
-        }
-        if (date == null) {
-            return null;
-        }
-        if (!(date instanceof Date)) {
-            return "" + date;
-        }
-
-        return column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.format(date) : MYSQL_DATETIME_FORMAT.format(date);
-    }
-
-    public static String convertDefaultToValidSQLDate(SQLColumn column) {
-        if (!column.isTimeBased()) {
-            throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
-        }
-        if (column.getDefaultVal() == null) {
-            return null;
-        }
-        String defaultVal = column.getDefaultVal();
-        return convertDateToValidSQLDate(!defaultVal.startsWith("CURRENT") ? new Date() : defaultVal, column);
-    }
-
     public static String getSampleValueForColumn(SQLColumn column) {
         String value;
         if (column.isTimeBased()) {
-            value = SQLUtils.convertDateToValidSQLDate(new Date(), column);
+            value = DataTypeUtils.convertDateToValidSQLDate(new Date(), column);
         } else if (column.isStringBased()) {
             value = "";
         } else {
@@ -556,7 +482,7 @@ public class SQLUtils {
         Date parsedDate = null;
         if (dateString != null) {
             try {
-                parsedDate = column.getDataType().equals("date") ? MYSQL_DATE_FORMAT.parse(dateString) : MYSQL_DATETIME_FORMAT.parse(dateString);
+                parsedDate = column.getDataType().equals("date") ? DataTypeUtils.MYSQL_DATE_FORMAT.parse(dateString) : DataTypeUtils.MYSQL_DATETIME_FORMAT.parse(dateString);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -592,7 +518,12 @@ public class SQLUtils {
                 SQLColumn column = table.getColumn(selectedCols[j]);
                 Object oldValue = row.getValue(column.getName());
                 if ((oldValue != null && !oldValue.equals(value) || value != null && !value.equals(oldValue)) && predicate.test(column)) {
-                    row.setValueForUpdate(column, value);
+                    if (row.isBrandNew()) {
+                        row.setValue(column.getName(), value);
+                        row.refreshWithUi(selectedRows[i]);
+                    } else {
+                        row.setValueForUpdate(column, value);
+                    }
                 }
             }
             if (row.hasUncommittedChanges()) {
@@ -606,7 +537,6 @@ public class SQLUtils {
                     break;
                 }
             }
-
         }
     }
 

@@ -353,6 +353,9 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="btnRefreshJTree">
                   <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="actionRefreshJTree" type="code"/>
+                    </Property>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/icons/ui_client/REFRESH_ICON.png"/>
                     </Property>

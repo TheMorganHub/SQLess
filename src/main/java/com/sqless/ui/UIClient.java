@@ -293,6 +293,7 @@ public class UIClient extends javax.swing.JFrame {
         });
         toolbarDiagrama.add(btnDbManager);
 
+        btnRefreshJTree.setAction(actionRefreshJTree);
         btnRefreshJTree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/REFRESH_ICON.png"))); // NOI18N
         btnRefreshJTree.setToolTipText("Refresh");
         btnRefreshJTree.setFocusable(false);

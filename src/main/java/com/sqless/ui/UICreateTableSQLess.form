@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <NonVisualComponents>
+    <Container class="javax.swing.JPopupMenu" name="popMenu">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemInsert">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionInsertCampo" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Insertar fila aqu&#xed;"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemDelete">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionDeleteCampo" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Eliminar fila(s)"/>
+          </Properties>
+        </MenuItem>
+      </SubComponents>
+    </Container>
+  </NonVisualComponents>
   <Properties>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[590, 505]"/>
@@ -116,7 +142,7 @@
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="uiTable.getTableHeader().setReorderingAllowed(false);&#xd;&#xa;uiTable.setSortable(false);&#xd;&#xa;uiTable.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));&#xd;&#xa;uiTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);"/>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable() {&#xd;&#xa;@Override&#xd;&#xa;protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,&#xd;&#xa;                                        int condition, boolean pressed) {&#xd;&#xa;    if (!ks.equals(KeyStroke.getKeyStroke(&quot;control S&quot;))) {&#xd;&#xa;        return super.processKeyBinding(ks, e, condition, pressed);&#xd;&#xa;    }&#xd;&#xa;return false;&#xd;&#xa;}&#xd;&#xa;&#xd;&#xa;};"/>
-                    <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;        });"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="uiTable.addMouseMotionListener(new MouseMotionAdapter() {&#xa;            @Override&#xa;            public void mouseDragged(MouseEvent e) {&#xa;                if (uiTable.isEditing()) {&#xa;                    uiTable.getCellEditor().cancelCellEditing();&#xa;                }&#xa;            }&#xa;        });&#xa;uiTable.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popMenu, uiTable));"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

@@ -9,6 +9,8 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +37,8 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
-import static com.sqless.utils.MiscUtils.log;
 import java.net.URL;
+import javax.swing.JPopupMenu;
 
 /**
  * Helper class that contains methods useful for UI.
@@ -147,6 +149,44 @@ public class UIUtils {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
         });
+    }
+
+    /**
+     * Crea un nuevo {@code MouseListener} para una tabla el cual activará el
+     * {@code JPopupMenu} dado. Este método ya incluye toda la lógica
+     * relacionada a cambios de selecciones, etc.
+     *
+     * @param popMenu El {@link JPopupMenu} que aparecerá.
+     * @param table La tabla sobre la cual aparecerá el {@code JPopupMenu}.
+     * @return un {@code MouseListener} listo para ser asignado a la tabla dada.
+     */
+    public static MouseAdapter mouseListenerWithPopUpMenuForJTable(JPopupMenu popMenu, JTable table) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    UIUtils.interruptCellEdit(table, UIUtils.CellEdit.STOP);
+                    int r = table.rowAtPoint(e.getPoint());
+                    int c = table.columnAtPoint(e.getPoint());
+                    if (r >= 0 && r < table.getRowCount()) {
+                        int[] selectedRows = table.getSelectedRows();
+                        int[] selectedCols = table.getSelectedColumns();
+                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r) || !MiscUtils.arrayContains(selectedCols, c)) {
+                            table.setColumnSelectionInterval(c, c);
+                            table.setRowSelectionInterval(r, r);
+                        }
+                    } else {
+                        table.clearSelection();
+                    }
+
+                    int rowindex = table.getSelectedRow();
+                    if (rowindex < 0) {
+                        return;
+                    }
+                    popMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        };
     }
 
     public static JComboBox createEditableComboBox(String[] model) {
@@ -391,8 +431,7 @@ public class UIUtils {
 
         if (fileUrl == null) { //let's try uppercase extension now
             fileUrl = UIUtils.class.getResource(ICONS_PATH + folder + "/" + fileName + (fileName.endsWith("_ICON") ? "" : "_ICON") + "." + extension.toUpperCase());
-            if (fileUrl == null) { //uppercase check failed, let's return a generic MISSING icon and log this
-                log("UIUtils", folder + " / " + fileName + " / " + extension);
+            if (fileUrl == null) { //uppercase check failed, let's return a generic MISSING icon
                 return new ImageIcon(UIUtils.class.getResource(ICONS_PATH + "ui_general/MISSING_ICON.png"));
             }
         }

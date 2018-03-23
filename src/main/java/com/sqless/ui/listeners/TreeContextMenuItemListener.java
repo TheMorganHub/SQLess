@@ -67,7 +67,6 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         }
         SQLQuery dropQuery = new SQLUpdateQuery(((SQLDroppable) node.getUserObject()).getDropStatement(), true);
         dropQuery.exec();
-//        client.createNewQueryPanelAndRun(((SQLDroppable) node.getUserObject()).getDropStatement());
     }
 
     public void doSelect(SQLessTreeNode node) {

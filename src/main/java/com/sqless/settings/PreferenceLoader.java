@@ -45,7 +45,7 @@ public class PreferenceLoader {
     private PreferenceLoader() {
         prefs = Preferences.userRoot().node(PATH);
         try {
-            if (!prefs.nodeExists(PATH_SETTINGS) || !prefs.nodeExists(PATH_PROFILE)) {
+            if (!prefs.nodeExists(PATH_SETTINGS)) {
                 System.out.println("PREPARING FOR FIRST TIME USE...");
                 performFirstTimeTasks();
             } else {

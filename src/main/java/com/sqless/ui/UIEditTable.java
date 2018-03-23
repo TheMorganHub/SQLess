@@ -111,9 +111,9 @@ public class UIEditTable extends FrontPanel {
                     for (int i = 1; i <= table.getColumnCount(); i++) {
                         SQLColumn column = table.getColumn(i - 1);
                         if (column.getDataType().equals("blob")) {
-                            row.add(SQLUtils.parseBlob((Blob) rs.getBlob(i)));
+                            row.add(DataTypeUtils.parseBlob((Blob) rs.getBlob(i)));
                         } else if (column.getDataType().equals("year")) {
-                            row.add(SQLUtils.parseSQLYear(rs.getString(i)));
+                            row.add(DataTypeUtils.parseSQLYear(rs.getString(i)));
                         } else if (column.isTimeBased()) {
                             row.add(SQLUtils.dateFromString(rs.getString(i), column));
                         } else {
@@ -182,7 +182,7 @@ public class UIEditTable extends FrontPanel {
             JLabel component = (JLabel) super.getTableCellRendererComponent(table1, value, isSelected, hasFocus, row, column);
             if (value != null) {
                 if (sqlColumn.isTimeBased()) {
-                    component.setText(SQLUtils.convertDateToValidSQLDate(value, sqlColumn));
+                    component.setText(DataTypeUtils.convertDateToValidSQLDate(value, sqlColumn));
                 }
             } else {
                 component.setText("<html><span style=\"color:gray\">Null</span></html>");
@@ -227,8 +227,8 @@ public class UIEditTable extends FrontPanel {
 
             if (editingColumn.isTimeBased()) { //resuelve un bug raro que hace que el DatePickerCellEditor registre un evento de edit cuando la fecha no cambió - solo para columnas de fechas
                 if (newValue != null) {
-                    String formattedOld = SQLUtils.convertDateToValidSQLDate(oldValue, editingColumn);
-                    String formattedNew = SQLUtils.convertDateToValidSQLDate(newValue, editingColumn);
+                    String formattedOld = DataTypeUtils.convertDateToValidSQLDate(oldValue, editingColumn);
+                    String formattedNew = DataTypeUtils.convertDateToValidSQLDate(newValue, editingColumn);
                     if (formattedOld.equals(formattedNew)) {
                         return;
                     }
@@ -279,32 +279,7 @@ public class UIEditTable extends FrontPanel {
                 }
             }
         });
-        uiTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
-                    int r = uiTable.rowAtPoint(e.getPoint());
-                    int c = uiTable.columnAtPoint(e.getPoint());
-                    if (r >= 0 && r < uiTable.getRowCount()) {
-                        int[] selectedRows = uiTable.getSelectedRows();
-                        int[] selectedCols = uiTable.getSelectedColumns();
-                        if (selectedRows.length == 0 || !MiscUtils.arrayContains(selectedRows, r) || !MiscUtils.arrayContains(selectedCols, c)) {
-                            uiTable.setColumnSelectionInterval(c, c);
-                            uiTable.setRowSelectionInterval(r, r);
-                        }
-                    } else {
-                        uiTable.clearSelection();
-                    }
-
-                    int rowindex = uiTable.getSelectedRow();
-                    if (rowindex < 0) {
-                        return;
-                    }
-                    popTable.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
+        uiTable.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popTable, uiTable));
         loadKeyBindings();
         scrLog = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextPane();
@@ -490,7 +465,7 @@ public class UIEditTable extends FrontPanel {
             Object value = defaultVal;
             if (defaultVal != null) {
                 if (column.isTimeBased()) {
-                    value = defaultVal.toString().startsWith("CURRENT") ? SQLUtils.convertDateToValidSQLDate(new Date(), column) : defaultVal;
+                    value = defaultVal.toString().startsWith("CURRENT") ? DataTypeUtils.convertDateToValidSQLDate(new Date(), column) : defaultVal;
                 }
             }
             if (column.isAutoincrement()) {
@@ -671,7 +646,7 @@ public class UIEditTable extends FrontPanel {
             SQLColumn sqlColumn = table.getColumn(column);
             String colName = sqlColumn.getName();
             if (sqlColumn.isTimeBased()) {
-                value = SQLUtils.convertDateToValidSQLDate(value, sqlColumn);
+                value = DataTypeUtils.convertDateToValidSQLDate(value, sqlColumn);
             }
             if (valuesForUpdate.containsKey(colName)) {
                 valuesForUpdate.replace(colName, value);
@@ -696,6 +671,13 @@ public class UIEditTable extends FrontPanel {
             this.isBrandNew = flag;
         }
 
+        /**
+         * Evalúa si una fila tiene cambios pendientes. Para filas nuevas, este
+         * método va a retornar {@code false} siempre.
+         *
+         * @return {@code true} si el {@code HashMap} de valores para update no
+         * es nulo y no está vacío.
+         */
         public boolean hasUncommittedChanges() {
             return !isBrandNew() && valuesForUpdate != null && !valuesForUpdate.isEmpty();
         }
@@ -737,7 +719,7 @@ public class UIEditTable extends FrontPanel {
                         String col = entry.getKey();
                         SQLColumn sqlColumn = table.getColumn(col);
                         Object value = entry.getValue();
-                        Object oldValue = sqlColumn.isTimeBased() ? SQLUtils.convertDateToValidSQLDate(columnsAndValues.get(col), sqlColumn) : columnsAndValues.get(col);
+                        Object oldValue = sqlColumn.isTimeBased() ? DataTypeUtils.convertDateToValidSQLDate(columnsAndValues.get(col), sqlColumn) : columnsAndValues.get(col);
                         DocStyler.of(txtLog).append("[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ", DocStyler.FontStyle.BOLD)
                                 .append("UPDATE: ", DocStyler.FontStyle.NORMAL)
                                 .append("'" + oldValue + "'", Color.RED).append(" -> ", Color.BLACK).append("'" + value + "'", Color.RED)
@@ -824,9 +806,9 @@ public class UIEditTable extends FrontPanel {
                     if (value != null && value instanceof String) {
                         value = SQLUtils.dateFromString(value.toString(), column);
                     }
-                } else if (SQLUtils.dataTypeIsInteger(column.getDataType())) {
+                } else if (DataTypeUtils.dataTypeIsInteger(column.getDataType())) {
                     value = value != null ? Integer.parseInt(value.toString()) : null;
-                } else if (SQLUtils.dataTypeIsDecimal(column.getDataType())) {
+                } else if (DataTypeUtils.dataTypeIsDecimal(column.getDataType())) {
                     value = value != null ? Double.parseDouble(value.toString()) : null;
                 }
 

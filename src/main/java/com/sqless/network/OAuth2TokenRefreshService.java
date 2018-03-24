@@ -80,6 +80,10 @@ public class OAuth2TokenRefreshService {
     public Credential getCurrentCredential() {
         return credential;
     }
+    
+    public static boolean isRunning() {
+        return instance != null;
+    }
 
     /**
      * Inicia la tarea programada de refrescar el token de acceso. Esta tarea se

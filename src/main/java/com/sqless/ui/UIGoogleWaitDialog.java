@@ -1,5 +1,6 @@
 package com.sqless.ui;
 
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.sqless.network.GoogleLogin;
 import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.UIUtils;
@@ -20,6 +21,7 @@ import com.sqless.utils.UIUtils;
 public class UIGoogleWaitDialog extends javax.swing.JDialog {
 
     private Thread secondaryThread;
+    private LocalServerReceiver serverReceiver;
 
     public UIGoogleWaitDialog() {
         super(UIClient.getInstance(), true);
@@ -30,19 +32,19 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
         lblDialog.setText("Esperando a Google...");
         secondaryThread = new Thread(() -> {
             GoogleLogin login = new GoogleLogin(googleUser -> {
-                if (secondaryThread != null) {
-                    GoogleUserManager.getInstance().addNew(googleUser);
-                    UIClient.getInstance().updateMenuBarForGoogleUser(googleUser);
-                } else { //si el usuario canceló el dialogo pero aceptó la página del browser
-                    UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al iniciar sesión. El token dado ya no es válido.", null);
-                    GoogleUserManager.getInstance().logOut();
-                }
+                GoogleUserManager.getInstance().addNew(googleUser);
+                UIClient.getInstance().updateMenuBarForGoogleUser(googleUser);
                 dispose();
             });
+            serverReceiver = login.getServerReceiver();
             login.start();
         });
         secondaryThread.start();
         setVisible(true);
+    }
+
+    public void setServerReceiver(LocalServerReceiver serverReceiver) {
+        this.serverReceiver = serverReceiver;
     }
 
     /**
@@ -57,12 +59,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
 
             secondaryThread = new Thread(() -> {
                 GoogleUserManager.getInstance().authenticateStoredCredentials(user -> {
-                    if (secondaryThread != null) {
-                        UIClient.getInstance().updateMenuBarForGoogleUser(user);
-                    } else { //si el usuario canceló el dialogo pero aceptó la página del browser
-                        UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al iniciar sesión. El token dado ya no es válido.", null);
-                        GoogleUserManager.getInstance().logOut();
-                    }
+                    UIClient.getInstance().updateMenuBarForGoogleUser(user);
                     dispose();
                 }, this);
             });
@@ -132,8 +129,12 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
     public void cancel() {
         if (secondaryThread != null) {
             dispose();
-            secondaryThread.interrupt();
-            secondaryThread = null;
+            try {
+                if (serverReceiver != null) {
+                    serverReceiver.stop();
+                }                
+            } catch (Exception e) {
+            }
             GoogleUserManager.getInstance().logOut();
         }
     }

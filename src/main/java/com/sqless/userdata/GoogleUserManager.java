@@ -55,7 +55,9 @@ public class GoogleUserManager {
         active = null;
         cleanUp();
         try {
-            OAuth2TokenRefreshService.getInstance().stop();
+            if (OAuth2TokenRefreshService.isRunning()) {
+                OAuth2TokenRefreshService.getInstance().stop();
+            }
         } catch (Exception e) {
             System.err.println("OAuth2TokenRefreshService: ocurrió una excepción al intentar finalizar el servicio.");
             e.printStackTrace();

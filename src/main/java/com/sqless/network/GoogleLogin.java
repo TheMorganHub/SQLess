@@ -22,6 +22,7 @@ import com.sqless.utils.UIUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import us.monoid.web.JSONResource;
@@ -56,9 +57,12 @@ public class GoogleLogin {
         try {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
-        } catch (Throwable t) {
+            serverReceiver = new LocalServerReceiver();
+            if (waitDialog != null) {
+                waitDialog.setServerReceiver(serverReceiver);
+            }
+        } catch (IOException | GeneralSecurityException t) {
             t.printStackTrace();
-            System.exit(1);
         }
     }
 
@@ -100,28 +104,27 @@ public class GoogleLogin {
      */
     private static final List<String> SCOPES
             = Arrays.asList(Oauth2Scopes.USERINFO_PROFILE, Oauth2Scopes.USERINFO_EMAIL, Oauth2Scopes.PLUS_ME);
-    
+
     private GoogleAuthorizationCodeFlow flow;
+
+    private LocalServerReceiver serverReceiver;
 
     /**
      * Creates an authorized Credential object.
      *
      * @return an authorized Credential object.
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public Credential authorize() throws IOException {
-        // Load client secrets.
         InputStream in = GoogleLogin.class.getResourceAsStream("/google/client_secret.json");
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
         // Build flow and trigger user authorization request.
         flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(DATA_STORE_FACTORY)
                 .setAccessType("offline")
                 .build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-
+        Credential credential = new AuthorizationCodeInstalledApp(flow, serverReceiver).authorize("user");
         System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
@@ -135,9 +138,9 @@ public class GoogleLogin {
         if (callback != null) {
             callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
         }
-        
+
         OAuth2TokenRefreshService.startInstance(flow);
-        
+
         //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
@@ -166,12 +169,15 @@ public class GoogleLogin {
             startOauth2Service();
         } catch (IOException e) {
             UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
-            e.printStackTrace();
-            if (waitDialog != null) {
-                waitDialog.cancel();
-            } else {
-                GoogleUserManager.getInstance().logOut();
-            }
+            waitDialog.cancel();
+        } catch (NullPointerException e) {
+            //va a saltar desde adentro de las librerías de Google si el usuario cancela el proceso de autenticación.
+            //el proceso de cancelación consiste en darle stop() al LocalServerReceiver
+            UIUtils.showMessage("Autenticación con Google", "El usuario canceló el inicio de sesión", null);
         }
+    }
+
+    public LocalServerReceiver getServerReceiver() {
+        return serverReceiver;
     }
 }

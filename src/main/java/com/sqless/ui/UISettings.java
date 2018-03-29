@@ -328,7 +328,7 @@ public class UISettings extends javax.swing.JDialog {
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
         try {
-            Runtime.getRuntime().exec("explorer.exe /select," + userPreferences.getProperty("defaultSaveDir"));
+            Runtime.getRuntime().exec("explorer.exe /select," + txtDefaultSaveDir.getText());
         } catch (IOException ex) {
             UIUtils.showErrorMessage("Error", "Could not open directory", getParent());
             System.err.println("Could not open directory.");

@@ -6,6 +6,7 @@ import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -71,6 +72,9 @@ public class UIQueryPanel extends FrontPanel {
     public void onCreate() {
         setSQLText(tabOriginalContents);
         sqlEditorPane.requestFocus();
+        EventQueue.invokeLater(() -> {
+            splitPane.setDividerLocation(0.65);
+        });
     }
 
     public void initEditor() {

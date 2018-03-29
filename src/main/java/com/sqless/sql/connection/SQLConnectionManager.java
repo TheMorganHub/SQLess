@@ -116,7 +116,7 @@ public class SQLConnectionManager {
 
     /**
      * Tests a specified connection by attempting to connect to database
-     * "master" in SQLServer using a temporary {@code Connection} object. If
+     * "mysql" in MySQL using a temporary {@code Connection} object. If
      * successful, the {@code Connection} is then promptly closed.
      *
      * @param username
@@ -129,7 +129,6 @@ public class SQLConnectionManager {
      */
     public boolean testConnection(String username, String password, String hostName, String port, Frame parent) {
         try (Connection testCon = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/mysql", username, password)) {
-            DriverManager.setLoginTimeout(3);
             System.out.println("Testing connection at " + hostName + ":" + port + " as " + username);
             System.out.println("Test successful.");
             return true;

@@ -10,7 +10,6 @@ import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.*;
 import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,14 +128,13 @@ public class SQLUtils {
      * called, the DB engine is queried for names. This guarantees that the list
      * returned by this method is always up-to-date.
      *
-     * @param includeMaster Whether to include the 'mysql' DB in the list.
      * @return a {@code List} of type {@code String} with the names of all the
      * databases within the engine.
      */
-    public static List<String> retrieveDBNamesFromServer(boolean includeMaster) {
+    public static List<String> retrieveDBNamesFromServer() {
         List<String> dbNames = new ArrayList<>();
 
-        SQLQuery dbNamesQuery = new SQLSelectQuery("SHOW DATABASES" + (includeMaster ? " WHERE `Database` != 'mysql'" : "")) {
+        SQLQuery dbNamesQuery = new SQLSelectQuery("SHOW DATABASES WHERE `Database` != 'mysql'") {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 while (rs.next()) {
@@ -429,30 +427,6 @@ public class SQLUtils {
             }
         };
         loadFKsQuery.exec();
-    }
-
-    /**
-     * Wraps names with spaces in '``' for compatibility with SQL queries. If
-     * the name doesn't have spaces, this method simply returns the name as it
-     * was given.
-     *
-     * @param name The string to be sqlified.
-     * @return a 'sqlfied' {@code String} compatible with SQL commands.
-     */
-    public static String sqlify(String name) {
-        if (name.contains(".")) {
-            String[] nameSplit = name.split("\\.");
-
-            if (nameSplit[1].split(" ").length > 1) {
-                return nameSplit[0] + "." + '`' + nameSplit[1] + '`';
-            }
-        }
-
-        if (name.contains(" ")) {
-            return '`' + name + '`';
-        }
-
-        return name;
     }
 
     public static String getConnectedDBName() {

@@ -15,6 +15,9 @@ import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -65,7 +68,18 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         if (confirmacion != 0) {
             return;
         }
-        SQLQuery dropQuery = new SQLUpdateQuery(((SQLDroppable) node.getUserObject()).getDropStatement(), true);
+        SQLQuery dropQuery = new SQLUpdateQuery(((SQLDroppable) node.getUserObject()).getDropStatement(), true) {
+            @Override
+            public void onSuccess(int updateCount) {
+                SwingUtilities.invokeLater(() -> {
+                    if (!node.isOfType(SQLessTreeNode.NodeType.DATABASE)) {
+                        JTree tree = client.getTree();
+                        UIUtils.selectTreeNode(tree, node.getParent());
+                        client.refreshJTree();
+                    }
+                });
+            }
+        };
         dropQuery.exec();
     }
 

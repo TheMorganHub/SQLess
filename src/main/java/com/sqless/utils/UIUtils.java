@@ -39,6 +39,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import java.net.URL;
 import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  * Helper class that contains methods useful for UI.
@@ -78,6 +82,17 @@ public class UIUtils {
         };
         splitPane.setUI(flatDividerSplitPaneUI);
         splitPane.setBorder(null);
+    }
+
+    /**
+     * Selecciona un nodo en el {@code JTree} dado programáticamente.
+     *
+     * @param tree el {@code JTree} en el que se hará la selección.
+     * @param node el nodo a seleccionar.
+     */
+    public static void selectTreeNode(JTree tree, TreeNode node) {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        tree.setSelectionPath(new TreePath(model.getPathToRoot(node)));
     }
 
     /**

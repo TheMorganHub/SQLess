@@ -35,14 +35,7 @@ public class SQLUIQuery extends SQLQuery {
 
     public SQLUIQuery(String sql, UIQueryPanel queryPanel) {
         super(sql);
-        try {
-            queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
-            statement = queryConnection.createStatement();
-            this.queryPanel = queryPanel;
-            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        this.queryPanel = queryPanel;
     }
 
     @Override
@@ -55,6 +48,9 @@ public class SQLUIQuery extends SQLQuery {
             queryPanel.updateRowsLabel(0);
             queryPanel.enableStopBtn(true);
             queryPanel.enableRunBtn(false);
+
+            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
+            queryTimer.setInitialDelay(0);
             queryTimer.start();
         }
 
@@ -65,9 +61,10 @@ public class SQLUIQuery extends SQLQuery {
             @Override
             public void run() {
                 try {
-                    boolean hasResult;
+                    queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
+                    statement = queryConnection.createStatement();
                     int updateCount = 0;
-                    hasResult = statement.execute(getSql());
+                    boolean hasResult = statement.execute(getSql());
                     while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
                         if (hasResult) {
                             fillTable(statement.getResultSet());
@@ -86,8 +83,8 @@ public class SQLUIQuery extends SQLQuery {
                 if (queryPanel != null) {
                     queryTimer.stop();
                     long elapsed = System.currentTimeMillis() - startTime;
-                    if (elapsed < 75) {
-                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceTime(elapsed);
+                    if (elapsed <= 76) {
+                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceMs(elapsed);
                     }
                     EventQueue.invokeLater(() -> {
                         queryPanel.enableStopBtn(false);
@@ -212,7 +209,7 @@ public class SQLUIQuery extends SQLQuery {
                 for (int i = 0; i < table.getColumnCount(); i++) {
                     TableColumn tableColumn = table.getColumn(i);
                     tableColumn.setMinWidth(i == 0 ? 10 : 20);
-                    tableColumn.setPreferredWidth(i == 0 ? 25 : 100);
+                    tableColumn.setPreferredWidth(i == 0 ? 25 : 120);
                     tableColumn.setCellRenderer(nullCellRenderer);
                 }
                 queryPanel.updateRowsLabel();
@@ -262,7 +259,7 @@ public class SQLUIQuery extends SQLQuery {
             queryPanel.updateTimerLabel(time);
         }
 
-        public void forceTime(long ms) {
+        public void forceMs(long ms) {
             String time = String.format(TIME_FORMAT, 0, 0, 0, ms);
             queryPanel.updateTimerLabel(time);
         }

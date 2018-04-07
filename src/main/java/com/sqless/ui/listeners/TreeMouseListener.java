@@ -28,9 +28,6 @@ public class TreeMouseListener extends MouseAdapter {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            if (SQLUtils.getConnectedDBName().equalsIgnoreCase("mysql")) {
-                return;
-            }
             SQLessTreeNode nodo = getNodeFromLocation(e.getPoint());
             if (locationIsValid(e)) {
                 addSelectionPath(e.getPoint());

@@ -8,7 +8,7 @@ public class SQLView extends SQLDataObject implements SQLDroppable {
 
     @Override
     public String getDropStatement() {
-        return "DROP VIEW " + getName(true);
+        return "DROP VIEW `" + getName() + "`";
     }
 
 }

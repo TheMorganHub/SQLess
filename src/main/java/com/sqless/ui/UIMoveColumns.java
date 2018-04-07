@@ -206,7 +206,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
 
     public void commit() {
         if (task == UICreateTableSQLess.TABLE_UPDATE) {
-            StringBuilder alterTableBuilder = new StringBuilder("ALTER TABLE ").append(table.getName(true)).append('\n');
+            StringBuilder alterTableBuilder = new StringBuilder("ALTER TABLE `").append(table.getName()).append("`\n");
             boolean anyPosChanged = false;
             for (SQLColumn column : table.getColumns()) {
                 if (column.positionChanged()) {

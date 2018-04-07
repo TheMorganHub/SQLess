@@ -58,7 +58,7 @@ public class UIQueryPanel extends FrontPanel {
         initResultsPanel();
         initMessagesPanel();
         tabPane.setSelectedIndex(0);
-        tabPane.addChangeListener((ChangeEvent e) -> {
+        tabPane.addChangeListener(changeEvent -> {
             int index = tabPane.getSelectedIndex();
             if (tabPane.getComponentAt(index) instanceof UIPanelResult) {
                 UIPanelResult panelResult = (UIPanelResult) tabPane.getComponentAt(index);
@@ -72,9 +72,7 @@ public class UIQueryPanel extends FrontPanel {
     public void onCreate() {
         setSQLText(tabOriginalContents);
         sqlEditorPane.requestFocus();
-        EventQueue.invokeLater(() -> {
-            splitPane.setDividerLocation(0.65);
-        });
+        EventQueue.invokeLater(() -> splitPane.setDividerLocation(0.65));
     }
 
     public void initEditor() {

@@ -293,7 +293,7 @@ public class UISettings extends javax.swing.JDialog {
                 JComboBox combo = (JComboBox) component;
                 String defaultDB = userPreferences.getProperty(combo.getName());
                 combo.addItem(userPreferences.getDefaultFor(combo.getName()));
-                for (String dbName : SQLUtils.retrieveDBNamesFromServer(false)) {
+                for (String dbName : SQLUtils.retrieveDBNamesFromServer()) {
                     combo.addItem(dbName);
                     if (defaultDB.equals(dbName)) {
                         combo.setSelectedItem(dbName);

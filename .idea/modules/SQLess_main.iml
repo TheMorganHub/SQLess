@@ -20,7 +20,7 @@
     </orderEntry>
     <orderEntry type="library" name="Gradle: us.monoid.web:resty:0.3.2" level="project" />
     <orderEntry type="library" name="Gradle: mysql:mysql-connector-java:5.1.45" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.apis:google-api-services-plus:v1-rev541-1.23.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.apis:google-api-services-oauth2:v2-rev134-1.23.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.oauth-client:google-oauth-client-jetty:1.23.0" level="project" />
     <orderEntry type="library" name="Gradle: org.swinglabs:swingx:1.6.1" level="project" />
     <orderEntry type="library" name="Gradle: net.java.dev.javacc:javacc:4.1" level="project" />

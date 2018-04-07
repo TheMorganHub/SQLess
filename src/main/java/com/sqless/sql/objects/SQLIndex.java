@@ -24,7 +24,7 @@ public class SQLIndex extends SQLObject implements SQLDroppable {
 
     @Override
     public String getDropStatement() {
-        return "DROP INDEX " + parentTable + "." + getName(true);
+        return "DROP INDEX `" + parentTable + "`.`" + getName() + "`";
     }
 
 }

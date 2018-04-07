@@ -218,7 +218,7 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
 
     @Override
     public String getDropStatement() {
-        return "DROP TABLE " + getName(true);
+        return "DROP TABLE `" + getName() + "`";
     }
 
     public String getRetrievePKStatement() {

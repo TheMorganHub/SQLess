@@ -11,4 +11,9 @@ public class SQLFunction extends SQLExecutable {
         return "SELECT " + getName() + "(" + prepareParameters() + ")";
     }
 
+    @Override
+    public String getDropStatement() {
+        return "DROP FUNCTION IF EXISTS `" + getName() + "`";
+    }
+
 }

@@ -152,7 +152,7 @@ public abstract class SQLDataObject extends SQLObject implements SQLSelectable {
     }
 
     public String getRetrieveIndexesStatement() {
-        return "SHOW INDEX FROM " + getName(true);
+        return "SHOW INDEX FROM `" + getName() + "`";
     }
 
     public String getRetrieveColumnDataStatement() {

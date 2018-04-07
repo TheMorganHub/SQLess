@@ -63,7 +63,7 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
     public SQLDataObject getTableObjectByName(String name) {
         if (tables != null) { //if tables haven't been loaded yet
             for (SQLTable table : tables) {
-                if (table.getName(true).equals(name)) {
+                if (table.getName().equals(name)) {
                     return table;
                 }
             }
@@ -71,7 +71,7 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
 
         if (views != null) { //if views haven't been loaded yet
             for (SQLView view : views) {
-                if (view.getName(true).equals(name)) {
+                if (view.getName().equals(name)) {
                     return view;
                 }
             }
@@ -82,7 +82,7 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
 
     @Override
     public String getDropStatement() {
-        return "DROP DATABASE " + getName() + ";";
+        return "DROP DATABASE `" + getName() + "`";
     }
 
     public String getCharsetAndCollationStatement() {

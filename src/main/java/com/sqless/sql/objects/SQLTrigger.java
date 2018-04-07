@@ -40,6 +40,6 @@ public class SQLTrigger extends SQLObject implements SQLDroppable {
 
     @Override
     public String getDropStatement() {
-        return "DROP TRIGGER " + getName(true) + "\nGO";
+        return "DROP TRIGGER `" + getName() + "`";
     }
 }

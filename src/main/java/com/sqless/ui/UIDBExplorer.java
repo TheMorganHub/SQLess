@@ -31,6 +31,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private SQLConnectionManager conManager;
     private final ImageIcon FAVOURITE_ICON = new ImageIcon(getClass().
             getResource("/icons/ui_dbexplorer/FAVOURITE_ICON.png"));
+    private final ImageIcon NOT_FAVOURITE_ICON = new ImageIcon(getClass().
+            getResource("/icons/ui_dbexplorer/NOT_FAVOURITE_ICON.png"));
     private SessionSettings sessionSettings;
 
     public UIDBExplorer() {
@@ -57,14 +59,21 @@ public class UIDBExplorer extends javax.swing.JDialog {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("");
         model.addColumn("Database");
-        for (String dbName : SQLUtils.retrieveDBNamesFromServer(chkShowMaster.isSelected())) {
-            Object[] row = {FAVOURITE_ICON, dbName};
+        for (String dbName : SQLUtils.retrieveDBNamesFromServer()) {
+            Object[] row = {dbIsDefault(dbName) ? FAVOURITE_ICON : NOT_FAVOURITE_ICON, dbName};
             model.addRow(row);
         }
 
         tableDb.setModel(model);
-        selectFirstRowIfNoDb();
+        //si no hay ninguna DB, ir a creation tab
+        if (tableDb.getRowCount() == 0) {
+            tabPaneMain.setSelectedIndex(1);
+            txtNewDbName.requestFocus();
+            return;
+        }
         tableDb.setCellEditor(new UIButtonColumn(tableDb, new ActionAddFavourite(), 0, true));
+        int defaultDbRow = getDefaultDbRow();
+        tableDb.setRowSelectionInterval(defaultDbRow, defaultDbRow);
         tableDb.packAll();
     }
 
@@ -79,7 +88,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         scrMain = new javax.swing.JScrollPane();
         tableDb = new JXTable() {
             public boolean isCellEditable(int row, int column) {
-                return column == 0 && !tableDb.getValueAt(row, 1).toString().equals("master");
+                return column == 0 && !tableDb.getValueAt(row, 1).toString().equals("mysql");
             }
         };
         iLblHost = new javax.swing.JLabel();
@@ -149,14 +158,14 @@ public class UIDBExplorer extends javax.swing.JDialog {
         tableDb.getTableHeader().setReorderingAllowed(false);
         tableDb.getTableHeader().setResizingAllowed(false);
         tableDb.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        HighlightPredicate myPredicate = new HighlightPredicate() {
+        /*HighlightPredicate myPredicate = new HighlightPredicate() {
             @Override
             public boolean isHighlighted(Component component, org.jdesktop.swingx.decorator.ComponentAdapter adapter) {
                 return dbIsDefault(adapter.getValue().toString()) || adapter.row == getDefaultDbRow();
             }
         };
         ColorHighlighter highlighter = new ColorHighlighter(myPredicate, UIUtils.COOL_GREEN, Color.BLACK);
-        tableDb.addHighlighter(highlighter);
+        tableDb.addHighlighter(highlighter);*/
 
         iLblHost.setText("Host:");
 
@@ -305,9 +314,12 @@ public class UIDBExplorer extends javax.swing.JDialog {
      * database.
      */
     public void actionConnectToDatabase() {
-        String dbName;
+        if (tableDb.getSelectedRow() == -1 && getDefaultDbRow() == -1) {
+            UIUtils.showErrorMessage("Conectar a una base de datos", "Debes elegir una base de datos", this);
+            return;
+        }
         //if there is a selection, prioritise selection over default db
-        dbName = tableDb.getSelectedRow() == -1 ? getDefaultDbName() : getSelectedRowValue();
+        String dbName = tableDb.getSelectedRow() != -1 ? getSelectedRowValue() : getDefaultDbName();
 
         if (dbName.equals(SQLUtils.getConnectedDBName())) {
             int confirmation = UIUtils.showYesNoOptionDialog("Connect to database", "You are already connected to "
@@ -400,7 +412,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     public void showMasterDB(boolean flag) {
         if (flag) {
-            ((DefaultTableModel) tableDb.getModel()).addRow(new Object[]{FAVOURITE_ICON, "mysql"});
+            ((DefaultTableModel) tableDb.getModel()).addRow(new Object[]{null, "mysql"});
             UIUtils.sortTable(tableDb, 1);
         } else {
             removeRow("mysql");
@@ -506,24 +518,6 @@ public class UIDBExplorer extends javax.swing.JDialog {
     }
 
     /**
-     * Selects the first row if no default db is found. If a default DB is
-     * found, this method does nothing.
-     */
-    public void selectFirstRowIfNoDb() {
-        int defaultDbRow = getDefaultDbRow();
-        if (defaultDbRow == -1 && tableDb.getRowCount() > 1) {
-            tableDb.setColumnSelectionInterval(1, 1);
-            tableDb.setRowSelectionInterval(0, 0);
-        }
-
-        //si no hay ninguna DB, ir a creation tab
-        if (tableDb.getRowCount() == 0) {
-            tabPaneMain.setSelectedIndex(1);
-            txtNewDbName.requestFocus();
-        }
-    }
-
-    /**
      * Returns the row number that holds the name of the default database from
      * {@link UserPreferencesLoader}.
      *
@@ -573,22 +567,23 @@ public class UIDBExplorer extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent e) {
             String selectedDbName = getSelectedRowValue();
             String newDefaultDb;
-            String message;
             UserPreferencesLoader loader = UserPreferencesLoader.getInstance();
             if (selectedDbName.equals(getDefaultDbName())) {
                 newDefaultDb = loader.getDefaultFor("Default.Database"); //clears default db
-                message = "The default database has been cleared.";
-
             } else {
                 newDefaultDb = selectedDbName;
-                message = "The default database is now " + newDefaultDb;
+            }
+
+            for (int i = 0; i < tableDb.getRowCount(); i++) {
+                tableDb.setValueAt(NOT_FAVOURITE_ICON, i, 0); //limpiamos favorito anterior
+                String valueAt = tableDb.getValueAt(i, 1).toString();
+                if (valueAt.equals(newDefaultDb)) {
+                    tableDb.setValueAt(FAVOURITE_ICON, i, 0); //seteanos favorito nuevo
+                }
             }
 
             loader.set("Default.Database", newDefaultDb);
             loader.flushFile();
-            tableDb.clearSelection();
-            selectFirstRowIfNoDb();
-            UIUtils.showMessage("Default database change", message, getParent());
         }
 
     }

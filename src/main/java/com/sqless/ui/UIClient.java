@@ -545,6 +545,10 @@ public class UIClient extends javax.swing.JFrame {
         toolbarTop.revalidate();
         toolbarTop.repaint();
     }
+    
+    public void refreshJTree() {
+        actionRefreshJTree.actionPerformed(null);
+    }
 
     public void addMenuBarItems() {
         FrontPanel frontUI = (FrontPanel) tabPaneContent.getComponentAt(tabPaneContent.getSelectedIndex());

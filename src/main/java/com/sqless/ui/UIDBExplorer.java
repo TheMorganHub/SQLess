@@ -2,8 +2,6 @@ package com.sqless.ui;
 
 import com.sqless.utils.UIUtils;
 import com.sqless.utils.SQLUtils;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
@@ -13,8 +11,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLUpdateQuery;
@@ -72,8 +68,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
             return;
         }
         tableDb.setCellEditor(new UIButtonColumn(tableDb, new ActionAddFavourite(), 0, true));
-        int defaultDbRow = getDefaultDbRow();
-        tableDb.setRowSelectionInterval(defaultDbRow, defaultDbRow);
+        int rowOnStart = getDefaultDbRow() == -1 ? 0 : getDefaultDbRow();
+        tableDb.setRowSelectionInterval(rowOnStart, rowOnStart);
         tableDb.packAll();
     }
 

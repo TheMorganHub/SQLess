@@ -29,7 +29,7 @@ import javax.swing.JTable;
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class SQLUtils {    
+public class SQLUtils {
 
     /**
      * Filtra la palabra clave 'DELIMITER' y todos los delimitadores que no sean
@@ -512,6 +512,20 @@ public class SQLUtils {
                 }
             }
         }
+    }
+
+    public static Object fetchFirstValueForColumn(SQLColumn column) {
+        FinalValue val = new FinalValue();
+        SQLQuery query = new SQLSelectQuery("SELECT `" + column.getName() + "` FROM `" + column.getParentTable().getName() + "` LIMIT 1") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                while (rs.next()) {
+                    val.set(rs.getString(1));
+                }
+            }
+        };
+        query.exec();
+        return val.get();
     }
 
 }

@@ -49,7 +49,7 @@ public abstract class SQLQuery {
     public void onFailure(String errMessage) {
     }
 
-    public void onFaiureStandard(String errMessage) {
+    public void onFailureStandard(String errMessage) {
         UIUtils.showErrorMessage("Error", errMessage, null);
     }
 

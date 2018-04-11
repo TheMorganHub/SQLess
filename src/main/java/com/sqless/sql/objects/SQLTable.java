@@ -183,7 +183,8 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
 
     public boolean columnIsFK(SQLColumn column) {
         for (SQLForeignKey foreignKey : foreignKeys) {
-            if (foreignKey.getField().equals(column.getName())) {
+            String field = foreignKey.getField();
+            if (field != null && field.equals(column.getName())) {
                 return true;
             }
         }

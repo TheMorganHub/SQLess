@@ -27,7 +27,22 @@ public class SQLPrimaryKey implements SQLEditable {
             pkColumnsBackup.add(pkColumn);
         }
     }
+    
+    public boolean hasAutoIncrementColumn() {
+        for (SQLColumn pkColumn : pkColumns) {
+            if (pkColumn.isAutoincrement()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    /**
+     * Agrega una columna a esta definición de PK. Si la columna es nullable,
+     * dejará de serlo.
+     *
+     * @param column
+     */
     public void addColumn(SQLColumn column) {
         if (column.isNullable()) {
             column.setNullable(false);
@@ -36,6 +51,12 @@ public class SQLPrimaryKey implements SQLEditable {
         pkColumns.add(column);
     }
 
+    /**
+     * Remueve una columna de la definición de esta PK. La columna se mantendrá
+     * como no nullable lo sea o no antes de haber sido asignada como PK.
+     *
+     * @param column
+     */
     public void removeColumn(SQLColumn column) {
         pkColumns.remove(column);
     }

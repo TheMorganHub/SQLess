@@ -21,6 +21,7 @@ import java.sql.SQLException;
 public class SQLUpdateQuery extends SQLQuery {
 
     private Connection standaloneUpdateConnection;
+    boolean queryFailed;
 
     public SQLUpdateQuery(String sql) {
         super(sql);
@@ -44,7 +45,7 @@ public class SQLUpdateQuery extends SQLQuery {
             onSuccess(affectedRows);
         } catch (SQLException ex) {
             if (defaultErrorHandling) {
-                onFaiureStandard(ex.getMessage());
+                onFailureStandard(ex.getMessage());
             } else {
                 onFailure(ex.getMessage());
             }

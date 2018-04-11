@@ -27,7 +27,7 @@ public class SQLSelectQuery extends SQLQuery {
             onSuccess(rs);
         } catch (SQLException e) {
             if (defaultErrorHandling) {
-                onFaiureStandard(e.getMessage());
+                onFailureStandard(e.getMessage());
             } else {
                 onFailure(e.getMessage());
             }  

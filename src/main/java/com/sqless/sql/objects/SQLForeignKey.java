@@ -12,6 +12,7 @@ public class SQLForeignKey extends SQLObject implements SQLEditable, SQLDroppabl
     private boolean brandNew;
     private String uncommittedName;
     private String firstTimeChangeStatement;
+    public static final String RULE_CASCADE = "CASCADE";
 
     public SQLForeignKey(String name, String tableName, String field, String referencedTableName, String referencedColumnName, String updateRule, String deleteRule) {
         super(name);

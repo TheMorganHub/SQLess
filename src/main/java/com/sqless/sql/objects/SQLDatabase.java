@@ -80,6 +80,17 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
         return null;
     }
 
+    public SQLTable getTableByName(String name) {
+        if (tables != null) {
+            for (SQLTable table : tables) {
+                if (table.getName().equals(name)) {
+                    return table;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getDropStatement() {
         return "DROP DATABASE `" + getName() + "`";

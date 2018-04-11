@@ -9,6 +9,7 @@ import com.sqless.sql.objects.SQLPrimaryKey;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.listeners.TableCellListener;
 import com.sqless.utils.DataTypeUtils;
+import com.sqless.utils.HintsManager;
 import com.sqless.utils.SQLUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
@@ -164,6 +165,10 @@ public class UICreateTableSQLess extends FrontPanel {
             }
         }
         cellFkChangeListener = new TableCellListener(uiTableFKs, actionEditFKCell);
+    }
+
+    public void forceAddFKToUITable(SQLForeignKey fk) {
+        getFKTableModel().addRow(new Object[]{fk.getName(), fk.getField(), fk.getReferencedTableName(), fk.getReferencedColumnName()});
     }
 
     public void prepararToolbar() {
@@ -501,6 +506,71 @@ public class UICreateTableSQLess extends FrontPanel {
         return false;
     }
 
+    public void processPKColumnChange(SQLColumn colEditada, int row) {
+        boolean newVal = (boolean) cellChangeListener.getNewValue();
+        if (newVal) {
+            sqlTable.getPrimaryKey().addColumn(colEditada);
+        } else {
+            sqlTable.getPrimaryKey().removeColumn(colEditada);
+        }
+        syncRowWithList(row);
+    }
+
+    public void processNameColumnChange(SQLColumn colEditada, int row) {
+        if (columnNameExists(cellChangeListener.getNewValue().toString(), row)) {
+            UIUtils.showErrorMessage("Editar nombre", "No puede haber columnas duplicadas en una tabla.", null);
+            uiTable.setValueAt(cellChangeListener.getOldValue(), row, 1);
+            return;
+        }
+
+        HintsManager hints = new HintsManager(this, colEditada, cellChangeListener);
+
+        if (cellChangeListener.getOldValue().toString().isEmpty()) {
+            hints.activate(HintsManager.GUESS_DATATYPE_BY_NAME);
+        }
+        colEditada.setUncommittedName(cellChangeListener.getNewValue().toString());
+
+        hints.activate(HintsManager.COULD_BE_PK);
+        hints.activate(HintsManager.COULD_BE_FK);
+        syncRowWithList(row);
+    }
+
+    public void processDataTypeColumnChange(SQLColumn colEditada, int row) {
+        colEditada.setDataType(cellChangeListener.getNewValue().toString());
+        syncRowWithList(row);
+        refreshPnlExtras();
+    }
+
+    public void processLengthColumnChange(SQLColumn colEditada, int row) {
+        if (!colEditada.getDataType().startsWith("enum") && !colEditada.getDataType().startsWith("set")
+                && !colEditada.getDataType().equals("text") && !colEditada.getDataType().equals("year")
+                && !colEditada.isTimeBased()) {
+            colEditada.setLength(cellChangeListener.getNewValue().toString());
+            syncRowWithList(row);
+        } else {
+            uiTable.setValueAt(cellChangeListener.getOldValue(), row, 3);
+        }
+    }
+
+    public void processDecimalColumnChange(SQLColumn colEditada, int row) {
+        //decimales - si el tipo de dato del row no es decimal, el campo decimal no se va a poder setear
+        if (!colEditada.getDataType().equals("decimal")) {
+            uiTable.setValueAt(null, row, 4);
+        } else {
+            colEditada.setNumericScale(cellChangeListener.getNewValue().toString());
+            syncRowWithList(row);
+        }
+    }
+
+    public void processNullColumnChange(SQLColumn colEditada, int row) {
+        if (colEditada.isPK()) { //una columna PK no puede ser nunca nullable
+            uiTable.setValueAt(false, row, 5);
+            UIUtils.showMessage("Convertir a nullable", "Una columna (PK) que identifica a esta tabla no puede ser nunca nullable", UIClient.getInstance());
+        } else {
+            colEditada.setNullable((boolean) cellChangeListener.getNewValue());
+        }
+    }
+
     private AbstractAction actionEditCell = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -512,56 +582,22 @@ public class UICreateTableSQLess extends FrontPanel {
 
             switch (cellChangeListener.getColumn()) {
                 case 0:
-                    boolean newVal = (boolean) cellChangeListener.getNewValue();
-                    if (newVal) {
-                        sqlTable.getPrimaryKey().addColumn(colEditada);
-                    } else {
-                        sqlTable.getPrimaryKey().removeColumn(colEditada);
-                    }
-                    syncRowWithList(row);
+                    processPKColumnChange(colEditada, row);
                     break;
                 case 1:
-                    if (columnNameExists(cellChangeListener.getNewValue().toString(), row)) {
-                        UIUtils.showErrorMessage("Editar nombre", "No puede haber columnas duplicadas en una tabla.", null);
-                        uiTable.setValueAt(cellChangeListener.getOldValue(), row, 1);
-                        return;
-                    }
-                    if (cellChangeListener.getOldValue().toString().isEmpty()) {
-                        colEditada.updateDataTypeByName(cellChangeListener.getNewValue().toString());
-                        refreshPnlExtras(); //si cambio el nombre puede cambiar el tipo de dato y por lo tanto los extras
-                    }
-                    colEditada.setUncommittedName(cellChangeListener.getNewValue().toString());
-                    syncRowWithList(row);
+                    processNameColumnChange(colEditada, row);
                     break;
                 case 2:
-                    colEditada.setDataType(cellChangeListener.getNewValue().toString());
-                    syncRowWithList(row);
-                    refreshPnlExtras();
+                    processDataTypeColumnChange(colEditada, row);
                     break;
                 case 3:
-                    if (!colEditada.getDataType().startsWith("enum") && !colEditada.getDataType().startsWith("set")
-                            && !colEditada.getDataType().equals("text") && !colEditada.getDataType().equals("year")
-                            && !colEditada.isTimeBased()) {
-                        colEditada.setLength(cellChangeListener.getNewValue().toString());
-                        syncRowWithList(row);
-                    } else {
-                        uiTable.setValueAt(cellChangeListener.getOldValue(), row, 3);
-                    }
+                    processLengthColumnChange(colEditada, row);
                     break;
-                case 4: //decimales - si el tipo de dato del row no es decimal, el campo decimal no se va a poder setear
-                    if (!colEditada.getDataType().equals("decimal")) {
-                        uiTable.setValueAt(null, row, 4);
-                    } else {
-                        colEditada.setNumericScale(cellChangeListener.getNewValue().toString());
-                        syncRowWithList(row);
-                    }
+                case 4:
+                    processDecimalColumnChange(colEditada, row);
                     break;
                 case 5:
-                    if (colEditada.isPK()) { //una columna PK no puede ser nunca nullable
-                        uiTable.setValueAt(false, row, 5);
-                    } else {
-                        colEditada.setNullable((boolean) cellChangeListener.getNewValue());
-                    }
+                    processNullColumnChange(colEditada, row);
                     break;
             }
             if (colEditada.evaluateUncommittedChanges()) {

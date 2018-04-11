@@ -277,11 +277,8 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="toolbarDiagrama" min="-2" pref="100" max="-2" attributes="0"/>
-                      <EmptySpace min="154" max="32767" attributes="0"/>
-                  </Group>
-                  <Component id="scrlDiagram" max="32767" attributes="0"/>
+                  <Component id="scrlDiagram" pref="263" max="32767" attributes="0"/>
+                  <Component id="toolbarDiagrama" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">

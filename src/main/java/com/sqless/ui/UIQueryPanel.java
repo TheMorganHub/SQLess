@@ -22,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import jsyntaxpane.DefaultSyntaxKit;

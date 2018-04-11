@@ -309,10 +309,8 @@ public class UIClient extends javax.swing.JFrame {
         pnlDiagram.setLayout(pnlDiagramLayout);
         pnlDiagramLayout.setHorizontalGroup(
             pnlDiagramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDiagramLayout.createSequentialGroup()
-                .addComponent(toolbarDiagrama, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(scrlDiagram)
+            .addComponent(scrlDiagram, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+            .addComponent(toolbarDiagrama, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlDiagramLayout.setVerticalGroup(
             pnlDiagramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

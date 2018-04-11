@@ -2,11 +2,11 @@ package com.sqless.ui;
 
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Frame;
 import javax.swing.SwingWorker;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.settings.UserPreferencesLoader;
+import java.util.concurrent.ExecutionException;
 
 public class UIConnectionWizard extends javax.swing.JDialog {
 
@@ -14,7 +14,6 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         REPAIR, CREATE, MODIFY;
     }
 
-    private Tester conTester;
     private UserPreferencesLoader userPrefLoader;
     private Frame parent;
     private Task task;
@@ -37,7 +36,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         pnlContainer = new javax.swing.JPanel();
@@ -190,66 +189,87 @@ public class UIConnectionWizard extends javax.swing.JDialog {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
+    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        testConnection(true);
+    }                                           
+
+    /**
+     * Hace un test de la conexión utilizando los valores dados en los campos de
+     * texto.
+     *
+     * @param andContinue si {@code true}, el método guardará los datos de
+     * conexión en el archivo de preferencias. Si {@code false}, el archivo no
+     * se actualizará.
+     */
+    public void testConnection(boolean andContinue) {
         String hostName = txtHost.getText();
         String port = txtPort.getText();
         String username = txtUserName.getText();
         String password = UIUtils.getStringFromPasswordField(txtPassword);
-        (new Thread(() -> {
-            testConnection();
-            while (!conTester.isDone()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                }
-            }
-            if (conTester.wasSuccessful()) {
-                userPrefLoader.makeDir();
-                userPrefLoader.set("Connection.Host", hostName);
-                userPrefLoader.set("Connection.Port", port);
-                userPrefLoader.set("Connection.Username", username);
-                userPrefLoader.set("Connection.Password", password);
-                userPrefLoader.flushFile();
-                dispose();
-            }
-        })).start();
-    }//GEN-LAST:event_btnContinueActionPerformed
+        enableInputFields(false);
+        enableContinue(false);
+        setCursor(UIUtils.WAIT_CURSOR);
+        UIUtils.changeLabelColour(lblConnectionStatus, Color.BLACK);
+        lblConnectionStatus.setText("Testing...");
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        SwingWorker<Boolean, Void> tester = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                boolean result = SQLConnectionManager.getInstance().testConnection(username, password, hostName, port, parent);
+                return result;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean success = get();
+                    lblConnectionStatus.setText(success ? "Success" : "Failed");
+                    UIUtils.changeLabelColour(lblConnectionStatus, success ? UIUtils.DARK_GREEN : Color.RED);
+                    enableContinue(success);
+                    setCursor(UIUtils.DEFAULT_CURSOR);
+                    enableInputFields(true);
+                    if (success) {
+                        btnContinue.requestFocus();
+                        if (andContinue) {
+                            userPrefLoader.makeDir();
+                            userPrefLoader.set("Connection.Host", hostName);
+                            userPrefLoader.set("Connection.Port", port);
+                            userPrefLoader.set("Connection.Username", username);
+                            userPrefLoader.set("Connection.Password", password);
+                            userPrefLoader.flushFile();
+                            dispose();
+                        }
+                    }
+                } catch (ExecutionException e) {
+                } catch (InterruptedException ex) {
+
+                }
+
+            }
+        };
+
+        tester.execute();
+    }
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {                                          
         if (isTask(Task.MODIFY)) {
             dispose();
         } else {
             System.exit(0);
         }
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }                                         
 
-    private void btnTestConnectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTestConnectionActionPerformed
-        testConnection();
-    }//GEN-LAST:event_btnTestConnectionActionPerformed
+    private void btnTestConnectionActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+        testConnection(false);
+    }                                                 
 
     public void prepareUI() {
         txtHost.setText((String) userPrefLoader.getProperty("Connection.Host"));
         txtPort.setText((String) userPrefLoader.getProperty("Connection.Port"));
         txtUserName.setText((String) userPrefLoader.getProperty("Connection.Username"));
         txtPassword.setText((String) userPrefLoader.getProperty("Connection.Password"));
-    }
-
-    public void testConnection() {
-        String hostName = txtHost.getText();
-        String port = txtPort.getText();
-        String username = txtUserName.getText();
-        String password = UIUtils.getStringFromPasswordField(txtPassword);
-        EventQueue.invokeLater(() -> {
-            enableInputFields(false);
-            enableContinue(false);
-            setCursor(UIUtils.WAIT_CURSOR);
-            UIUtils.changeLabelColour(lblConnectionStatus, Color.BLACK);
-            lblConnectionStatus.setText("Testing...");
-        });
-        conTester = new Tester(username, password, hostName, port, parent);
-        conTester.execute();
     }
 
     public void enableInputFields(boolean flag) {
@@ -269,47 +289,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         return this.task.equals(task);
     }
 
-    class Tester extends SwingWorker<Void, Void> {
-
-        private boolean success;
-        private String username;
-        private String password;
-        private String hostName;
-        private String port;
-        private Frame parent;
-
-        public Tester(String username, String password, String hostName, String port, Frame parent) {
-            this.username = username;
-            this.password = password;
-            this.hostName = hostName;
-            this.port = port;
-            this.parent = parent;
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            success = SQLConnectionManager.getInstance().testConnection(username, password, hostName, port, parent);
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            lblConnectionStatus.setText(success ? "Success" : "Failed");
-            UIUtils.changeLabelColour(lblConnectionStatus, success ? UIUtils.DARK_GREEN : Color.RED);
-            enableContinue(success);
-            setCursor(UIUtils.DEFAULT_CURSOR);
-            enableInputFields(true);
-            if (success) {
-                btnContinue.requestFocus();
-            }
-        }
-
-        public boolean wasSuccessful() {
-            return success;
-        }
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnContinue;
     private javax.swing.JButton btnTestConnection;
@@ -325,5 +305,5 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtPort;
     private javax.swing.JTextField txtUserName;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }

@@ -1,33 +1,33 @@
-package com.sqless.ui.enumeditor;
+package com.sqless.ui.fkcelleditor;
 
+import com.sqless.sql.objects.SQLForeignKey;
 import javax.swing.BorderFactory;
 import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
-public class UISQLSetEditor extends javax.swing.JPanel {
+public class UIFKCellEditor extends javax.swing.JPanel {
     
-    private UISQLSetPanelInner panelInnerPopUp;
-    private String[] defaultVals;
+    private UIFKPanelInner panelInnerPopUp;
+    private SQLForeignKey fk;
 
-    public UISQLSetEditor(String[] defaultVals) {
+    public UIFKCellEditor(SQLForeignKey fk) {
         initComponents();
-        this.defaultVals = defaultVals;
-        txtEnumValues.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 0));
+        this.fk = fk;
+        txtFKValue.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 0));
     }
     
-    public void setValues(String values) {
-        txtEnumValues.setText(values);
+    public void setValue(String value) {
+        txtFKValue.setText(value);
     }
     
-    public String getValues() {
+    public String getValue() {
         if (panelInnerPopUp == null) {
-            return txtEnumValues.getText();
+            return txtFKValue.getText();
         }
-        StringBuilder sb = new StringBuilder();
-        for (String selectedValue : panelInnerPopUp.getSelectedValues()) {
-            sb.append(selectedValue).append(",");
-        }
+        String val = panelInnerPopUp.getSelectedValue();
         panelInnerPopUp = null;
-        return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : sb.toString();
+        return val;
     }
 
     @SuppressWarnings("unchecked")
@@ -35,14 +35,14 @@ public class UISQLSetEditor extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        txtEnumValues = new javax.swing.JTextField();
+        txtFKValue = new javax.swing.JTextField();
         btnShowPopup = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
-        txtEnumValues.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        txtEnumValues.setBorder(null);
-        txtEnumValues.setPreferredSize(new java.awt.Dimension(0, 13));
+        txtFKValue.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        txtFKValue.setBorder(null);
+        txtFKValue.setPreferredSize(new java.awt.Dimension(0, 13));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -51,7 +51,7 @@ public class UISQLSetEditor extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(txtEnumValues, gridBagConstraints);
+        add(txtFKValue, gridBagConstraints);
 
         btnShowPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_general/COMBOBOX_ARROW_ICON.png"))); // NOI18N
         btnShowPopup.setBorder(null);
@@ -74,13 +74,27 @@ public class UISQLSetEditor extends javax.swing.JPanel {
 
     private void btnShowPopupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPopupActionPerformed
         JPopupMenu popMenu = new JPopupMenu();
-        panelInnerPopUp = new UISQLSetPanelInner(popMenu, defaultVals, txtEnumValues.getText());
-        popMenu.add(panelInnerPopUp);
+        panelInnerPopUp = new UIFKPanelInner(popMenu, fk, txtFKValue.getText());
+        popMenu.add(panelInnerPopUp);        
         popMenu.show(this, btnShowPopup.getLocation().x - 95, btnShowPopup.getLocation().y + 20);
+        popMenu.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                panelInnerPopUp.setCancelled(true);
+            }
+        });
     }//GEN-LAST:event_btnShowPopupActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnShowPopup;
-    private javax.swing.JTextField txtEnumValues;
+    private javax.swing.JTextField txtFKValue;
     // End of variables declaration//GEN-END:variables
 }

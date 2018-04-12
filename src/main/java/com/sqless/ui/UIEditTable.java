@@ -4,6 +4,7 @@ import com.sqless.ui.enumeditor.SQLSetCellEditor;
 import com.mysql.jdbc.Blob;
 import com.sqless.queries.*;
 import com.sqless.sql.objects.*;
+import com.sqless.ui.fkcelleditor.FKCellEditor;
 import com.sqless.ui.listeners.TableCellListener;
 import com.sqless.utils.*;
 import java.awt.Color;
@@ -32,7 +33,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import org.jdesktop.swingx.JXTable;
@@ -148,6 +148,9 @@ public class UIEditTable extends FrontPanel {
                 uiColumn.setCellEditor(new DefaultCellEditor(UIUtils.makeComboBoxForEnumColumn(sqlColumn)));
             } else if (sqlColumn.getDataType().equals("set")) {
                 uiColumn.setCellEditor(new SQLSetCellEditor(SQLUtils.getEnumLikeValuesAsArray(sqlColumn.getEnumLikeValues())));
+            } else if (sqlColumn.isFK()) {
+                SQLForeignKey fkFromColumn = table.getForeignKeyFromColumn(sqlColumn);
+                uiColumn.setCellEditor(new FKCellEditor(fkFromColumn));
             } else {
                 uiColumn.setCellEditor(new StringCellEditor(new JTextField()));
                 ((DefaultCellEditor) uiTable.getDefaultEditor(String.class)).setClickCountToStart(1);
@@ -561,9 +564,11 @@ public class UIEditTable extends FrontPanel {
                 return;
             }
 
-            int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
-            if (opt == 1) {
-                return;
+            if (!rows.get(selectedRows[0]).isBrandNew()) {
+                int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
+                if (opt == 1) {
+                    return;
+                }
             }
 
             int lastDeleted = -1;

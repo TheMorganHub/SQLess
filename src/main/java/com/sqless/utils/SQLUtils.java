@@ -527,5 +527,19 @@ public class SQLUtils {
         query.exec();
         return val.get();
     }
+    
+    public static List<Object> getAllowedValuesForFk(SQLForeignKey fk) {
+        List<Object> refTableVals = new ArrayList<>();
+        SQLQuery query = new SQLSelectQuery("SELECT " + fk.getReferencedColumnName() + " FROM " + fk.getReferencedTableName() + " LIMIT 50") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                while (rs.next()) {
+                    refTableVals.add(rs.getString(1));
+                }
+            }        
+        };
+        query.exec();
+        return refTableVals;
+    }
 
 }

@@ -130,6 +130,19 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
     public List<SQLForeignKey> getForeignKeys() {
         return foreignKeys;
     }
+    
+    public SQLForeignKey getForeignKeyFromColumn(SQLColumn column) {
+        if (foreignKeys == null || foreignKeys.isEmpty() || column == null || !column.isFK()) {
+            return null;
+        }
+        
+        for (SQLForeignKey foreignKey : foreignKeys) {
+            if (foreignKey.getField().equals(column.getName())) {
+                return foreignKey;
+            }
+        }
+        return null;
+    }
 
     public void setForeignKeys(List<SQLForeignKey> foreignKeys) {
         this.foreignKeys = foreignKeys;

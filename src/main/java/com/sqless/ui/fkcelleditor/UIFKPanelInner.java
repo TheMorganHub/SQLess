@@ -3,9 +3,12 @@ package com.sqless.ui.fkcelleditor;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLSelectQuery;
 import com.sqless.sql.objects.SQLForeignKey;
+import com.sqless.utils.SQLUtils;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -13,6 +16,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -28,8 +32,17 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         initComponents();
         this.parent = parent;
         this.fk = fk;
-        this.originalValue = originalValue;        
+        this.originalValue = originalValue;
         loadTable();
+        loadKeybindings();
+    }
+
+    public void loadKeybindings() {
+        txtSearch.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ACTION_SEARCH");
+        txtSearch.getActionMap().put("ACTION_SEARCH", actionSearch);        
+        EventQueue.invokeLater(() -> {
+            txtSearch.requestFocus();
+        });
     }
 
     public void loadTable() {
@@ -70,7 +83,7 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         }
         return -1;
     }
-    
+
     public void setCancelled(boolean flag) {
         this.cancelled = flag;
     }
@@ -95,13 +108,15 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         scrTable = new javax.swing.JScrollPane();
         uiTable = new org.jdesktop.swingx.JXTable();
         txtSearch = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
 
         btnCancelar.setAction(actionCancel);
         btnCancelar.setText("Cancelar");
+        btnCancelar.setFocusable(false);
 
         btnOK.setAction(actionOK);
         btnOK.setText("OK");
+        btnOK.setFocusable(false);
         btnOK.setPreferredSize(new java.awt.Dimension(75, 23));
 
         uiTable.setBackground(new java.awt.Color(240, 240, 240));
@@ -120,9 +135,12 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         uiTable.setSortable(false);
         uiTable.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, Color.WHITE));
         uiTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        uiTable.getActionMap().remove("find");
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_edittable/SEARCH_ICON.png"))); // NOI18N
-        jButton1.setMargin(new java.awt.Insets(2, 4, 2, 4));
+        btnSearch.setAction(actionSearch);
+        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_edittable/SEARCH_ICON.png"))); // NOI18N
+        btnSearch.setFocusable(false);
+        btnSearch.setMargin(new java.awt.Insets(2, 4, 2, 4));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -132,7 +150,7 @@ public class UIFKPanelInner extends javax.swing.JPanel {
                 .addGap(6, 6, 6)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
-                .addComponent(jButton1)
+                .addComponent(btnSearch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCancelar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -146,11 +164,12 @@ public class UIFKPanelInner extends javax.swing.JPanel {
                 .addGap(6, 6, 6)
                 .addComponent(scrTable, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCancelar)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnSearch)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnCancelar)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(6, 6, 6))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -170,10 +189,23 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         }
     };
 
+    private Action actionSearch = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Vector<Vector<String>> filas = SQLUtils.findAnyWithStringInTable(fk.getReferencedTableName(), txtSearch.getText());
+            if (filas.isEmpty()) {
+                return;
+            }
+            Vector<String> columnas = filas.remove(0);
+            getModel().setDataVector(filas, columnas);
+            uiTable.packAll();
+        }
+    };
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOK;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JScrollPane scrTable;
     private javax.swing.JTextField txtSearch;
     private org.jdesktop.swingx.JXTable uiTable;

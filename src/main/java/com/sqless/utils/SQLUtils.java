@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -516,7 +517,7 @@ public class SQLUtils {
 
     public static Object fetchFirstValueForColumn(SQLColumn column) {
         FinalValue val = new FinalValue();
-        SQLQuery query = new SQLSelectQuery("SELECT `" + column.getName() + "` FROM `" + column.getParentTable().getName() + "` LIMIT 1") {
+        SQLQuery query = new SQLSelectQuery("SELECT `" + column.getName() + "` FROM `" + column.getParentTable().getName() + "` LIMIT 1", true) {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 while (rs.next()) {
@@ -527,19 +528,62 @@ public class SQLUtils {
         query.exec();
         return val.get();
     }
-    
+
     public static List<Object> getAllowedValuesForFk(SQLForeignKey fk) {
         List<Object> refTableVals = new ArrayList<>();
-        SQLQuery query = new SQLSelectQuery("SELECT " + fk.getReferencedColumnName() + " FROM " + fk.getReferencedTableName() + " LIMIT 50") {
+        SQLQuery query = new SQLSelectQuery("SELECT " + fk.getReferencedColumnName() + " FROM " + fk.getReferencedTableName() + " LIMIT 50", true) {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 while (rs.next()) {
                     refTableVals.add(rs.getString(1));
                 }
-            }        
+            }
         };
         query.exec();
         return refTableVals;
+    }
+
+    /**
+     * Devuelve cualquier fila(s) que contengan el valor dado en la tabla. El
+     * valor puede estar incluido dentro de otra string y también será devuelto.
+     * Por ejemplo, si el valor a buscar es "er" y se encuentra una fila con el
+     * valor "user", ésta será devuelta.
+     *
+     * @param tableName La tabla en la cual se buscará el valor dado.
+     * @param value El valor a buscar.
+     * @return Las filas que contengan el valor dado con los datos de todas sus
+     * columnas. <br> <b>Nota: el primer índice del vector de vectores devueltos
+     * contiene el nombre de las columnas.</b>. Si no se encuentra el valor, el
+     * vector de vectores volverá vacío.
+     */
+    public static Vector<Vector<String>> findAnyWithStringInTable(String tableName, String value) {
+        Vector<Vector<String>> rows = new Vector<>();
+        if (value == null) {
+            return rows;
+        }
+
+        StringBuilder querySb = new StringBuilder("SELECT * FROM `" + tableName + "` WHERE ");
+        Vector<String> columns = new Vector<>(getColumnsFromTableAsString(tableName));
+        for (int i = 0; i < columns.size(); i++) {
+            String columnName = columns.get(i);
+            querySb.append("`").append(columnName).append("`").append(" LIKE ").append("'%").append(value).append("%'").append(i < columns.size() - 1 ? " OR " : "");
+        }
+
+        SQLQuery findQuery = new SQLSelectQuery(querySb.toString(), true) {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                while (rs.next()) {
+                    Vector<String> row = new Vector<>();
+                    for (int i = 0; i < columns.size(); i++) {
+                        row.add(rs.getString(i + 1));
+                    }
+                    rows.add(row);
+                }
+                rows.add(0, columns);
+            }
+        };
+        findQuery.exec();
+        return rows;
     }
 
 }

@@ -10,6 +10,7 @@ import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.*;
 import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,11 +102,13 @@ public class SQLUtils {
             return null;
         }
         String original = enumLikeValues;
-        Pattern enumPattern = Pattern.compile("(enum|set)\\((.*)\\)$");
+        Pattern enumPattern = Pattern.compile("[^,']+");
         Matcher matcher = enumPattern.matcher(original);
-        String group = matcher.find() ? matcher.group(2) : "";
-        String groupNoLeadingAndEndQuot = group.substring(1, group.length() - 1);
-        return groupNoLeadingAndEndQuot.split("','");
+        List<String> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        return matches.toArray(new String[matches.size()]);
     }
 
     public static Map<String, String> getMySQLInfo() {
@@ -305,8 +308,13 @@ public class SQLUtils {
                     newColumn.setDateTimePrecision(DataTypeUtils.dataTypeIsTimeBased(dataType));
                     newColumn.setOnUpdateCurrentTimeStamp(rs.getString("EXTRA").equalsIgnoreCase("ON UPDATE CURRENT_TIMESTAMP"));
                     newColumn.setAutoincrement(rs.getString("EXTRA").equals("auto_increment"), false);
-                    if (newColumn.getDataType().equals("enum") || newColumn.getDataType().equals("set")) {
-                        newColumn.setEnumLikeValues(rs.getString("COLUMN_TYPE"));
+
+                    if (newColumn.getDataType().equals("enum")) {
+                        String enumTypes = rs.getString("COLUMN_TYPE");
+                        newColumn.setEnumLikeValues(enumTypes.substring(5, enumTypes.length() - 1));
+                    } else if (newColumn.getDataType().equals("set")) {
+                        String setTypes = rs.getString("COLUMN_TYPE");
+                        newColumn.setEnumLikeValues(setTypes.substring(4, setTypes.length() - 1));
                     }
                     columns.add(newColumn);
                 }

@@ -129,8 +129,11 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
         this.enumLikeValues = enumLikeValues;
     }
 
-    public String getEnumLikeValues() {
-        return enumLikeValues == null ? dataType + "()" : enumLikeValues.substring(enumLikeValues.indexOf(dataType));
+    public String getEnumLikeValues(boolean includeDataType) {
+        if (enumLikeValues == null) {
+            return includeDataType ? dataType + "()" : "";
+        }
+        return includeDataType ? dataType + "(" + enumLikeValues + ")" : enumLikeValues;
     }
 
     public String getNonSupportedDataType() {
@@ -507,7 +510,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
 
     public String getChangeColumnStatement() {
         return ((!getName().equals(uncommittedName) ? "CHANGE COLUMN `" + getName() + "` `" + uncommittedName + "` " : "MODIFY COLUMN `" + getName() + "` ")
-                + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues() : getDataType() + getDataPrecision())
+                + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision())
                 + (unsigned ? " UNSIGNED" : "")
                 + " " + (isStringBased() ? "CHARACTER SET " + characterSet + " " + "COLLATE " + collation : "")
                 + " " + (nullable ? "NULL" : "NOT NULL")
@@ -519,7 +522,9 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
 
     @Override
     public String getCreateStatement() {
-        return "`" + getUncommittedName() + "` " + dataType + getDataPrecision() + " " + (nullable ? "NULL" : "NOT NULL") + " "
+        return "`" + getUncommittedName() + "` " 
+                + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision()) 
+                + " " + (nullable ? "NULL" : "NOT NULL") + " "
                 + (autoincrement ? "AUTO_INCREMENT " : "")
                 + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT " + (isStringBased() ? "'" + defaultVal + "'" : defaultVal));
     }

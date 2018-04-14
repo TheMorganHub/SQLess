@@ -149,7 +149,7 @@ public class UIUtils {
     }
 
     public static JComboBox<String> makeComboBoxForEnumColumn(SQLColumn column) {
-        return createEditableComboBox(SQLUtils.getEnumLikeValuesAsArray(column.getEnumLikeValues()));
+        return createEditableComboBox(SQLUtils.getEnumLikeValuesAsArray(column.getEnumLikeValues(false)));
     }
 
     public static void scrollToTop(JScrollPane scrollPane) {

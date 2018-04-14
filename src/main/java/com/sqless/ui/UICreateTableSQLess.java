@@ -14,11 +14,8 @@ import com.sqless.utils.SQLUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -42,8 +39,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -86,7 +81,7 @@ public class UICreateTableSQLess extends FrontPanel {
         fkList = this.sqlTable.getForeignKeys();
         columnList = this.sqlTable.getColumns();
 
-        pnlExtraSettings.add(new UIColumnExtrasPanel());
+        pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
     }
 
     public void prepararUI() {
@@ -690,145 +685,6 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private class UIColumnExtrasPanel extends javax.swing.JPanel {
-
-        public UIColumnExtrasPanel() {
-            init();
-        }
-
-        public void refresh() {
-            this.setVisible(uiTable.getRowCount() > 0);
-            if (columnList.isEmpty()) {
-                return;
-            }
-            SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow() == -1 ? 0 : uiTable.getSelectedRow());
-            switch (selectedColumn.getDataType()) {
-                case "tinyint":
-                case "smallint":
-                case "mediumint":
-                case "int":
-                case "bigint":
-                    chkAutoIncrement.setVisible(true);
-                    chkAutoIncrement.removeItemListener(autoIncrementValueChangeListener);
-                    chkAutoIncrement.setSelected(selectedColumn.isAutoincrement());
-                    chkAutoIncrement.addItemListener(autoIncrementValueChangeListener);
-
-                    chkUnsigned.setVisible(true);
-                    chkUnsigned.removeItemListener(unsignedChangeListener);
-                    chkUnsigned.setSelected(selectedColumn.isUnsigned());
-                    chkUnsigned.addItemListener(unsignedChangeListener);
-                    break;
-                default:
-                    chkAutoIncrement.setVisible(false);
-                    chkUnsigned.setVisible(false);
-                    break;
-            }
-            txtDefault.getDocument().removeDocumentListener(defaultValueChangeListener);
-            txtDefault.setText(selectedColumn.getDefaultVal());
-            txtDefault.getDocument().addDocumentListener(defaultValueChangeListener);
-        }
-
-        public void init() {
-            chkAutoIncrement = new JCheckBox("Autoincrement");
-            chkUnsigned = new JCheckBox("Unsigned");
-            lblDefault = new JLabel("Default:");
-            txtDefault = new JTextField();
-
-            lblDefault = new javax.swing.JLabel();
-            txtDefault = new javax.swing.JTextField();
-
-            setLayout(new java.awt.GridBagLayout());
-
-            lblDefault.setText("Default:");
-            add(lblDefault, getConstraintsForGridX(JLabel.class, 0));
-            add(txtDefault, getConstraintsForGridX(JTextField.class, 0));
-            add(chkAutoIncrement, getConstraintsForGridX(JCheckBox.class, 1));
-            add(chkUnsigned, getConstraintsForGridX(JCheckBox.class, 2));
-
-            txtDefault.getDocument().addDocumentListener(defaultValueChangeListener);
-            chkAutoIncrement.addItemListener(autoIncrementValueChangeListener);
-        }
-
-        private GridBagConstraints getConstraintsForGridX(Class type, int y) {
-            GridBagConstraints gridBagConstraints = new GridBagConstraints();
-            switch (type.getSimpleName()) {
-                case "JLabel":
-                    gridBagConstraints.gridx = 0;
-                    gridBagConstraints.gridy = y;
-                    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                    gridBagConstraints.insets = new java.awt.Insets(14, 10, 10, 0);
-                    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                    break;
-                case "JTextField":
-                    gridBagConstraints.gridx = 0;
-                    gridBagConstraints.gridy = y;
-                    gridBagConstraints.gridheight = 2;
-                    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                    gridBagConstraints.weightx = 1.0;
-                    gridBagConstraints.insets = new java.awt.Insets(11, 150, 10, 10);
-                    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                    break;
-                case "JCheckBox":
-                    gridBagConstraints.gridx = 0;
-                    gridBagConstraints.gridy = y;
-                    gridBagConstraints.gridheight = 1;
-                    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                    gridBagConstraints.insets = new java.awt.Insets(0, 7, 0, 2);
-                    break;
-            }
-            return gridBagConstraints;
-        }
-
-        public JCheckBox getChkAutoIncrement() {
-            return chkAutoIncrement;
-        }
-
-        public JTextField getTxtDefault() {
-            return txtDefault;
-        }
-
-        private JTextField txtDefault;
-        private JLabel lblDefault;
-        private JCheckBox chkAutoIncrement;
-        private JCheckBox chkUnsigned;
-        private DocumentListener defaultValueChangeListener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
-                selectedColumn.setDefaultVal(txtDefault.getText(), true);
-                boldTitleLabel();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (uiTable.getSelectedRow() != -1) { //si la columna no está siendo eliminada
-                    SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
-                    selectedColumn.setDefaultVal(txtDefault.getText(), true);
-                    boldTitleLabel();
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-        };
-        private ItemListener autoIncrementValueChangeListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
-                selectedColumn.setAutoincrement(chkAutoIncrement.isSelected(), true);
-                boldTitleLabel();
-            }
-        };
-        private ItemListener unsignedChangeListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
-                selectedColumn.setUnsigned(chkUnsigned.isSelected(), true);
-                boldTitleLabel();
-            }
-        };
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;

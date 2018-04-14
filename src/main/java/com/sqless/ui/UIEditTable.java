@@ -147,7 +147,7 @@ public class UIEditTable extends FrontPanel {
             } else if (sqlColumn.getDataType().equals("enum")) {
                 uiColumn.setCellEditor(new DefaultCellEditor(UIUtils.makeComboBoxForEnumColumn(sqlColumn)));
             } else if (sqlColumn.getDataType().equals("set")) {
-                uiColumn.setCellEditor(new SQLSetCellEditor(SQLUtils.getEnumLikeValuesAsArray(sqlColumn.getEnumLikeValues())));
+                uiColumn.setCellEditor(new SQLSetCellEditor(SQLUtils.getEnumLikeValuesAsArray(sqlColumn.getEnumLikeValues(false))));
             } else if (sqlColumn.isFK()) {
                 SQLForeignKey fkFromColumn = table.getForeignKeyFromColumn(sqlColumn);
                 uiColumn.setCellEditor(new FKCellEditor(fkFromColumn));

@@ -183,6 +183,18 @@ public class SQLConnectionManager {
         return connection;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
     public static SQLConnectionManager getInstance() {
         return INSTANCE;
     }

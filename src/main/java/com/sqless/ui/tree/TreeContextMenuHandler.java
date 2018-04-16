@@ -47,6 +47,9 @@ public class TreeContextMenuHandler {
 
         TreeMenuItemSet executableContext = new TreeMenuItemSet(FUNCTION, PROCEDURE);
         executableContext.add(new TreeContextMenuItem("Execute", ContextItemFunctionality.EXECUTE));
+        
+        TreeMenuItemSet databaseContext = new TreeMenuItemSet(DATABASE);
+        databaseContext.add(new TreeContextMenuItem("Dump to SQL file", "EXPORT_DB"));
 
         TreeMenuItemSet genericMenu = new TreeMenuItemSet(DATABASE, TABLE_COLUMN, TABLE, VIEW, VIEW_COLUMN, INDEX,
                 FUNCTION, PROCEDURE, TRIGGER);
@@ -59,6 +62,7 @@ public class TreeContextMenuHandler {
         itemSets.add(tableObjectContext);
         itemSets.add(executableContext);
         itemSets.add(columnTableObjectContext);
+        itemSets.add(databaseContext);
         itemSets.add(genericMenu);
     }
 

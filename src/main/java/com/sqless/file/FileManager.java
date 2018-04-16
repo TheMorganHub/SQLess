@@ -4,6 +4,7 @@ import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.ui.UIQueryPanel;
+import com.sqless.utils.Callback;
 import com.sqless.utils.TextUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -309,6 +310,44 @@ public class FileManager {
             } catch (java.io.IOException ex) {
                 UIUtils.showErrorMessage("Error", "Could not save file", client);
             }
+        }
+    }
+
+    /**
+     * Muestra un {@code JFileChooser} pero al apretarse el botón de aceptar, el
+     * vez de guardar el archivo, se ejecuta el callback dado. A este callback
+     * se le pasará como parámetro la ruta seleccionada por el usuario en el
+     * {@code JFileChooser}.
+     *
+     * @param extension
+     * @param callback
+     */
+    public void saveFileAs(String extension, Callback<String> callback) {
+        UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                extension + " File (." + extension + ")", extension);
+        chooser.setDialogTitle("Save as...");
+        chooser.setFileFilter(filter);
+        String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
+        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+                ? new File(defSaveDir)
+                : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        int returnVal = chooser.showSaveDialog(client);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File selFile = chooser.getSelectedFile();
+            String selFileFullPath = FileManager.appendExtension(selFile.getPath(), extension);
+            String selFileName = FileManager.appendExtension(selFile.getName(), extension);
+            if (FileManager.dirOrFileExists(selFileFullPath)) {
+                int overwrite = overwriteFile(selFileName);
+                if (overwrite != 0) {
+                    saveFileAs(extension, callback);
+                    return;
+                }
+            }
+            callback.exec(selFileFullPath);
         }
     }
 

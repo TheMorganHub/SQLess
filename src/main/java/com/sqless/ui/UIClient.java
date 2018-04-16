@@ -525,7 +525,7 @@ public class UIClient extends javax.swing.JFrame {
         FrontPanel frontUI = (FrontPanel) tabPaneContent.getComponentAt(tabPaneContent.getSelectedIndex());
 
         removeNonStandardToolbarIcons();
-        Component[] toolbarComponents = frontUI.getToolbarComponents(); //tira exception desde JAR
+        Component[] toolbarComponents = frontUI.getToolbarComponents();
 
         if (toolbarComponents != null) {
             for (Component toolbarComponent : toolbarComponents) {
@@ -543,7 +543,7 @@ public class UIClient extends javax.swing.JFrame {
         toolbarTop.revalidate();
         toolbarTop.repaint();
     }
-    
+
     public void refreshJTree() {
         actionRefreshJTree.actionPerformed(null);
     }

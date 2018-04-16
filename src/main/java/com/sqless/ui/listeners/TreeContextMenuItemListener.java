@@ -13,11 +13,18 @@ import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UICreateTableSQLess;
 import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
+import com.sqless.utils.DatabaseDumper;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -28,9 +35,17 @@ import javax.swing.tree.TreePath;
 public class TreeContextMenuItemListener extends MouseAdapter {
 
     private UIClient client;
+    /**
+     * Un mapa de acciones que ejecutarán los nodos con funcionalidad OTHER
+     * dependiendo de la key que los menu item tengan.
+     *
+     * @see TreeContextMenuItem#getActionKey()
+     */
+    private Map<String, ActionListener> actionMap;
 
     public TreeContextMenuItemListener() {
         client = UIClient.getInstance();
+        loadActions();
     }
 
     @Override
@@ -59,7 +74,15 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             case EDIT:
                 doEdit(node);
                 break;
+            case OTHER:
+                actionOther(source);
+                break;
         }
+    }
+
+    private void loadActions() {
+        actionMap = new HashMap<>();
+        actionMap.put("EXPORT_DB", actionExportDb);
     }
 
     public void doDrop(SQLessTreeNode node) {
@@ -125,8 +148,6 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                 uiCreateTable.prepararUI();
                 client.sendToNewTab(uiCreateTable);
                 break;
-            case TABLE: //create column
-                break;
         }
     }
 
@@ -135,7 +156,39 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         client.getTree().startEditingAtPath(new TreePath(node.getPath()));
     }
 
+    public void actionOther(TreeContextMenuItem source) {
+        String key = source.getActionKey();
+        ActionListener action = actionMap.get(key);
+        if (action != null) {
+            action.actionPerformed(null);
+        }
+    }
+
     private SQLessTreeNode getCallingNode() {
         return (SQLessTreeNode) client.getTree().getSelectionPath().getLastPathComponent();
     }
+
+    private ActionListener actionExportDb = e -> {
+        try (InputStream link = getClass().getResourceAsStream("/sqldump/mysqldump.exe")) {
+            File tempDirectory = new File(System.getProperty("java.io.tmpdir") + "/SQLess");
+            System.out.println(tempDirectory);
+            File tempFile = new File(tempDirectory.getPath() + "/mysqldump.exe");
+            if (tempDirectory.exists()) {
+                if (!tempFile.exists()) {
+                    Files.copy(link, tempFile.getAbsoluteFile().toPath());
+                } else {
+                    System.out.println("El archivo ya existe");
+                }
+                DatabaseDumper dbDumper = new DatabaseDumper(tempFile);
+                dbDumper.start();
+            } else {
+                if (tempDirectory.mkdir()) {
+                    Files.copy(link, tempFile.getAbsoluteFile().toPath());
+                }
+            }
+            tempFile.deleteOnExit();
+        } catch (IOException ex) {
+            UIUtils.showErrorMessage("Error", ex.getMessage(), null);
+        }
+    };
 }

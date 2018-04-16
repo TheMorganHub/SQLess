@@ -664,7 +664,7 @@ public class UICreateTableSQLess extends FrontPanel {
 
     public void refreshPnlExtras() {
         UIColumnExtrasPanel extrasPnl = (UIColumnExtrasPanel) pnlExtraSettings.getComponent(0);
-        extrasPnl.refresh();
+        extrasPnl.refresh(columnList);
     }
 
     private PropertyChangeListener tableEditorPropertyChangeListener = (evt) -> {
@@ -931,8 +931,8 @@ public class UICreateTableSQLess extends FrontPanel {
                 for (int i = 0; i < uiTable.getRowCount(); i++) {
                     syncRowWithList(i);
                 }
+                refreshPnlExtras();
             }
-            refreshPnlExtras();
         } else {
             int opt = UIUtils.showOptionDialog("Mover columnas", "Se han detectado columnas con cambios pendientes. "
                     + "Para poder acceder a opciones avanzadas de orden de columnas es necesario hacer el commit en la base de datos.", null,

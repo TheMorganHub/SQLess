@@ -10,7 +10,6 @@ import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.*;
 import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;

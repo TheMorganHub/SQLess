@@ -1,11 +1,17 @@
 package com.sqless.ui;
 
 import com.sqless.sql.objects.SQLColumn;
+import com.sqless.utils.SQLUtils;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -46,6 +52,10 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         txtDefault = new JTextField();
         lblEnumSetValues = new JLabel("Values:");
         txtEnumSetValues = new JTextField();
+        btnEditValues = new JButton("...");
+        btnEditValues.setMargin(new Insets(1, 4, 1, 4));
+        btnEditValues.setFocusable(false);
+        btnEditValues.addActionListener(actionEditValues);
 
         setLayout(new java.awt.GridBagLayout());
     }
@@ -55,8 +65,9 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         revalidate();
     }
 
-    public void refresh() {
+    public void refresh(List<SQLColumn> columnList) {
         this.setVisible(uiTable.getRowCount() > 0);
+        this.columnList = columnList;
         if (columnList.isEmpty()) {
             return;
         }
@@ -84,6 +95,7 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
             case "enum":
                 addToPnl(lblEnumSetValues, 1);
                 addToPnl(txtEnumSetValues, 1);
+                addToPnl(btnEditValues, 1);
                 txtEnumSetValues.getDocument().removeDocumentListener(enumSetValueChangeListener);
                 txtEnumSetValues.setText(selectedColumn.getEnumLikeValues(false));
                 txtEnumSetValues.getDocument().addDocumentListener(enumSetValueChangeListener);
@@ -106,17 +118,20 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         switch (type.getSimpleName()) {
             case "JLabel":
                 gridBagConstraints.insets = new java.awt.Insets(5, 10, 10, 0);
-                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
                 break;
             case "JTextField":
-                gridBagConstraints.gridheight = 2;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new java.awt.Insets(0, 150, 10, 10);
+                gridBagConstraints.weightx = 1;
+                gridBagConstraints.insets = new java.awt.Insets(0, 100, 10, 10);
                 gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
                 break;
             case "JCheckBox":
-                gridBagConstraints.gridheight = 1;
                 gridBagConstraints.insets = new java.awt.Insets(0, 7, 0, 2);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                break;
+            case "JButton":
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
                 break;
         }
         return gridBagConstraints;
@@ -143,7 +158,7 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         public void changedUpdate(DocumentEvent e) {
         }
     };
-    
+
     private DocumentListener enumSetValueChangeListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -167,7 +182,7 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         public void changedUpdate(DocumentEvent e) {
         }
     };
-    
+
     private ItemListener autoIncrementValueChangeListener = new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
@@ -185,6 +200,21 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         }
     };
 
+    private Action actionEditValues = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
+            UISetEnumValuesEditor editor = new UISetEnumValuesEditor(selectedColumn.getName(), SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)));
+            String valuesFromEditor = editor.showDialog();
+            if (editor.valuesChanged()) {
+                selectedColumn.setEnumLikeValues(valuesFromEditor);
+                selectedColumn.evaluateUncommittedChanges();
+                txtEnumSetValues.setText(valuesFromEditor);
+                frontPanel.boldTitleLabel();
+            }
+        }
+    };
+    private JButton btnEditValues;
     private JTextField txtDefault;
     private JTextField txtEnumSetValues;
     private JLabel lblEnumSetValues;

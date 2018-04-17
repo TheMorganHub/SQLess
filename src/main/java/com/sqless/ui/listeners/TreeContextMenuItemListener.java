@@ -11,9 +11,9 @@ import com.sqless.ui.UIClient;
 import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UICreateTableSQLess;
+import com.sqless.ui.UIDatabaseDumper;
 import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
-import com.sqless.utils.DatabaseDumper;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -171,7 +171,6 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     private ActionListener actionExportDb = e -> {
         try (InputStream link = getClass().getResourceAsStream("/sqldump/mysqldump.exe")) {
             File tempDirectory = new File(System.getProperty("java.io.tmpdir") + "/SQLess");
-            System.out.println(tempDirectory);
             File tempFile = new File(tempDirectory.getPath() + "/mysqldump.exe");
             if (tempDirectory.exists()) {
                 if (!tempFile.exists()) {
@@ -179,7 +178,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                 } else {
                     System.out.println("El archivo ya existe");
                 }
-                DatabaseDumper dbDumper = new DatabaseDumper(tempFile);
+                UIDatabaseDumper dbDumper = new UIDatabaseDumper(tempFile);
                 dbDumper.start();
             } else {
                 if (tempDirectory.mkdir()) {

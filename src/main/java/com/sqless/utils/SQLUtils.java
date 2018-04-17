@@ -593,4 +593,64 @@ public class SQLUtils {
         return rows;
     }
 
+    public static Map<String, Integer> getDbStats() {
+        Map<String, Integer> mapStats = new HashMap<>();
+        SQLQuery rowCountQuery = new SQLSelectQuery("SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + getConnectedDBName() + "';") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                mapStats.put("ROW_COUNT", rs.next() ? rs.getInt(1) : 0);
+            }
+
+            @Override
+            public void onFailure(String errMessage) {
+                mapStats.put("ROW_COUNT", -1);
+            }
+        };
+
+        SQLQuery tableCountQuery = new SQLSelectQuery("SELECT TABLE_TYPE, COUNT(*) AS cnt FROM information_schema.tables WHERE table_schema = '" + getConnectedDBName() + "' GROUP BY TABLE_TYPE;") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                mapStats.put("TABLE_COUNT", 0);
+                mapStats.put("VIEW_COUNT", 0);
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    int count = rs.getInt(2);
+                    mapStats.put(rowCount == 1 ? "TABLE_COUNT" : "VIEW_COUNT", count);
+                }
+            }
+
+            @Override
+            public void onFailure(String errMessage) {
+                mapStats.put("TABLE_COUNT", -1);
+                mapStats.put("VIEW_COUNT", -1);
+            }
+        };
+
+        SQLQuery routinesCountQuery = new SQLSelectQuery("SELECT ROUTINE_TYPE, COUNT(*) as CNT FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = '"
+                + getConnectedDBName() + "' GROUP BY ROUTINE_TYPE;") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                mapStats.put("FUNCTION_COUNT", 0);
+                mapStats.put("PROCEDURE_COUNT", 0);
+                while (rs.next()) {
+                    String routineType = rs.getString(1);
+                    int count = rs.getInt(2);
+                    mapStats.put(routineType + "_COUNT", count);
+                }
+            }
+
+            @Override
+            public void onFailure(String errMessage) {
+                mapStats.put("FUNCTION_COUNT", -1);
+                mapStats.put("PROCEDURE_COUNT", -1);
+            }
+        };
+
+        rowCountQuery.exec();
+        tableCountQuery.exec();
+        routinesCountQuery.exec();
+        return mapStats;
+    }
+
 }

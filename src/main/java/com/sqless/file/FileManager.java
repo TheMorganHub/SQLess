@@ -457,6 +457,10 @@ public class FileManager {
         }
         return false;
     }
+    
+    public static void deleteFile(String pathName) throws IOException {
+        Files.deleteIfExists(Paths.get(pathName));
+    }
 
     public static void delete(File f) throws IOException {
         if (f.isDirectory()) {

@@ -3,7 +3,6 @@ package com.sqless.ui;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.sqless.network.GoogleLogin;
 import com.sqless.userdata.GoogleUserManager;
-import com.sqless.utils.UIUtils;
 
 /**
  * Un JDialog que aparecerá al momento en que el usuario decide hacer Log in con
@@ -78,6 +77,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
+        setResizable(false);
 
         lblDialog.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDialog.setText("Esperando a Google...");

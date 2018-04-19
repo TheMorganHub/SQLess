@@ -193,6 +193,28 @@ public class FileManager {
         }
     }
 
+    public void loadFile(Callback<String> callback) {
+        UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "SQL File (.sql)", "SQL");
+        chooser.setDialogTitle("Open...");
+        chooser.setFileFilter(filter);
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
+        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+                ? new File(defSaveDir)
+                : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        int returnVal = chooser.showOpenDialog(client);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String filePath = chooser.getSelectedFile().getPath();
+            callback.exec(filePath);
+        }
+    }
+
     public void dragNDropFile(File file) {
         JTabbedPane tabPane = client.getTabPaneContent();
         if (fileIsSQL(file)) {
@@ -457,7 +479,7 @@ public class FileManager {
         }
         return false;
     }
-    
+
     public static void deleteFile(String pathName) throws IOException {
         Files.deleteIfExists(Paths.get(pathName));
     }

@@ -47,6 +47,17 @@ public class SQLConnectionManager {
         }
         return newCon;
     }
+    
+    public Connection newBatchQueryConnection() {
+        Connection newCon = null;
+        try {
+            DriverManager.setLoginTimeout(3);
+            newCon = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + connectedDB.getName()
+                    + "", username, password);
+        } catch (SQLException e) {
+        }
+        return newCon;
+    }
 
     private boolean connectToDatabase(String dbName, String username, String password,
             String hostName, String port, Frame parent) {

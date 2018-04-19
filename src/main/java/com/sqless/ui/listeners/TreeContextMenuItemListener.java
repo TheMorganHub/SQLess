@@ -1,5 +1,6 @@
 package com.sqless.ui.listeners;
 
+import com.sqless.file.FileManager;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLUpdateQuery;
 import com.sqless.sql.objects.SQLDroppable;
@@ -14,6 +15,7 @@ import com.sqless.ui.UICreateTableSQLess;
 import com.sqless.ui.UIDatabaseDumper;
 import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
+import com.sqless.ui.UIExecuteFromScript;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -83,6 +85,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     private void loadActions() {
         actionMap = new HashMap<>();
         actionMap.put("EXPORT_DB", actionExportDb);
+        actionMap.put("EXECUTE_FROM_SCRIPT", actionExecuteFromScript);
     }
 
     public void doDrop(SQLessTreeNode node) {
@@ -189,5 +192,12 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         } catch (IOException ex) {
             UIUtils.showErrorMessage("Error", ex.getMessage(), null);
         }
+    };
+    
+    private ActionListener actionExecuteFromScript = e -> {
+        FileManager.getInstance().loadFile(fileContents -> {
+            UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(fileContents);
+            uiExecuteFromScript.start();
+        });
     };
 }

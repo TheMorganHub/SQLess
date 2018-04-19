@@ -21,7 +21,6 @@ import java.sql.SQLException;
 public class SQLUpdateQuery extends SQLQuery {
 
     private Connection standaloneUpdateConnection;
-    boolean queryFailed;
 
     public SQLUpdateQuery(String sql) {
         super(sql);

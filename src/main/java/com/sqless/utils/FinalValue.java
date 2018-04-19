@@ -6,17 +6,24 @@ package com.sqless.utils;
  * que toda variable referenciada dentro de una clase anónima debe ser final.
  *
  * @author Morgan
- * @param <T>
+ * @param <V>
  */
-public class FinalValue<T> {
+public class FinalValue<V> {
 
-    private T value;
+    private V value;
 
-    public void set(T t) {
-        this.value = t;
+    public FinalValue() {
     }
 
-    public T get() {
+    public FinalValue(V value) {
+        this.value = value;
+    }
+
+    public void set(V v) {
+        this.value = v;
+    }
+
+    public V get() {
         return value;
     }
 }

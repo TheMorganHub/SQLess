@@ -18,8 +18,13 @@ public abstract class SQLQuery {
      */
     protected boolean defaultErrorHandling;
 
+    public SQLQuery() {
+    }
+    
     public SQLQuery(String sql) {
+//        long start = System.currentTimeMillis();
         this.sql = SQLUtils.filterDelimiterKeyword(sql);
+//        System.out.println("Removed delimiters in " + (System.currentTimeMillis() - start) + "ms (" + sql.getBytes().length + " bytes)");
     }
 
     /**

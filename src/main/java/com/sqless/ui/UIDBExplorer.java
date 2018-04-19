@@ -338,8 +338,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
     public void actionDropDatabase() {
         String dbName = tableDb.getSelectedRow() == -1 ? getDefaultDbName() : getSelectedRowValue();
         if (SQLUtils.getConnectedDBName().equals(dbName)) {
-            int option = UIUtils.showOptionDialog("Drop database", "The database is current in use and "
-                    + "cannot be dropped.\nWhat would you like to do?", getParent(),
+            int option = UIUtils.showOptionDialog("Drop database", "The database is current in use.\nWhat would you like to do?", getParent(),
                     "Cancel", "Close connection and drop");
             switch (option) {
                 case 1:
@@ -463,25 +462,26 @@ public class UIDBExplorer extends javax.swing.JDialog {
      * removes the row that contained said database from the UI table.
      *
      * @param dbName the name of the database to remove.
-     * @param closeConnection Whether to close the connection to said database
+     * @param closeCurrentConnection Whether to close the connection to said database
      * before dropping it. The caller of this method must set this flag to
      * {@code true} if the database to be dropped is in use at the time this
      * method is called.
      */
-    public void dropDatabase(String dbName, boolean closeConnection) {
+    public void dropDatabase(String dbName, boolean closeCurrentConnection) {
         int confirmation = UIUtils.showConfirmationMessage("Drop database ",
                 "Are you sure you wish to permanently drop database " + dbName + "?", getParent());
         if (confirmation != 0) {
             return;
         }
-        String sql = (closeConnection ? "USE mysql; " : "") + "DROP DATABASE " + dbName;
+        String sql = (closeCurrentConnection ? "USE mysql; " : "") + "DROP DATABASE " + dbName;
         SQLQuery dropDatabaseQuery = new SQLUpdateQuery(sql) {
             @Override
             public void onSuccess(int affectedRows) {
                 UIUtils.showMessage("Drop database", "Database " + dbName + " has "
                         + "been dropped successfully.", getParent());
                 removeRow(dbName);
-                if (closeConnection) {
+                if (closeCurrentConnection) {
+                    SQLConnectionManager.getInstance().setNewConnection("mysql", null); //si la conexión que dropeamos era la actual, cambiamos la conexión a 'mysql', de lo contrario, nos quedaría null
                     client.clearJTree();
                 }
             }

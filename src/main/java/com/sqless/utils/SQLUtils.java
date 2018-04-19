@@ -2,6 +2,7 @@ package com.sqless.utils;
 
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLSelectQuery;
+import com.sqless.queries.SQLUpdateQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -651,6 +652,41 @@ public class SQLUtils {
         tableCountQuery.exec();
         routinesCountQuery.exec();
         return mapStats;
+    }
+
+    public static int getMaxPacketSize() {
+        FinalValue<Integer> packetSize = new FinalValue<>();
+        SQLQuery packetQuery = new SQLSelectQuery("SHOW VARIABLES LIKE 'max_allowed_packet';") {
+            @Override
+            public void onSuccess(ResultSet rs) throws SQLException {
+                packetSize.set(rs.next() ? rs.getInt(2) : -1);
+            }
+
+            @Override
+            public void onFailure(String errMessage) {
+                packetSize.set(-1);
+            }
+        };
+        packetQuery.exec();
+        return packetSize.get();
+    }
+    
+    public static boolean setPacketSize(long newSize) {
+        FinalValue<Boolean> queryStatus = new FinalValue<>();
+        SQLQuery updatePacket = new SQLUpdateQuery("SET GLOBAL max_allowed_packet=" + newSize + ";") {
+            @Override
+            public void onSuccess(int updateCount) {
+                queryStatus.set(true);
+            }
+
+            @Override
+            public void onFailure(String errMessage) {
+                queryStatus.set(false);
+                System.err.println(errMessage);
+            }            
+        };
+        updatePacket.exec();
+        return queryStatus.get();
     }
 
 }

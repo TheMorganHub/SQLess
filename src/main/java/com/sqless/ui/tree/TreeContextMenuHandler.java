@@ -33,7 +33,7 @@ public class TreeContextMenuHandler {
         itemSets = new ArrayList<>();
 
         TreeMenuItemSet tableCategoriesContext = new TreeMenuItemSet(CAT_TABLES);
-        tableCategoriesContext.add(new TreeContextMenuItem("New table...", ContextItemFunctionality.CREATE));
+        tableCategoriesContext.add(new TreeContextMenuItem("New table", ContextItemFunctionality.CREATE));
 
         TreeMenuItemSet selectableContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
         selectableContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
@@ -49,7 +49,8 @@ public class TreeContextMenuHandler {
         executableContext.add(new TreeContextMenuItem("Execute", ContextItemFunctionality.EXECUTE));
         
         TreeMenuItemSet databaseContext = new TreeMenuItemSet(DATABASE);
-        databaseContext.add(new TreeContextMenuItem("Dump to SQL file", "EXPORT_DB"));
+        databaseContext.add(new TreeContextMenuItem("Dump to SQL file...", "EXPORT_DB"));
+        databaseContext.add(new TreeContextMenuItem("Execute from SQL File...", "EXECUTE_FROM_SCRIPT"));
 
         TreeMenuItemSet genericMenu = new TreeMenuItemSet(DATABASE, TABLE_COLUMN, TABLE, VIEW, VIEW_COLUMN, INDEX,
                 FUNCTION, PROCEDURE, TRIGGER);

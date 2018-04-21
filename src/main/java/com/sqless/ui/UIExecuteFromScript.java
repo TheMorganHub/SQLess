@@ -1,20 +1,10 @@
 package com.sqless.ui;
 
 import com.sqless.queries.SQLBatchQuery;
-import com.sqless.queries.SQLQuery;
-import com.sqless.queries.SQLUpdateQuery;
-import com.sqless.utils.FinalValue;
 import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
@@ -22,7 +12,6 @@ import javax.swing.SwingWorker;
 public class UIExecuteFromScript extends javax.swing.JDialog {
 
     private String filePath;
-    private String queryContents;
     private ScriptExecutor scriptExecutor;
 
     public UIExecuteFromScript(String filePath) {
@@ -119,6 +108,9 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
                         delimiter = line.split(" ")[1];
                         continue;
                     }
+                    if (line.startsWith("--") || line.isEmpty()) {
+                        continue;
+                    }
                     buffer.append(line.replaceFirst("\\h+$", "")).append("\n"); //remueve los espacios en blanco (si es que los hay) después de DELIMITER [delimitador]
                     if (line.endsWith(delimiter)) {
                         String statement = buffer.toString().replace(delimiter, ""); //buffer.toString().replace(delimiter, ";")
@@ -144,6 +136,7 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
                 System.err.println(ex.getMessage());
             } catch (ExecutionException ex) {
                 UIUtils.showErrorMessage("Error", "Hubo un error al ejecutar el archivo dado.\nError: " + ex.getMessage(), UIExecuteFromScript.this);
+                ex.printStackTrace();
             } finally {
                 dispose();
             }

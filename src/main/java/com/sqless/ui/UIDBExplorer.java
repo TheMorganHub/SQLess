@@ -19,6 +19,7 @@ import com.sqless.utils.TextUtils;
 import com.sqless.settings.UserPreferencesLoader;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 
 public class UIDBExplorer extends javax.swing.JDialog {
@@ -45,9 +46,21 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     public void prepareUI() {
         lblHost.setText(conManager.getServerHostname());
-        loadTable();
+        loadTable();        
         comboCharset.addItemListener(new CharsetChangeListener());
         showMasterDB((Boolean) sessionSettings.get(SessionSettings.Keys.SHOW_MASTER_DB));
+        tabPaneMain.addChangeListener(c -> {
+            int tabNum = tabPaneMain.getSelectedIndex();
+            switch (tabNum) {
+                case 0:
+                    getRootPane().setDefaultButton(btnConnect);
+                    break;
+                case 1:
+                    getRootPane().setDefaultButton(btnCreateDb);
+                    break;
+            }
+        });
+
         pack();
     }
 
@@ -71,12 +84,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
         int rowOnStart = getDefaultDbRow() == -1 ? 0 : getDefaultDbRow();
         tableDb.setRowSelectionInterval(rowOnStart, rowOnStart);
         tableDb.packAll();
+        tableDb.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popTable, tableDb));        
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popTable = new javax.swing.JPopupMenu();
+        menuItemDropDb = new javax.swing.JMenuItem();
         tabPaneMain = new javax.swing.JTabbedPane();
         pnlManager = new javax.swing.JPanel();
         btnDrop = new javax.swing.JButton();
@@ -100,6 +116,10 @@ public class UIDBExplorer extends javax.swing.JDialog {
         comboCharset = new javax.swing.JComboBox<>();
         comboCollation = new javax.swing.JComboBox<>();
 
+        menuItemDropDb.setAction(actionDropDatabase);
+        menuItemDropDb.setText("Drop database");
+        popTable.add(menuItemDropDb);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Database explorer");
 
@@ -114,6 +134,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         });
 
         btnConnect.setText("Connect");
+        btnConnect.setFocusable(false);
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConnectActionPerformed(evt);
@@ -188,7 +209,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
                         .addComponent(lblHost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlManagerLayout.createSequentialGroup()
                         .addComponent(chkShowMaster)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 224, Short.MAX_VALUE)
                         .addComponent(btnDrop)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConnect)))
@@ -202,7 +223,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
                     .addComponent(iLblHost)
                     .addComponent(lblHost))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkShowMaster, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -219,6 +240,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         iLblName.setText("Name:");
 
         btnRestoreDefaults.setText("Restore defaults");
+        btnRestoreDefaults.setFocusable(false);
         btnRestoreDefaults.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRestoreDefaultsActionPerformed(evt);
@@ -226,6 +248,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         });
 
         btnCreateDb.setText("Create");
+        btnCreateDb.setFocusable(false);
         btnCreateDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCreateDbActionPerformed(evt);
@@ -237,20 +260,18 @@ public class UIDBExplorer extends javax.swing.JDialog {
         iLblCollation.setText("Collation:");
 
         comboCharset.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Default", "ascii - US ASCII", "utf8 - UTF-8 Unicode", "utf16 - UTF-16 Unicode" }));
+        comboCharset.setFocusable(false);
+
+        comboCollation.setFocusable(false);
 
         javax.swing.GroupLayout pnlCreationLayout = new javax.swing.GroupLayout(pnlCreation);
         pnlCreation.setLayout(pnlCreationLayout);
         pnlCreationLayout.setHorizontalGroup(
             pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCreationLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCreationLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCreationLayout.createSequentialGroup()
-                        .addGap(0, 228, Short.MAX_VALUE)
-                        .addComponent(btnRestoreDefaults)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCreateDb))
-                    .addGroup(pnlCreationLayout.createSequentialGroup()
+                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCreationLayout.createSequentialGroup()
                         .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(iLblName, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(iLblCharset)
@@ -258,8 +279,13 @@ public class UIDBExplorer extends javax.swing.JDialog {
                         .addGap(18, 18, 18)
                         .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtNewDbName)
-                            .addComponent(comboCharset, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(comboCollation, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(comboCharset, 0, 346, Short.MAX_VALUE)
+                            .addComponent(comboCollation, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(pnlCreationLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnCreateDb, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnRestoreDefaults))))
                 .addContainerGap())
         );
         pnlCreationLayout.setVerticalGroup(
@@ -277,10 +303,10 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comboCollation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(iLblCollation))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, Short.MAX_VALUE)
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRestoreDefaults)
-                    .addComponent(btnCreateDb))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRestoreDefaults)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                .addComponent(btnCreateDb, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -337,7 +363,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     public void actionDropDatabase() {
         String dbName = tableDb.getSelectedRow() == -1 ? getDefaultDbName() : getSelectedRowValue();
-        if (SQLUtils.getConnectedDBName().equals(dbName)) {
+        if (SQLUtils.getConnectedDBName().equalsIgnoreCase(dbName)) {
             int option = UIUtils.showOptionDialog("Drop database", "The database is current in use.\nWhat would you like to do?", getParent(),
                     "Cancel", "Close connection and drop");
             switch (option) {
@@ -398,6 +424,10 @@ public class UIDBExplorer extends javax.swing.JDialog {
             UIUtils.showErrorMessage("Error", "The database name cannot start with a number.", getParent());
             return;
         }
+        if (dbExists(txtNewDbName.getText())) {
+            UIUtils.showErrorMessage("Error", "La base de datos ya existe. Elige otro nombre.", getParent());
+            return;
+        }
         executeCreateScript();
     }//GEN-LAST:event_btnCreateDbActionPerformed
 
@@ -426,14 +456,20 @@ public class UIDBExplorer extends javax.swing.JDialog {
     }
 
     public void executeCreateScript() {
-        SQLQuery createDbQuery = new SQLUpdateQuery(scriptCreate()) {
+        SQLQuery createDbQuery = new SQLUpdateQuery(scriptCreate(), true) {
             @Override
             public void onSuccess(int affectedRows) {
-                UIUtils.showMessage("Database creation", "The database " + txtNewDbName.getText()
-                        + " has been created successfully.", getParent());
+                String newDbName = txtNewDbName.getText();
                 DefaultTableModel model = (DefaultTableModel) tableDb.getModel();
-                model.addRow(new Object[]{FAVOURITE_ICON, txtNewDbName.getText()});
+                model.addRow(new Object[]{NOT_FAVOURITE_ICON, newDbName});
                 UIUtils.sortTable(tableDb, 1);
+                int opt = UIUtils.showConfirmationMessage("Database creation", "The database " + newDbName
+                        + " has been created successfully.\nWould you like SQLess to connect to it?", getParent());
+                if (opt == 0) {
+                    SQLConnectionManager.getInstance().setNewConnection(newDbName, client);
+                    client.createJTree();
+                    dispose();
+                }
             }
         };
         createDbQuery.exec();
@@ -449,7 +485,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         String newDbName = txtNewDbName.getText();
         String defCharSet = getCharSetFromCombo();
         String defCollation = comboCollation.getSelectedItem().toString();
-        return "CREATE DATABASE " + newDbName + " DEFAULT CHARACTER SET " + defCharSet + " DEFAULT COLLATE " + defCollation;
+        return "CREATE DATABASE `" + newDbName + "` DEFAULT CHARACTER SET " + defCharSet + " DEFAULT COLLATE " + defCollation;
     }
 
     public String getCharSetFromCombo() {
@@ -462,9 +498,9 @@ public class UIDBExplorer extends javax.swing.JDialog {
      * removes the row that contained said database from the UI table.
      *
      * @param dbName the name of the database to remove.
-     * @param closeCurrentConnection Whether to close the connection to said database
-     * before dropping it. The caller of this method must set this flag to
-     * {@code true} if the database to be dropped is in use at the time this
+     * @param closeCurrentConnection Whether to close the connection to said
+     * database before dropping it. The caller of this method must set this flag
+     * to {@code true} if the database to be dropped is in use at the time this
      * method is called.
      */
     public void dropDatabase(String dbName, boolean closeCurrentConnection) {
@@ -473,15 +509,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
         if (confirmation != 0) {
             return;
         }
-        String sql = (closeCurrentConnection ? "USE mysql; " : "") + "DROP DATABASE " + dbName;
+        if (closeCurrentConnection) {
+            SQLConnectionManager.getInstance().setNewConnection("mysql", null);
+        }
+        String sql = "DROP DATABASE `" + dbName + "`";
         SQLQuery dropDatabaseQuery = new SQLUpdateQuery(sql) {
             @Override
             public void onSuccess(int affectedRows) {
-                UIUtils.showMessage("Drop database", "Database " + dbName + " has "
-                        + "been dropped successfully.", getParent());
                 removeRow(dbName);
                 if (closeCurrentConnection) {
-                    SQLConnectionManager.getInstance().setNewConnection("mysql", null); //si la conexión que dropeamos era la actual, cambiamos la conexión a 'mysql', de lo contrario, nos quedaría null
                     client.clearJTree();
                 }
             }
@@ -502,7 +538,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
     public void removeRow(String value) {
         DefaultTableModel model = (DefaultTableModel) tableDb.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
-            if (model.getValueAt(i, 1).toString().equals(value)) {
+            if (model.getValueAt(i, 1).toString().equalsIgnoreCase(value)) {
                 model.removeRow(i);
                 break;
             }
@@ -540,6 +576,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
      */
     public boolean dbIsDefault(String dbName) {
         return dbName.equals(getDefaultDbName());
+    }
+
+    public boolean dbExists(String db) {
+        for (int i = 0; i < tableDb.getRowCount(); i++) {
+            if (tableDb.getValueAt(i, 1).toString().equalsIgnoreCase(db)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -583,6 +628,13 @@ public class UIDBExplorer extends javax.swing.JDialog {
         }
 
     }
+    
+    private Action actionDropDatabase = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            actionDropDatabase();
+        }
+    };
 
     private class CharsetChangeListener implements ItemListener {
 
@@ -628,8 +680,10 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private javax.swing.JLabel iLblHost;
     private javax.swing.JLabel iLblName;
     private javax.swing.JLabel lblHost;
+    private javax.swing.JMenuItem menuItemDropDb;
     private javax.swing.JPanel pnlCreation;
     private javax.swing.JPanel pnlManager;
+    private javax.swing.JPopupMenu popTable;
     private javax.swing.JScrollPane scrMain;
     private javax.swing.JTabbedPane tabPaneMain;
     private org.jdesktop.swingx.JXTable tableDb;

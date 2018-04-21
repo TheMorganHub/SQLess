@@ -47,7 +47,7 @@ public class SQLConnectionManager {
         }
         return newCon;
     }
-    
+
     public Connection newBatchQueryConnection() {
         Connection newCon = null;
         try {
@@ -126,9 +126,9 @@ public class SQLConnectionManager {
     }
 
     /**
-     * Tests a specified connection by attempting to connect to database
-     * "mysql" in MySQL using a temporary {@code Connection} object. If
-     * successful, the {@code Connection} is then promptly closed.
+     * Tests a specified connection by attempting to connect to database "mysql"
+     * in MySQL using a temporary {@code Connection} object. If successful, the
+     * {@code Connection} is then promptly closed.
      *
      * @param username
      * @param password
@@ -206,8 +206,12 @@ public class SQLConnectionManager {
         return hostName;
     }
 
+    public String getPort() {
+        return port;
+    }
+
     public static SQLConnectionManager getInstance() {
         return INSTANCE;
     }
-
+    
 }

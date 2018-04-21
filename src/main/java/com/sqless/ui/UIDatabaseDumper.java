@@ -112,8 +112,9 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
                 setVisible(true);
             });
             String filePath = mysqldumpFile.getPath().replace(".exe", "");
-            proc = Runtime.getRuntime().exec(new String[]{filePath, "-h" + conManager.getHostName(), "-u" + conManager.getUsername(),
-                "-p" + conManager.getPassword(), SQLUtils.getConnectedDBName(), "--routines", "-r" + chosenPath});
+            proc = Runtime.getRuntime().exec(new String[]{filePath, "-h" + conManager.getHostName(), "--port=" + conManager.getPort(), "-u" + conManager.getUsername(),
+                (conManager.getPassword().isEmpty() ? "" : "-p" + conManager.getPassword()), SQLUtils.getConnectedDBName(), "--routines", "-r" + chosenPath});
+
             proc.waitFor();
             return null;
         }

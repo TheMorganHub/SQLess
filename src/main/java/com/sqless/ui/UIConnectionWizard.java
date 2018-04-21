@@ -36,7 +36,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         pnlContainer = new javax.swing.JPanel();
@@ -189,11 +189,11 @@ public class UIConnectionWizard extends javax.swing.JDialog {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
-    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         testConnection(true);
-    }                                           
+    }//GEN-LAST:event_btnContinueActionPerformed
 
     /**
      * Hace un test de la conexión utilizando los valores dados en los campos de
@@ -253,17 +253,17 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         tester.execute();
     }
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {                                          
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         if (isTask(Task.MODIFY)) {
             dispose();
         } else {
             System.exit(0);
         }
-    }                                         
+    }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void btnTestConnectionActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+    private void btnTestConnectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTestConnectionActionPerformed
         testConnection(false);
-    }                                                 
+    }//GEN-LAST:event_btnTestConnectionActionPerformed
 
     public void prepareUI() {
         txtHost.setText((String) userPrefLoader.getProperty("Connection.Host"));
@@ -289,7 +289,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         return this.task.equals(task);
     }
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnContinue;
     private javax.swing.JButton btnTestConnection;
@@ -305,5 +305,5 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtPort;
     private javax.swing.JTextField txtUserName;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }

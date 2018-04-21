@@ -3,6 +3,7 @@ package com.sqless.ui.listeners;
 import com.sqless.file.FileManager;
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLUpdateQuery;
+import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.SQLDroppable;
 import com.sqless.sql.objects.SQLExecutable;
 import com.sqless.ui.tree.TreeContextMenuItem;
@@ -25,7 +26,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
@@ -98,9 +98,11 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             @Override
             public void onSuccess(int updateCount) {
                 SwingUtilities.invokeLater(() -> {
-                    if (!node.isOfType(SQLessTreeNode.NodeType.DATABASE)) {
-                        JTree tree = client.getTree();
-                        UIUtils.selectTreeNode(tree, node.getParent());
+                    if (node.isOfType(SQLessTreeNode.NodeType.DATABASE)) {
+                        client.clearJTree();
+                        SQLConnectionManager.getInstance().setNewConnection("mysql", null);
+                    } else {
+                        UIUtils.selectTreeNode(client.getTree(), node.getParent());
                         client.refreshJTree();
                     }
                 });
@@ -193,7 +195,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             UIUtils.showErrorMessage("Error", ex.getMessage(), null);
         }
     };
-    
+
     private ActionListener actionExecuteFromScript = e -> {
         FileManager.getInstance().loadFile(fileContents -> {
             UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(fileContents);

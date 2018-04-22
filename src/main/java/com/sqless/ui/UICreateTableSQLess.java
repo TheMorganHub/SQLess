@@ -65,6 +65,13 @@ public class UICreateTableSQLess extends FrontPanel {
     public static final int TABLE_UPDATE = 2;
     private int task = -1;
 
+    /**
+     * Crea un nuevo editor de tablas.
+     *
+     * @param parentPane El {@code JTabbedPane} que contendrá a este editor.
+     * @param sqlTable La {@code SQLTable} a editar. Si es {@code null}, se
+     * asume que el editor va a estar en modo creación de tabla.
+     */
     public UICreateTableSQLess(JTabbedPane parentPane, SQLTable sqlTable) {
         super(parentPane);
         initComponents();
@@ -82,6 +89,50 @@ public class UICreateTableSQLess extends FrontPanel {
         columnList = this.sqlTable.getColumns();
 
         pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
+        prepararUI();
+    }
+
+    /**
+     * Crea un nuevo editor de tablas en modo creación. Usar este constructor
+     * sólo si se está creando una tabla mediante una sugerencia de SQLess. Por
+     * ejemplo, si creamos una base de datos y nos conectamos a ella y está
+     * vacía. Para crear un editor normalmente, usar
+     * {@link #UICreateTableSQLess(javax.swing.JTabbedPane, com.sqless.sql.objects.SQLTable)}
+     *
+     * @param parentPane El {@code JTabbedPane} que contendrá a este editor.
+     * @param fromSuggestion Si {@code true}, el editor automáticamente agregará
+     * una columna de nombre id que será PK. Si {@code false}, se tirará una
+     * excepción.
+     */
+    public UICreateTableSQLess(JTabbedPane parentPane, boolean fromSuggestion) {
+        super(parentPane);
+        if (!fromSuggestion) {
+            throw new IllegalArgumentException("Wrong constructor for UICreateTableSQLess. "
+                    + "Use UICreateTableSQLess(JTabbedPane parentPane, SQLTable sqlTable) if the editor isn't created from a suggestion.");
+        }
+        initComponents();
+
+        task = TABLE_CREATE;
+        sqlTable = new SQLTable();
+        fkList = this.sqlTable.getForeignKeys();
+        columnList = this.sqlTable.getColumns();
+
+        SQLColumn pkCol = new SQLColumn("id");
+        pkCol.setAutoincrement(true, false);
+        SQLColumn newExtraCol = new SQLColumn("");
+        sqlTable.getPrimaryKey().addColumn(pkCol);
+        sqlTable.addColumn(pkCol);
+        sqlTable.addColumn(newExtraCol);
+        getTableModel().addRow(new Object[5]);
+
+        pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
+        syncRowWithList(0);
+        syncRowWithList(1);
+        prepararUI();
+        SwingUtilities.invokeLater(() -> {
+            uiTable.setRowSelectionInterval(1, 1);
+            SwingUtilities.invokeLater(() -> uiTable.editCellAt(1, 1));
+        });
     }
 
     public void prepararUI() {

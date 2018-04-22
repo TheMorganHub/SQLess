@@ -24,6 +24,7 @@ import static com.sqless.settings.PreferenceLoader.PrefKey.*;
 import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
+import com.sqless.utils.HintsManager;
 
 public class UIClient extends javax.swing.JFrame {
 
@@ -80,9 +81,9 @@ public class UIClient extends javax.swing.JFrame {
                 splash.dispose();
                 setVisible(true);
 
-                UIDBExplorer uiConDB = new UIDBExplorer();
-                uiConDB.setVisible(true);
                 initSecondaryComponents();
+                UIDBExplorer uiConDB = new UIDBExplorer();
+                uiConDB.setVisible(true);                
             }
 
         };
@@ -474,6 +475,13 @@ public class UIClient extends javax.swing.JFrame {
     public void actionSettings() {
         UISettings uiSettings = new UISettings(this);
         uiSettings.setVisible(true);
+    }
+    
+    public void onNewConnection() {
+        if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {
+            HintsManager hintsManager = new HintsManager();
+            hintsManager.activate(HintsManager.CREATE_TABLE_IN_EMPTY_DB);
+        }
     }
 
     public void sendToNewTab(FrontPanel frontUI) {

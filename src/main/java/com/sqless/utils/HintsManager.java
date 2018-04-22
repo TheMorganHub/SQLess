@@ -15,6 +15,7 @@ public class HintsManager {
     public static final int COULD_BE_PK = 12;
     public static final int COULD_BE_FK = 13;
     public static final int GUESS_DATATYPE_BY_NAME = 14;
+    public static final int CREATE_TABLE_IN_EMPTY_DB = 15;
     private UICreateTableSQLess ui;
     private TableCellListener tableChangeListener;
     private SQLColumn col;
@@ -23,6 +24,9 @@ public class HintsManager {
         this.ui = ui;
         this.col = col;
         this.tableChangeListener = tableChangeListener;
+    }
+
+    public HintsManager() {
     }
 
     public void activate(int hint) {
@@ -36,10 +40,13 @@ public class HintsManager {
             case GUESS_DATATYPE_BY_NAME:
                 processGuessDataTypeByName();
                 break;
+            case CREATE_TABLE_IN_EMPTY_DB:
+                processCreateTableInEmptyDb();
+                break;
         }
     }
 
-    public void processCanBePK() {
+    private void processCanBePK() {
         if (col.isPK()) {
             return;
         }
@@ -57,7 +64,7 @@ public class HintsManager {
         }
     }
 
-    public void processCanBeFK() {
+    private void processCanBeFK() {
         if (col.isFK() || !col.getDataType().equals("int")) {
             return;
         }
@@ -106,9 +113,18 @@ public class HintsManager {
         }
     }
 
-    public void processGuessDataTypeByName() {
+    private void processGuessDataTypeByName() {
         col.updateDataTypeByName(tableChangeListener.getNewValue().toString());
         ui.refreshPnlExtras();
+    }
+    
+    private void processCreateTableInEmptyDb() {
+        UIClient client = UIClient.getInstance();
+        int opt = UIUtils.showConfirmationMessage("Sugerencia", "SQLess detectó que la base de datos está vacía. ¿Deseas crear una tabla?", client);
+        if (opt == 0) {
+            UICreateTableSQLess createTableUI = new UICreateTableSQLess(client.getTabPaneContent(), true);
+            client.sendToNewTab(createTableUI);
+        }
     }
 
 }

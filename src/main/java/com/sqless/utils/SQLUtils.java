@@ -654,39 +654,22 @@ public class SQLUtils {
         return mapStats;
     }
 
-    public static int getMaxPacketSize() {
-        FinalValue<Integer> packetSize = new FinalValue<>();
-        SQLQuery packetQuery = new SQLSelectQuery("SHOW VARIABLES LIKE 'max_allowed_packet';") {
+    public static boolean currentDbIsEmpty() {
+        FinalValue<Boolean> isEmpty = new FinalValue<>(Boolean.FALSE);
+        SQLQuery query = new SQLSelectQuery("SELECT COUNT(*) FROM information_schema.tables WHERE TABLE_SCHEMA = '" + getConnectedDBName() + "'") {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
-                packetSize.set(rs.next() ? rs.getInt(2) : -1);
+                int count = rs.next() ? rs.getInt(1) : 0;
+                isEmpty.set(count == 0);
             }
 
             @Override
             public void onFailure(String errMessage) {
-                packetSize.set(-1);
+                UIUtils.showErrorMessage("Error", "No se pudo traer información sobre las tablas para la base de datos " + getConnectedDBName(), null);
             }
         };
-        packetQuery.exec();
-        return packetSize.get();
-    }
-    
-    public static boolean setPacketSize(long newSize) {
-        FinalValue<Boolean> queryStatus = new FinalValue<>();
-        SQLQuery updatePacket = new SQLUpdateQuery("SET GLOBAL max_allowed_packet=" + newSize + ";") {
-            @Override
-            public void onSuccess(int updateCount) {
-                queryStatus.set(true);
-            }
-
-            @Override
-            public void onFailure(String errMessage) {
-                queryStatus.set(false);
-                System.err.println(errMessage);
-            }            
-        };
-        updatePacket.exec();
-        return queryStatus.get();
+        query.exec();
+        return isEmpty.get();
     }
 
 }

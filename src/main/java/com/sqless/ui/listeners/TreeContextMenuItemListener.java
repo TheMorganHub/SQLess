@@ -150,7 +150,6 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         switch (node.getType()) {
             case CAT_TABLES:
                 UICreateTableSQLess uiCreateTable = new UICreateTableSQLess(client.getTabPaneContent(), null);
-                uiCreateTable.prepararUI();
                 client.sendToNewTab(uiCreateTable);
                 break;
         }

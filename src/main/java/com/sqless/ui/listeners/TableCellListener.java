@@ -158,7 +158,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable {
         newValue = table.getValueAt(row, column);
 
         //  The data has changed, invoke the supplied Action
-        if (newValue == null || !newValue.toString().equals(oldValue.toString())) {
+        if (newValue == null || (oldValue != null && !newValue.toString().equals(oldValue.toString()))) {
 
             //  Make a copy of the data in case another cell starts editing
             //  while processing this change

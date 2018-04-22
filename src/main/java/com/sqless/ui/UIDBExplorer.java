@@ -19,6 +19,8 @@ import com.sqless.utils.TextUtils;
 import com.sqless.settings.UserPreferencesLoader;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 
@@ -31,12 +33,14 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private final ImageIcon NOT_FAVOURITE_ICON = new ImageIcon(getClass().
             getResource("/icons/ui_dbexplorer/NOT_FAVOURITE_ICON.png"));
     private SessionSettings sessionSettings;
+    private List<String> newDatabases;
 
     public UIDBExplorer() {
         super(UIClient.getInstance(), true);
         this.client = UIClient.getInstance();
         this.conManager = SQLConnectionManager.getInstance();
         this.sessionSettings = SessionSettings.getINSTANCE();
+        this.newDatabases = new ArrayList<>();
         initComponents();
 
         prepareUI();
@@ -62,6 +66,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
         });
 
         pack();
+    }
+    
+    public boolean dbIsNew(String dbName) {
+        for (String newDatabase : newDatabases) {
+            if (newDatabase.equalsIgnoreCase(dbName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void loadTable() {
@@ -352,9 +365,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
             }
         }
 
-        conManager.setNewConnection(dbName, client);
+        if (dbIsNew(dbName)) {
+            conManager.setNewConnection(dbName, true, client);
+        } else {
+            conManager.setNewConnection(dbName, client);
+        }
+        
         client.createJTree();
         dispose();
+        client.onNewConnection();
     }
 
     private void btnDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDropActionPerformed
@@ -463,12 +482,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 DefaultTableModel model = (DefaultTableModel) tableDb.getModel();
                 model.addRow(new Object[]{NOT_FAVOURITE_ICON, newDbName});
                 UIUtils.sortTable(tableDb, 1);
+                newDatabases.add(newDbName);
+                
                 int opt = UIUtils.showConfirmationMessage("Database creation", "The database " + newDbName
                         + " has been created successfully.\nWould you like SQLess to connect to it?", getParent());
                 if (opt == 0) {
-                    SQLConnectionManager.getInstance().setNewConnection(newDbName, client);
+                    SQLConnectionManager.getInstance().setNewConnection(newDbName, true, client);
                     client.createJTree();
                     dispose();
+                    client.onNewConnection();
                 }
             }
         };

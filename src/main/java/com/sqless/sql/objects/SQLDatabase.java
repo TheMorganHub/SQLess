@@ -15,9 +15,15 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
     private List<SQLView> views;
     private List<SQLExecutable> functions;
     private List<SQLExecutable> procedures;
+    private boolean isBrandNew;
 
     public SQLDatabase(String name) {
         super(name);
+    }
+
+    public SQLDatabase(String name, boolean isBrandNew) {
+        super(name);
+        this.isBrandNew = isBrandNew;
     }
 
     public void loadTables() {
@@ -34,6 +40,10 @@ public class SQLDatabase extends SQLObject implements SQLDroppable {
 
     public void loadProcedures() {
         procedures = SQLUtils.getExecutables(SQLProcedure.class);
+    }
+
+    public boolean isBrandNew() {
+        return isBrandNew;
     }
 
     public List<SQLTable> getTables() {

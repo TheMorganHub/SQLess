@@ -91,7 +91,7 @@ public class SQLConnectionManager {
      * @param parent The parent {@code Frame} that will display any errors that
      * occur within this operation.
      */
-    private void connectToSavedHost(String dbName, Frame parent) {
+    private void connectToSavedHost(String dbName, boolean dbIsBrandNew, Frame parent) {
         UserPreferencesLoader userPrefs = UserPreferencesLoader.getInstance();
         String hostName = userPrefs.getProperty("Connection.Host");
         String port = userPrefs.getProperty("Connection.Port");
@@ -99,13 +99,26 @@ public class SQLConnectionManager {
         String password = userPrefs.getProperty("Connection.Password");
         boolean success = connectToDatabase(dbName, username, password, hostName, port, parent);
         if (success) {
-            connectedDB = new SQLDatabase(dbName);
+            connectedDB = dbIsBrandNew ? new SQLDatabase(dbName, true) : new SQLDatabase(dbName);
         } else {
             UIConnectionWizard fixConnection = new UIConnectionWizard(parent,
                     UIConnectionWizard.Task.REPAIR);
             fixConnection.setVisible(true);
-            connectToSavedHost(dbName, parent);
+            connectToSavedHost(dbName, dbIsBrandNew, parent);
         }
+    }
+
+    /**
+     * Convenience method for
+     * {@link #setNewConnection(String, boolean, Frame)}. The
+     * DB will not be considered brand new.
+     *
+     * @param dbName The DB name to connect to.
+     * @param parent The {@code Frame} that will display any errors that occur
+     * within this operation.
+     */
+    public void setNewConnection(String dbName, Frame parent) {
+        connectToSavedHost(dbName, false, parent);
     }
 
     /**
@@ -117,12 +130,13 @@ public class SQLConnectionManager {
      * engine as well as error handling.
      *
      * @param dbName The name of the DB to which the client wants to connect.
+     * @param dbIsBrandNew Whether the DB to connect to is brand new.
      * @param parent The {@code Frame} that will display any errors that occur
      * within this operation.
      */
-    public void setNewConnection(String dbName, Frame parent) {
+    public void setNewConnection(String dbName, boolean dbIsBrandNew, Frame parent) {
         closeConnection();
-        connectToSavedHost(dbName, parent);
+        connectToSavedHost(dbName, dbIsBrandNew, parent);
     }
 
     /**
@@ -213,5 +227,5 @@ public class SQLConnectionManager {
     public static SQLConnectionManager getInstance() {
         return INSTANCE;
     }
-    
+
 }

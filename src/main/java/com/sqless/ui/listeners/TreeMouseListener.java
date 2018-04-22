@@ -2,7 +2,6 @@ package com.sqless.ui.listeners;
 
 import com.sqless.ui.tree.TreeContextMenuHandler;
 import com.sqless.ui.tree.SQLessTreeNode;
-import com.sqless.utils.SQLUtils;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

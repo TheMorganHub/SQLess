@@ -1,9 +1,12 @@
 package com.sqless.queries;
 
-import com.sqless.utils.SQLUtils;
 import com.sqless.utils.UIUtils;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class SQLQuery {
 
@@ -20,11 +23,14 @@ public abstract class SQLQuery {
 
     public SQLQuery() {
     }
-    
+
     public SQLQuery(String sql) {
-//        long start = System.currentTimeMillis();
-        this.sql = SQLUtils.filterDelimiterKeyword(sql);
-//        System.out.println("Removed delimiters in " + (System.currentTimeMillis() - start) + "ms (" + sql.getBytes().length + " bytes)");
+        this.sql = sql;
+    }
+
+    public void filterDelimiterKeyword() {
+        long start = System.currentTimeMillis();
+        this.sql = filterDelimiterKeyword(sql);
     }
 
     /**
@@ -73,5 +79,69 @@ public abstract class SQLQuery {
             }
         } catch (SQLException e) {
         }
+    }
+
+    /**
+     * Filtra la palabra clave 'DELIMITER' y todos los delimitadores que no sean
+     * ';' asociados a esa palabra clave en la query dada ya que no es válida en
+     * JDBC.<br>
+     * Por ejemplo: <br><pre>
+     * <code>
+     * DELIMITER $$ <br>
+     *
+     * CREATE PROCEDURE film_not_in_stock(IN p_film_id INT, IN p_store_id INT,
+     * OUT p_film_count INT) READS SQL DATA <br>
+     * BEGIN <br>
+     * SELECT inventory_id FROM inventory WHERE film_id = p_film_id AND store_id
+     * = p_store_id AND NOT inventory_in_stock(inventory_id); <br>
+     *
+     * SELECT FOUND_ROWS() INTO p_film_count; <br>
+     * END $$
+     * </code></pre>
+     * <br>
+     * <br>
+     * Se convertirá en: <br>
+     * <pre><code>
+     * CREATE PROCEDURE film_not_in_stock(IN p_film_id INT, IN p_store_id INT,
+     * OUT p_film_count INT) READS SQL DATA <br>
+     * BEGIN <br>
+     * SELECT inventory_id FROM inventory WHERE film_id = p_film_id AND store_id
+     * = p_store_id AND NOT inventory_in_stock(inventory_id); <br>
+     *
+     * SELECT FOUND_ROWS() INTO p_film_count; <br>
+     * END ;
+     * </code></pre>
+     *
+     * @param sql La query SQL a filtrar.
+     * @return La misma query SQL sin nada relacionado a {@code DELIMITER}. Si
+     * la query original no hace uso de la palabra clave {@code DELIMITER} será
+     * retornada sin modificaciones.
+     */
+    private static String filterDelimiterKeyword(String sql) {
+        Pattern delimiterPat = Pattern.compile("DELIMITER *(\\S*)");
+        Matcher matcher = delimiterPat.matcher(sql);
+        Set<String> delimitersToReplace = new HashSet<>();
+        while (matcher.find()) {
+            String delimiter = matcher.group(1);
+            if (!delimiter.equals(";")) {
+                //delimitadores que necesitan ser escapados antes de ser aplicados en expresiones regulares
+                if (delimiter.contains("/") || delimiter.contains("$")) {
+                    StringBuilder escapedDelimiters = new StringBuilder();
+                    for (int i = 0; i < delimiter.length(); i++) {
+                        if (delimiter.charAt(i) == '/' || delimiter.charAt(i) == '$') {
+                            escapedDelimiters.append('\\').append(delimiter.charAt(i));
+                        }
+                    }
+                    delimiter = escapedDelimiters.toString();
+                }
+                delimitersToReplace.add(delimiter);
+            }
+        }
+
+        if (delimitersToReplace.isEmpty()) {
+            return sql;
+        }
+        String replaced = sql.replaceAll(String.join("|", delimitersToReplace), ";");
+        return replaced.replaceAll("DELIMITER *(\\S*)", "");
     }
 }

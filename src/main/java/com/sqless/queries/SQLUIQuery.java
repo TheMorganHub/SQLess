@@ -61,6 +61,7 @@ public class SQLUIQuery extends SQLQuery {
             @Override
             public void run() {
                 try {
+                    filterDelimiterKeyword();
                     queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
                     statement = queryConnection.createStatement();
                     int updateCount = 0;
@@ -142,6 +143,7 @@ public class SQLUIQuery extends SQLQuery {
         static final int MAX_ROWS = 1000000;
         private DefaultTableModel newTableModel;
         private UIPanelResult uiPanelResult;
+        public boolean packed = false;
 
         public TableFiller(ResultSet rs) {
             this.rs = rs;
@@ -154,6 +156,7 @@ public class SQLUIQuery extends SQLQuery {
             try {
                 if (!rs.isClosed()) {
                     newTableModel = makeModel(rs.getMetaData());
+                    table.setModel(newTableModel);
                 }
 
                 while (!rs.isClosed() && rs.next()) {
@@ -174,6 +177,11 @@ public class SQLUIQuery extends SQLQuery {
                         row.add(cellValue);
                     }
                     newTableModel.addRow(row);
+
+                    if (rowCount == 1000) {
+                        packTable();
+                    }
+
                     if (rowCount == MAX_ROWS) {
                         queryTimer.stop();
                         UIUtils.showWarning("Número máximo de filas excedido", "El número máximo de filas (" + MAX_ROWS + ") que SQLess puede mostrar para esta query será excedido. "
@@ -188,6 +196,36 @@ public class SQLUIQuery extends SQLQuery {
             return null;
         }
 
+        @Override
+        protected void done() {
+            if (newTableModel != null) {
+                UIPanelResult.NullSQLCellRenderer nullCellRenderer = new UIPanelResult.NullSQLCellRenderer();
+                queryPanel.addResultPanel(uiPanelResult);
+
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    TableColumn tableColumn = table.getColumn(i);
+                    tableColumn.setCellRenderer(nullCellRenderer);
+                }
+                queryPanel.updateRowsLabel();
+                
+                if (!packed) {
+                    packTable();
+                }
+            }
+
+            synchronized (SQLUIQuery.this) {
+                SQLUIQuery.this.notify();
+            }
+        }
+
+        public void packTable() {
+            table.packAll();
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.packColumn(i, -1, 375);
+            }
+            packed = true;
+        }
+
         public DefaultTableModel makeModel(ResultSetMetaData rsmd) throws SQLException {
             DefaultTableModel model = new DefaultTableModel();
             columnCount = rsmd.getColumnCount() + 1;
@@ -198,26 +236,6 @@ public class SQLUIQuery extends SQLQuery {
                 model.addColumn(rsmd.getColumnName(i));
             }
             return model;
-        }
-
-        @Override
-        protected void done() {
-            if (newTableModel != null) {
-                UIPanelResult.NullSQLCellRenderer nullCellRenderer = new UIPanelResult.NullSQLCellRenderer();
-                queryPanel.addResultPanel(uiPanelResult);
-                table.setModel(newTableModel);
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    TableColumn tableColumn = table.getColumn(i);
-                    tableColumn.setMinWidth(i == 0 ? 10 : 20);
-                    tableColumn.setPreferredWidth(i == 0 ? 25 : 120);
-                    tableColumn.setCellRenderer(nullCellRenderer);
-                }
-                queryPanel.updateRowsLabel();
-            }
-
-            synchronized (SQLUIQuery.this) {
-                SQLUIQuery.this.notify();
-            }
         }
     }
 

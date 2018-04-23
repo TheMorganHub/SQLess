@@ -1,11 +1,13 @@
 package com.sqless.utils;
 
+import com.sqless.file.FileManager;
 import com.sqless.sql.objects.SQLColumn;
 import com.sqless.sql.objects.SQLForeignKey;
 import com.sqless.sql.objects.SQLPrimaryKey;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.UICreateTableSQLess;
+import com.sqless.ui.UIExecuteFromScript;
 import com.sqless.ui.listeners.TableCellListener;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -117,13 +119,21 @@ public class HintsManager {
         col.updateDataTypeByName(tableChangeListener.getNewValue().toString());
         ui.refreshPnlExtras();
     }
-    
+
     private void processCreateTableInEmptyDb() {
         UIClient client = UIClient.getInstance();
-        int opt = UIUtils.showConfirmationMessage("Sugerencia", "SQLess detectó que la base de datos está vacía. ¿Deseas crear una tabla?", client);
-        if (opt == 0) {
-            UICreateTableSQLess createTableUI = new UICreateTableSQLess(client.getTabPaneContent(), true);
-            client.sendToNewTab(createTableUI);
+        int opt = UIUtils.showOptionDialog("Sugerencia", "SQLess detectó que la base de datos está vacía. ¿Deseas crear una tabla?", client, "Sí", "Llenar desde archivo SQL...", "No");
+        switch (opt) {
+            case 0:
+                UICreateTableSQLess createTableUI = new UICreateTableSQLess(client.getTabPaneContent(), true);
+                client.sendToNewTab(createTableUI);
+                break;
+            case 1:
+                FileManager.getInstance().loadFile(fileContents -> {
+                    UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(fileContents);
+                    uiExecuteFromScript.start();
+                });
+                break;
         }
     }
 

@@ -17,7 +17,7 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
     public UIExecuteFromScript(String filePath) {
         super(UIClient.getInstance(), true);
         initComponents();
-        this.filePath = filePath;
+        this.filePath = filePath + (!filePath.endsWith(".sql") ? ".sql" : "");
         setLocationRelativeTo(getParent());
     }
 
@@ -96,11 +96,13 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
                     @Override
                     public void onSuccess(int[] updateCounts) {
                         System.out.println(Arrays.toString(updateCounts));
+                        //TODO success report
                     }
-                    
+
                     @Override
                     public void onFailure(int[] updateCounts, String errMessage) {
                         System.err.println(errMessage);
+                        //TODO error report
                     }
                 };
                 while ((line = reader.readLine()) != null) {
@@ -135,8 +137,9 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
             } catch (InterruptedException ex) {
                 System.err.println(ex.getMessage());
             } catch (ExecutionException ex) {
-                UIUtils.showErrorMessage("Error", "Hubo un error al ejecutar el archivo dado.\nError: " + ex.getMessage(), UIExecuteFromScript.this);
-                ex.printStackTrace();
+                dispose();
+                UIUtils.showErrorMessage("Error", "Hubo un error al ejecutar el archivo dado."
+                        + "\nAsegúrate que la ruta es la correcta y que el archivo SQL es válido y no está corrupto.", UIClient.getInstance());
             } finally {
                 dispose();
             }

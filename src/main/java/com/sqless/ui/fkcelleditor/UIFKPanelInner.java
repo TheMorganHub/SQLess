@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -105,19 +104,33 @@ public class UIFKPanelInner extends javax.swing.JPanel {
 
         btnCancelar = new javax.swing.JButton();
         btnOK = new javax.swing.JButton();
-        scrTable = new javax.swing.JScrollPane();
-        uiTable = new org.jdesktop.swingx.JXTable();
         txtSearch = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
+        scrTable = new javax.swing.JScrollPane();
+        uiTable = new org.jdesktop.swingx.JXTable();
+
+        setMaximumSize(new java.awt.Dimension(350, 32767));
 
         btnCancelar.setAction(actionCancel);
         btnCancelar.setText("Cancelar");
         btnCancelar.setFocusable(false);
+        btnCancelar.setMaximumSize(new java.awt.Dimension(350, 32767));
 
         btnOK.setAction(actionOK);
         btnOK.setText("OK");
         btnOK.setFocusable(false);
+        btnOK.setMaximumSize(new java.awt.Dimension(350, 32767));
         btnOK.setPreferredSize(new java.awt.Dimension(75, 23));
+
+        txtSearch.setMaximumSize(new java.awt.Dimension(350, 32767));
+
+        btnSearch.setAction(actionSearch);
+        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_edittable/SEARCH_ICON.png"))); // NOI18N
+        btnSearch.setFocusable(false);
+        btnSearch.setMargin(new java.awt.Insets(2, 4, 2, 4));
+        btnSearch.setMaximumSize(new java.awt.Dimension(350, 32767));
+
+        scrTable.setMaximumSize(new java.awt.Dimension(350, 32767));
 
         uiTable.setBackground(new java.awt.Color(240, 240, 240));
         uiTable.setModel(new javax.swing.table.DefaultTableModel());
@@ -125,6 +138,7 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         uiTable.setEditable(false);
         uiTable.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         uiTable.setGridColor(new java.awt.Color(204, 204, 204));
+        uiTable.setMaximumSize(new java.awt.Dimension(350, 32767));
         uiTable.setRowHeight(20);
         uiTable.setSelectionBackground(new java.awt.Color(233, 243, 253));
         uiTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
@@ -137,40 +151,37 @@ public class UIFKPanelInner extends javax.swing.JPanel {
         uiTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         uiTable.getActionMap().remove("find");
 
-        btnSearch.setAction(actionSearch);
-        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_edittable/SEARCH_ICON.png"))); // NOI18N
-        btnSearch.setFocusable(false);
-        btnSearch.setMargin(new java.awt.Insets(2, 4, 2, 4));
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
-                .addComponent(btnSearch)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCancelar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6))
-            .addComponent(scrTable)
+                .addComponent(btnOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(scrTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(scrTable, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(5, 5, 5)
+                .addComponent(scrTable, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnSearch)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnCancelar)
-                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(6, 6, 6))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(5, 5, 5))
         );
     }// </editor-fold>//GEN-END:initComponents
 

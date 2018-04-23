@@ -84,6 +84,9 @@ public class UIEditTable extends FrontPanel {
 
         uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "REFRESH_TABLE");
         uiTable.getActionMap().put("REFRESH_TABLE", actionRefreshTable);
+        
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_ROW");
+        uiTable.getActionMap().put("DELETE_ROW", actionDeleteRow);
     }
 
     public void makeTableModel() {
@@ -133,7 +136,6 @@ public class UIEditTable extends FrontPanel {
         };
         querySelect.exec();
 
-        uiTable.packAll();
         UIUtils.enhanceTableColumns(uiTable, table);
     }
 
@@ -245,6 +247,7 @@ public class UIEditTable extends FrontPanel {
                 } else {
                     sqlRow.setValueForUpdate(column, newValue);
                 }
+                sqlRow.setIsUntouched(false);
             }
 
         }
@@ -331,6 +334,7 @@ public class UIEditTable extends FrontPanel {
 
         splitPane.setLeftComponent(scrTable);
 
+        txtLog.setEditable(false);
         txtLog.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         txtLog.setComponentPopupMenu(popLog);
         scrLog.setViewportView(txtLog);
@@ -454,6 +458,7 @@ public class UIEditTable extends FrontPanel {
         ((DefaultTableModel) uiTable.getModel()).addRow(data);
         SQLRow newRow = new SQLRow(data);
         newRow.setBrandNew(true);
+        newRow.setIsUntouched(true);
         rows.add(newRow);
         uiTable.setColumnSelectionInterval(0, 0);
         uiTable.setRowSelectionInterval(uiTable.getRowCount() - 1, uiTable.getRowCount() - 1);
@@ -606,6 +611,7 @@ public class UIEditTable extends FrontPanel {
         private Map<String, Object> valuesForUpdate;
         private Object[] pkValues;
         private boolean queryResult;
+        private boolean isUntouched;
 
         public SQLRow(Vector rowData) {
             columnsAndValues = new LinkedHashMap<>();
@@ -625,6 +631,14 @@ public class UIEditTable extends FrontPanel {
 
         public SQLRow() {
             this(null);
+        }
+
+        public boolean isUntouched() {
+            return isUntouched;
+        }
+
+        public void setIsUntouched(boolean flag) {
+            this.isUntouched = flag;
         }
 
         /**
@@ -879,15 +893,6 @@ public class UIEditTable extends FrontPanel {
             return queryResult;
         }
 
-        public boolean isAllNull() {
-            for (Map.Entry<String, Object> entry : columnsAndValues.entrySet()) {
-                if (entry.getValue() != null) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         @Override
         public String toString() {
             return columnsAndValues.toString();
@@ -917,7 +922,7 @@ public class UIEditTable extends FrontPanel {
                     int selectedRow = selectedRows[i];
                     SQLRow sqlRow = rows.get(selectedRow);
                     if (sqlRow.isBrandNew()) {
-                        if (sqlRow.isAllNull()) {
+                        if (sqlRow.isUntouched()) {
                             rows.remove(selectedRow);
                             ((DefaultTableModel) uiTable.getModel()).removeRow(selectedRow);
                             continue;
@@ -937,7 +942,7 @@ public class UIEditTable extends FrontPanel {
                 if (previousSelected < rows.size()) {
                     SQLRow row = rows.get(previousSelected);
                     if (row.isBrandNew()) {
-                        if (row.isAllNull()) {
+                        if (row.isUntouched()) {
                             rows.remove(row);
                             ((DefaultTableModel) uiTable.getModel()).removeRow(previousSelected);
                         } else {

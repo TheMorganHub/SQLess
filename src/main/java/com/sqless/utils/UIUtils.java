@@ -114,15 +114,18 @@ public class UIUtils {
      */
     public static void enhanceTableColumns(JXTable table, SQLTable reference) {
         List<SQLColumn> sqlColumns = reference.getColumns();
+        table.packAll();
         for (int i = 0; i < sqlColumns.size(); i++) {
             SQLColumn sqlColumn = sqlColumns.get(i);
-            TableColumn uiTableColumn = table.getColumn(i);
-            if (sqlColumn.isTimeBased() || sqlColumn.getDataType().equals("enum") || sqlColumn.getDataType().equals("set")) {
+            TableColumn uiTableColumn = table.getColumn(i);            
+            if (sqlColumn.isTimeBased() || sqlColumn.getDataType().equals("enum") || sqlColumn.getDataType().equals("set") || sqlColumn.isFK()) {
                 table.packColumn(i, uiTableColumn.getPreferredWidth(), uiTableColumn.getPreferredWidth() + 15);
+            } else {
+                table.packColumn(i, -1, 375);
             }
         }
     }
-
+    
     /**
      * Para ({@link CellEdit#STOP}) o cancela ({@link CellEdit#CANCEL}) la
      * edición de una celda.

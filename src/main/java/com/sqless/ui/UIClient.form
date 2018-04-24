@@ -17,7 +17,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="actionLogOutGoogle" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Log out"/>
+            <Property name="text" type="java.lang.String" value="Cerrar sesi&#xf3;n"/>
             <Property name="name" type="java.lang.String" value="menuLogOutGoogle" noResource="true"/>
           </Properties>
         </MenuItem>
@@ -30,7 +30,7 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="submenuArchivo">
           <Properties>
-            <Property name="text" type="java.lang.String" value="File"/>
+            <Property name="text" type="java.lang.String" value="Archivo"/>
             <Property name="name" type="java.lang.String" value="submenuArchivo" noResource="true"/>
           </Properties>
           <SubComponents>
@@ -39,7 +39,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+N"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="New SQL file..."/>
+                <Property name="text" type="java.lang.String" value="Nuevo archivo SQL..."/>
                 <Property name="name" type="java.lang.String" value="menuNewFile" noResource="true"/>
               </Properties>
               <Events>
@@ -51,7 +51,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Shift+Ctrl+A"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Open..."/>
+                <Property name="text" type="java.lang.String" value="Abrir..."/>
                 <Property name="name" type="java.lang.String" value="menuOpen" noResource="true"/>
               </Properties>
               <Events>
@@ -62,13 +62,13 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="submenuTools">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Tools"/>
+            <Property name="text" type="java.lang.String" value="Herramientas"/>
             <Property name="name" type="java.lang.String" value="submenuTools" noResource="true"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuSettings">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Settings"/>
+                <Property name="text" type="java.lang.String" value="Preferencias"/>
                 <Property name="name" type="java.lang.String" value="menuSettings" noResource="true"/>
               </Properties>
               <Events>
@@ -79,7 +79,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="submenuHelp">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Help"/>
+            <Property name="text" type="java.lang.String" value="Ayuda"/>
             <Property name="name" type="java.lang.String" value="submenuHelp" noResource="true"/>
           </Properties>
           <AuxValues>
@@ -88,7 +88,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuAbout">
               <Properties>
-                <Property name="text" type="java.lang.String" value="About"/>
+                <Property name="text" type="java.lang.String" value="Acerca de"/>
                 <Property name="name" type="java.lang.String" value="menuAbout" noResource="true"/>
               </Properties>
               <Events>
@@ -99,7 +99,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="submenuLogin">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Log in"/>
+            <Property name="text" type="java.lang.String" value="Iniciar sesi&#xf3;n"/>
             <Property name="name" type="java.lang.String" value="submenuLogin" noResource="true"/>
           </Properties>
           <AuxValues>
@@ -111,7 +111,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="actionLogInGoogle" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Log in (Google)"/>
+                <Property name="text" type="java.lang.String" value="Iniciar sesi&#xf3;n (Google)"/>
                 <Property name="name" type="java.lang.String" value="menuLoginGoogle" noResource="true"/>
               </Properties>
             </MenuItem>

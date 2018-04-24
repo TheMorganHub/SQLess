@@ -53,8 +53,8 @@ public class HintsManager {
             return;
         }
         if (tableChangeListener.getNewValue().equals("id")) {
-            int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría identificar a esta tabla. "
-                    + "Deseas que SQLess la transforme en una Primary Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
+            int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría identificar a esta tabla.\n"
+                    + "¿Deseas que SQLess la transforme en una Primary Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
             if (opt == 0) {
                 col.getParentTable().getPrimaryKey().addColumn(col);
                 SQLPrimaryKey pk = col.getParentTable().getPrimaryKey();
@@ -88,11 +88,11 @@ public class HintsManager {
                         //ahora revisamos la tabla potencial para ver si tiene una columna compatible. Asumimos que si hay una columna ID, esa columna identifica a esa tabla
                         if (potentialRefTableCol.getName().equals("id") && potentialRefTableCol.isPK() && potentialRefTableCol.getDataType().equals("int")) {
                             int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría servir para unir esta tabla con la tabla '"
-                                    + potentialRefTableName + "'. Deseas que SQLess cree esta unión mediante una Foreign Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
+                                    + potentialRefTableName + "'.\n¿Deseas que SQLess cree esta unión mediante una Foreign Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
                             if (opt == 0) {
                                 Object requiredValForColumn = SQLUtils.fetchFirstValueForColumn(potentialRefTableCol);
                                 if (requiredValForColumn == null) {
-                                    UIUtils.showErrorMessage("Sugerencia", "Ha habido un error al convertir esta columna en foreign key. "
+                                    UIUtils.showErrorMessage("Error", "Ha habido un error al convertir esta columna en foreign key.\n"
                                             + "Revisa que la tabla referenciada pueda ser identificada por una primary key en una columna 'id' "
                                             + "y que ese valor no sea null.", UIClient.getInstance());
                                     return;
@@ -122,7 +122,7 @@ public class HintsManager {
 
     private void processCreateTableInEmptyDb() {
         UIClient client = UIClient.getInstance();
-        int opt = UIUtils.showOptionDialog("Sugerencia", "SQLess detectó que la base de datos está vacía. ¿Deseas crear una tabla?", client, "Sí", "Llenar desde archivo SQL...", "No");
+        int opt = UIUtils.showOptionDialog("Sugerencia", "SQLess detectó que la base de datos está vacía.\n¿Deseas crear una tabla?", client, "Sí", "Llenar desde archivo SQL...", "No");
         switch (opt) {
             case 0:
                 UICreateTableSQLess createTableUI = new UICreateTableSQLess(client.getTabPaneContent(), true);

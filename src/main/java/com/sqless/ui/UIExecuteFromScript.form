@@ -62,7 +62,7 @@
     <Component class="javax.swing.JLabel" name="lblExecuting">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="Executing..."/>
+        <Property name="text" type="java.lang.String" value="Ejecutando..."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancelar">

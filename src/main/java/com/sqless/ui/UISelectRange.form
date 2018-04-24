@@ -3,7 +3,7 @@
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Range selection"/>
+    <Property name="title" type="java.lang.String" value="Selecci&#xf3;n por rango"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
@@ -44,7 +44,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="iLblSelEnd" max="32767" attributes="0"/>
-                      <Component id="iLblSelStart" max="32767" attributes="0"/>
+                      <Component id="iLblSelStart" pref="149" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -53,7 +53,7 @@
                               </Group>
                               <Component id="btnGo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="54" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -71,9 +71,9 @@
                   <Component id="iLblSelEnd" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="spinnerEnd" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="11" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="btnGo" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -81,12 +81,12 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="iLblSelStart">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Selection start"/>
+            <Property name="text" type="java.lang.String" value="Comienzo de la selecci&#xf3;n"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="iLblSelEnd">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Selection end"/>
+            <Property name="text" type="java.lang.String" value="Fin de la selecci&#xf3;n"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="spinnerStart">
@@ -107,7 +107,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnGo">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Go"/>
+            <Property name="text" type="java.lang.String" value="Seleccionar"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGoActionPerformed"/>

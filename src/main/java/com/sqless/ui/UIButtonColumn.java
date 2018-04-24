@@ -120,9 +120,7 @@ public class UIButtonColumn extends AbstractCellEditor
         return editorValue;
     }
 
-//
-//  Implement TableCellRenderer interface
-//
+    @Override
     public Component getTableCellRendererComponent(
             JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (isSelected) {
@@ -139,19 +137,17 @@ public class UIButtonColumn extends AbstractCellEditor
             renderButton.setBorder(originalBorder);
         }
 
-//		renderButton.setText( (value == null) ? "" : value.toString() );
         if (value == null) {
             renderButton.setText("");
             renderButton.setIcon(null);
         } else if (value instanceof Icon) {
             renderButton.setText("");
             renderButton.setIcon((Icon) value);
-//            renderButton.setEnabled(!table.getValueAt(row, 1).toString().equals("master"));
         } else {
             renderButton.setText(value.toString());
             renderButton.setIcon(null);
         }
-        
+
         return renderButton;
     }
 
@@ -159,8 +155,9 @@ public class UIButtonColumn extends AbstractCellEditor
 //  Implement ActionListener interface
 //
     /*
-	 *	The button has been pressed. Stop editing and invoke the custom Action
+     *	The button has been pressed. Stop editing and invoke the custom Action
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         int row = table.convertRowIndexToModel(table.getEditingRow());
         fireEditingStopped();
@@ -181,6 +178,7 @@ public class UIButtonColumn extends AbstractCellEditor
 	 *  the mouse to another cell before releasing it, the editor is still
 	 *  active. Make sure editing is stopped when the mouse is released.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (table.isEditing()
                 && table.getCellEditor() == this) {
@@ -188,6 +186,7 @@ public class UIButtonColumn extends AbstractCellEditor
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (isButtonColumnEditor
                 && table.isEditing()) {
@@ -197,12 +196,15 @@ public class UIButtonColumn extends AbstractCellEditor
         isButtonColumnEditor = false;
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 }

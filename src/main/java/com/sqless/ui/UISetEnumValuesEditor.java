@@ -179,7 +179,7 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
         btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Enum/Set editor");
+        setTitle("Editor de valores");
         setResizable(false);
 
         tbButtons.setFloatable(false);

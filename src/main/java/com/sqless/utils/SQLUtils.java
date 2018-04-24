@@ -2,7 +2,6 @@ package com.sqless.utils;
 
 import com.sqless.queries.SQLQuery;
 import com.sqless.queries.SQLSelectQuery;
-import com.sqless.queries.SQLUpdateQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,9 +12,7 @@ import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -98,7 +95,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve table names from server: " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer los nombres de las tablas desde el servidor.\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         showTablesQuery.exec();
@@ -117,7 +114,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve Column names from server: " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer los nombres de las columnas desde el servidor.\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         getColumnsQuery.exec();
@@ -151,7 +148,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve views from database: " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer las vistas desde el servidor.\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         getViewsQuery.exec();
@@ -258,7 +255,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve column data for " + tableObject.getName() + ": " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer datos de columna para " + tableObject.getName() + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         getColumnDataQuery.exec();
@@ -298,7 +295,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve indexes for " + tableObject.getName() + ": " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer los índices para " + tableObject.getName() + " desde el servidor.\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         getIndexesQuery.exec();
@@ -321,7 +318,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "Could not retrieve triggers for " + tableObject.getName() + ": " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer triggers para " + tableObject.getName() + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         getTriggersQuery.exec();
@@ -342,8 +339,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "There was an error retrieving primary keys for "
-                        + table.getName() + ": " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer primary keys para " + table.getName() + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         loadKeysQuery.exec();
@@ -367,8 +363,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("ERROR", "There was an error retrieving foreign keys for "
-                        + table.getName() + ": " + errMessage, null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer claves foráneas para " + table.getName() + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         loadFKsQuery.exec();
@@ -601,7 +596,8 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("Error", "No se pudo traer información sobre las tablas para la base de datos " + getConnectedDBName(), null);
+                UIUtils.showErrorMessage("Error", "No se pudo traer información sobre las tablas para la base de datos " + getConnectedDBName() 
+                        + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };
         query.exec();

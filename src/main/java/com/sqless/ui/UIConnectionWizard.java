@@ -27,10 +27,10 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         this.task = task;
         if (isTask(Task.MODIFY) || isTask(Task.REPAIR)) {
             prepareUI();
-            setTitle(isTask(Task.MODIFY) ? "Modify a connection" : "Repair a connection");
-            btnContinue.setText("Apply");
+            setTitle(isTask(Task.MODIFY) ? "Editar una conexión" : "Reparar una conexión");
+            btnContinue.setText("Aplicar");
         } else {
-            setTitle("Create a connection");
+            setTitle("Crear una conexión");
         }
         getRootPane().setDefaultButton(btnTestConnection);
     }
@@ -64,20 +64,20 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         lblLogin.setIconTextGap(10);
 
         lblUserName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblUserName.setText("Username:");
+        lblUserName.setText("Usuario:");
 
         lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblPassword.setText("Password:");
+        lblPassword.setText("Contraseña:");
 
         lblHost.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblHost.setText("Host:");
 
         lblPort.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblPort.setText("Port:");
+        lblPort.setText("Puerto:");
 
         txtPort.setText("3306");
 
-        btnContinue.setText("Continue");
+        btnContinue.setText("Continuar");
         btnContinue.setEnabled(false);
         btnContinue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,21 +85,21 @@ public class UIConnectionWizard extends javax.swing.JDialog {
             }
         });
 
-        btnCancel.setText("Cancel");
+        btnCancel.setText("Cancelar");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
 
-        btnTestConnection.setText("Test connection");
+        btnTestConnection.setText("Probar conexión");
         btnTestConnection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnTestConnectionActionPerformed(evt);
             }
         });
 
-        iLblConStatus.setText("Connection status:");
+        iLblConStatus.setText("Estado de la conexión:");
 
         javax.swing.GroupLayout pnlContainerLayout = new javax.swing.GroupLayout(pnlContainer);
         pnlContainer.setLayout(pnlContainerLayout);
@@ -116,9 +116,9 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                             .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                            .addComponent(txtPassword)
                             .addComponent(txtUserName, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPort, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPort, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                             .addComponent(txtHost, javax.swing.GroupLayout.Alignment.LEADING))
                         .addContainerGap())
                     .addGroup(pnlContainerLayout.createSequentialGroup()
@@ -128,22 +128,23 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblConnectionStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(pnlContainerLayout.createSequentialGroup()
-                                .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblLogin)
-                                    .addGroup(pnlContainerLayout.createSequentialGroup()
-                                        .addComponent(btnTestConnection)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnCancel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnContinue)))
-                                .addGap(0, 1, Short.MAX_VALUE)))
+                                .addComponent(lblLogin)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(pnlContainerLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnTestConnection)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnCancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnContinue)))
                         .addGap(10, 10, 10))))
         );
         pnlContainerLayout.setVerticalGroup(
             pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlContainerLayout.createSequentialGroup()
+                .addGap(7, 7, 7)
                 .addComponent(lblLogin)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblHost)
                     .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -163,7 +164,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(iLblConStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblConnectionStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnContinue)
                     .addComponent(btnCancel)
@@ -175,16 +176,11 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(pnlContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(pnlContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(pnlContainer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -212,7 +208,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         enableContinue(false);
         setCursor(UIUtils.WAIT_CURSOR);
         UIUtils.changeLabelColour(lblConnectionStatus, Color.BLACK);
-        lblConnectionStatus.setText("Testing...");
+        lblConnectionStatus.setText("Probando...");
 
         SwingWorker<Boolean, Void> tester = new SwingWorker<Boolean, Void>() {
             @Override
@@ -225,7 +221,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
             protected void done() {
                 try {
                     boolean success = get();
-                    lblConnectionStatus.setText(success ? "Success" : "Failed");
+                    lblConnectionStatus.setText(success ? "Exitoso" : "Fallido");
                     UIUtils.changeLabelColour(lblConnectionStatus, success ? UIUtils.DARK_GREEN : Color.RED);
                     enableContinue(success);
                     setCursor(UIUtils.DEFAULT_CURSOR);

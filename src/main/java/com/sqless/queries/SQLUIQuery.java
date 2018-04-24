@@ -2,6 +2,7 @@ package com.sqless.queries;
 
 import com.mysql.jdbc.Blob;
 import com.sqless.sql.connection.SQLConnectionManager;
+import com.sqless.ui.UIClient;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.DataTypeUtils;
@@ -185,7 +186,7 @@ public class SQLUIQuery extends SQLQuery {
                     if (rowCount == MAX_ROWS) {
                         queryTimer.stop();
                         UIUtils.showWarning("Número máximo de filas excedido", "El número máximo de filas (" + MAX_ROWS + ") que SQLess puede mostrar para esta query será excedido. "
-                                + "SQLess mostrará los resultados hasta ahora y pasará a la siguiente query en cola.", null);
+                                + "SQLess mostrará los resultados hasta ahora y pasará a la siguiente query en cola.", UIClient.getInstance());
                         break;
                     }
                 }

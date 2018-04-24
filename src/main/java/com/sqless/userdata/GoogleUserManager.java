@@ -70,7 +70,7 @@ public class GoogleUserManager {
                 FileManager.delete(GoogleLogin.CREDENTIALS_DIR);
             }
         } catch (IOException ex) {
-            UIUtils.showErrorMessage("Log out", "Ha ocurrido un error inesperado. No se puede hacer cerrar sesión en este momento", null);
+            UIUtils.showErrorMessage("Cerrar sesión", "Ha ocurrido un error inesperado. No se puede hacer cerrar sesión en este momento.", null);
             ex.printStackTrace();
         }
     }

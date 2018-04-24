@@ -29,7 +29,6 @@ public abstract class SQLQuery {
     }
 
     public void filterDelimiterKeyword() {
-        long start = System.currentTimeMillis();
         this.sql = filterDelimiterKeyword(sql);
     }
 

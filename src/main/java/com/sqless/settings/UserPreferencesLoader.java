@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.TreeSet;
 import javax.swing.filechooser.FileSystemView;
 import com.sqless.file.FileManager;
+import com.sqless.ui.UIClient;
 
 public class UserPreferencesLoader {
 
@@ -57,7 +58,7 @@ public class UserPreferencesLoader {
         try (OutputStream output = new FileOutputStream(SETTINGS_FILE)) {
             userProperties.store(output, null);
         } catch (IOException ex) {
-            UIUtils.showErrorMessage("Error", "Could not save user properties.", null);
+            UIUtils.showErrorMessage("Error", "No se pudieron guardar las propiedades de usuario.", UIClient.getInstance());
             System.err.println(ex.getMessage());
         }
     }
@@ -69,7 +70,7 @@ public class UserPreferencesLoader {
         try (InputStream input = new FileInputStream(SETTINGS_FILE)) {
             userProperties.load(input);
         } catch (IOException ex) {
-            UIUtils.showErrorMessage("Error", "Could not load user properties.", null);
+            UIUtils.showErrorMessage("Error", "No se pudieron guardar las propiedades de usuario.", UIClient.getInstance());
             System.err.println(ex.getMessage());
         }
     }

@@ -10,7 +10,7 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="menuItemCopyCategory">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Copy"/>
+            <Property name="text" type="java.lang.String" value="Copiar"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="popMenuTable.addSeparator();"/>
@@ -24,7 +24,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/icons/ui_client/COPYTABLEWITHHEADERS_ICON.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="With headers"/>
+                <Property name="text" type="java.lang.String" value="Con encabezados"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemCopyRows">
@@ -35,7 +35,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/icons/ui_client/COPYTABLEICON.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Without headers"/>
+                <Property name="text" type="java.lang.String" value="Sin encabezados"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -45,7 +45,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="actionSelectRange" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Select range..."/>
+            <Property name="text" type="java.lang.String" value="Seleccionar por rango..."/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemSelectAllTable">
@@ -53,7 +53,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="actionSelectAll" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Select all"/>
+            <Property name="text" type="java.lang.String" value="Seleccionar todo"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="popMenuTable.addSeparator();"/>
@@ -67,7 +67,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/icons/ui_general/SAVE_ICON.png"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Save table as..."/>
+            <Property name="text" type="java.lang.String" value="Guardar tabla como..."/>
           </Properties>
         </MenuItem>
       </SubComponents>

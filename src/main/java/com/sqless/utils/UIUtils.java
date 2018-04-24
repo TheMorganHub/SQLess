@@ -341,8 +341,8 @@ public class UIUtils {
     public static int showYesNoOptionDialog(String title, String message, int messageType,
             boolean dontAskAgain, java.awt.Component parent) {
         Object[] options = !dontAskAgain
-                ? new Object[]{"Yes", "No"}
-                : new Object[]{"Yes", "No", "No, don't ask me again"};
+                ? new Object[]{"Sí", "No"}
+                : new Object[]{"Sí", "No", "No, no preguntarme de nuevo"};
         return JOptionPane.showOptionDialog(parent, TextUtils.splitIntoLines(message), title,
                 JOptionPane.DEFAULT_OPTION, messageType, null, options, options[0]);
     }

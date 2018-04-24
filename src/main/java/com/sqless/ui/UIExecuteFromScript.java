@@ -36,7 +36,7 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
         progressExecution.setIndeterminate(true);
 
         lblExecuting.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblExecuting.setText("Executing...");
+        lblExecuting.setText("Ejecutando...");
 
         btnCancelar.setText("Cancelar");
         btnCancelar.setFocusable(false);

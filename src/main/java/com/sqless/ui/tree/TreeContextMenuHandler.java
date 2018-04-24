@@ -33,29 +33,28 @@ public class TreeContextMenuHandler {
         itemSets = new ArrayList<>();
 
         TreeMenuItemSet tableCategoriesContext = new TreeMenuItemSet(CAT_TABLES);
-        tableCategoriesContext.add(new TreeContextMenuItem("New table", ContextItemFunctionality.CREATE));
+        tableCategoriesContext.add(new TreeContextMenuItem("Nueva tabla", ContextItemFunctionality.CREATE));
 
         TreeMenuItemSet selectableContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
         selectableContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
 
         TreeMenuItemSet tableObjectContext = new TreeMenuItemSet(TABLE);
-        tableObjectContext.add(new TreeContextMenuItem("Modify", ContextItemFunctionality.MODIFY));
-        tableObjectContext.add(new TreeContextMenuItem("Edit rows", ContextItemFunctionality.EDIT));
+        tableObjectContext.add(new TreeContextMenuItem("Modificar tabla", ContextItemFunctionality.MODIFY));
+        tableObjectContext.add(new TreeContextMenuItem("Editar filas", ContextItemFunctionality.EDIT));
 
         TreeMenuItemSet columnTableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN);
-        columnTableObjectContext.add(new TreeContextMenuItem("Rename", ContextItemFunctionality.RENAME));
+        columnTableObjectContext.add(new TreeContextMenuItem("Renombrar", ContextItemFunctionality.RENAME));
 
         TreeMenuItemSet executableContext = new TreeMenuItemSet(FUNCTION, PROCEDURE);
-        executableContext.add(new TreeContextMenuItem("Execute", ContextItemFunctionality.EXECUTE));
+        executableContext.add(new TreeContextMenuItem("Ejecutar", ContextItemFunctionality.EXECUTE));
         
         TreeMenuItemSet databaseContext = new TreeMenuItemSet(DATABASE);
-        databaseContext.add(new TreeContextMenuItem("Dump to SQL file...", "EXPORT_DB"));
-        databaseContext.add(new TreeContextMenuItem("Execute from SQL File...", "EXECUTE_FROM_SCRIPT"));
+        databaseContext.add(new TreeContextMenuItem("Exportar a archivo SQL...", "EXPORT_DB"));
+        databaseContext.add(new TreeContextMenuItem("Ejecutar desde archivo SQL...", "EXECUTE_FROM_SCRIPT"));
 
         TreeMenuItemSet genericMenu = new TreeMenuItemSet(DATABASE, TABLE_COLUMN, TABLE, VIEW, VIEW_COLUMN, INDEX,
                 FUNCTION, PROCEDURE, TRIGGER);
-
-        genericMenu.add(new TreeContextMenuItem("Delete", ContextItemFunctionality.DROP));
+        genericMenu.add(new TreeContextMenuItem("Eliminar", ContextItemFunctionality.DROP));
 
 //        el orden de agregado afecta la posición de los items. Los que se agregan primero van a aparecer primero.
         itemSets.add(tableCategoriesContext);

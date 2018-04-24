@@ -332,7 +332,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 {null, null, null, null, null,  new Boolean(true)}
             },
             new String [] {
-                "", "Nombre", "Tipo", "Length", "Decimales", "Acepta null"
+                "", "Nombre", "Tipo", "Longitud", "Decimales", "Acepta null"
             }
         ) {
             Class[] types = new Class [] {
@@ -415,7 +415,7 @@ public class UICreateTableSQLess extends FrontPanel {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
         );
 
-        tabbedpane.addTab("Foreign keys", pnlFKs);
+        tabbedpane.addTab("Claves foráneas", pnlFKs);
 
         sqlPane.setEditable(false);
         scrSQL.setViewportView(sqlPane);

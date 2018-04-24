@@ -229,7 +229,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
 
                 @Override
                 public void onFailure(String errMessage) {
-                    UIUtils.showErrorMessage("Move columns", errMessage, UIMoveColumns.this);
+                    UIUtils.showErrorMessage("Mover columnas", errMessage, UIMoveColumns.this);
                 }
             };
             alterTableQuery.exec();

@@ -43,7 +43,7 @@ public class NodeTreeModel extends DefaultTreeModel {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("Rename object", "Could not rename object: " + errMessage, null);
+                UIUtils.showErrorMessage("Renombrar objeto", "No se pudo renombrar el objeto. El servidor respondió con el mensaje:\n" + errMessage, null);
                 cellEditor.cancelCellEditing();
             }
         };

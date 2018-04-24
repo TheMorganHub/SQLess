@@ -116,7 +116,7 @@
                         <Column editable="true" title="" type="java.lang.Boolean"/>
                         <Column editable="true" title="Nombre" type="java.lang.String"/>
                         <Column editable="true" title="Tipo" type="java.lang.String"/>
-                        <Column editable="true" title="Length" type="java.lang.Integer"/>
+                        <Column editable="true" title="Longitud" type="java.lang.Integer"/>
                         <Column editable="true" title="Decimales" type="java.lang.Integer"/>
                         <Column editable="true" title="Acepta null" type="java.lang.Boolean">
                           <Data value="true"/>
@@ -178,8 +178,8 @@
         <Container class="javax.swing.JPanel" name="pnlFKs">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Foreign keys">
-                <Property name="tabTitle" type="java.lang.String" value="Foreign keys"/>
+              <JTabbedPaneConstraints tabName="Claves for&#xe1;neas">
+                <Property name="tabTitle" type="java.lang.String" value="Claves for&#xe1;neas"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

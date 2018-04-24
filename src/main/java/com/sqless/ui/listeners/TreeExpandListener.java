@@ -54,8 +54,8 @@ public class TreeExpandListener implements TreeWillExpandListener {
 
             if (node.isOfType(TABLE)) {
                 if (UIUtils.nodeHasDummy(node)) {
-                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columns", CAT_COLUMNS);
-                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indexes", CAT_INDEXES);
+                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columnas", CAT_COLUMNS);
+                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indices", CAT_INDEXES);
                     SQLessTreeNode triggersNode = new SQLessTreeNode("Triggers", CAT_TRIGGERS);
                     columnsNode.add(UIUtils.dummyNode());
                     indexesNode.add(UIUtils.dummyNode());
@@ -146,8 +146,8 @@ public class TreeExpandListener implements TreeWillExpandListener {
 
             if (node.isOfType(VIEW)) {
                 if (UIUtils.nodeHasDummy(node)) {
-                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columns", CAT_VIEWS_COLUMNS);
-                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indexes", CAT_INDEXES);
+                    SQLessTreeNode columnsNode = new SQLessTreeNode("Columnas", CAT_VIEWS_COLUMNS);
+                    SQLessTreeNode indexesNode = new SQLessTreeNode("Indices", CAT_INDEXES);
                     SQLessTreeNode triggersNode = new SQLessTreeNode("Triggers", CAT_TRIGGERS);
                     columnsNode.add(UIUtils.dummyNode());
                     indexesNode.add(UIUtils.dummyNode());

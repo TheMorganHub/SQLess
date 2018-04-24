@@ -80,7 +80,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
     public void loadTable() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("");
-        model.addColumn("Database");
+        model.addColumn("Bases de datos");
         for (String dbName : SQLUtils.retrieveDBNamesFromServer()) {
             Object[] row = {dbIsDefault(dbName) ? FAVOURITE_ICON : NOT_FAVOURITE_ICON, dbName};
             model.addRow(row);
@@ -130,15 +130,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
         comboCollation = new javax.swing.JComboBox<>();
 
         menuItemDropDb.setAction(actionDropDatabase);
-        menuItemDropDb.setText("Drop database");
+        menuItemDropDb.setText("Eliminar base de datos");
         popTable.add(menuItemDropDb);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Database explorer");
+        setTitle("Administrador de base de datos");
 
         tabPaneMain.setFocusable(false);
 
-        btnDrop.setText("Drop");
+        btnDrop.setText("Eliminar");
         btnDrop.setFocusable(false);
         btnDrop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -146,7 +146,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
             }
         });
 
-        btnConnect.setText("Connect");
+        btnConnect.setText("Conectar");
         btnConnect.setFocusable(false);
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -201,7 +201,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
         lblHost.setText("###");
 
-        chkShowMaster.setText("Show 'mysql' database");
+        chkShowMaster.setText("Mostrar base de datos 'mysql'");
         chkShowMaster.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkShowMasterActionPerformed(evt);
@@ -222,7 +222,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
                         .addComponent(lblHost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlManagerLayout.createSequentialGroup()
                         .addComponent(chkShowMaster)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 224, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
                         .addComponent(btnDrop)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConnect)))
@@ -246,13 +246,13 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        tabPaneMain.addTab("Management", pnlManager);
+        tabPaneMain.addTab("Administrar", pnlManager);
 
-        pnlCreation.setBorder(javax.swing.BorderFactory.createTitledBorder("Create a database"));
+        pnlCreation.setBorder(javax.swing.BorderFactory.createTitledBorder("Crear base de datos"));
 
-        iLblName.setText("Name:");
+        iLblName.setText("Nombre:");
 
-        btnRestoreDefaults.setText("Restore defaults");
+        btnRestoreDefaults.setText("Restaurar predeterminados");
         btnRestoreDefaults.setFocusable(false);
         btnRestoreDefaults.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -260,7 +260,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
             }
         });
 
-        btnCreateDb.setText("Create");
+        btnCreateDb.setText("Crear");
         btnCreateDb.setFocusable(false);
         btnCreateDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -323,7 +323,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        tabPaneMain.addTab("Creation", pnlCreation);
+        tabPaneMain.addTab("Crear", pnlCreation);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -357,8 +357,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
         String dbName = tableDb.getSelectedRow() != -1 ? getSelectedRowValue() : getDefaultDbName();
 
         if (dbName.equals(SQLUtils.getConnectedDBName())) {
-            int confirmation = UIUtils.showYesNoOptionDialog("Connect to database", "You are already connected to "
-                    + dbName + ".\nWould you like to refresh the connection?", JOptionPane.QUESTION_MESSAGE,
+            int confirmation = UIUtils.showYesNoOptionDialog("Conectar a una base de datos", "Ya estás conectado a "
+                    + dbName + ".\n¿Te gustaría refrescar la conexión?", JOptionPane.QUESTION_MESSAGE,
                     false, getParent());
             if (confirmation != 0) {
                 return;
@@ -383,8 +383,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
     public void actionDropDatabase() {
         String dbName = tableDb.getSelectedRow() == -1 ? getDefaultDbName() : getSelectedRowValue();
         if (SQLUtils.getConnectedDBName().equalsIgnoreCase(dbName)) {
-            int option = UIUtils.showOptionDialog("Drop database", "The database is current in use.\nWhat would you like to do?", getParent(),
-                    "Cancel", "Close connection and drop");
+            int option = UIUtils.showOptionDialog("Eliminar base de datos", "La base de datos está en uso.\n¿Qué deseas hacer?", getParent(),
+                    "Cancelar", "Cerrar conexión y eliminar");
             switch (option) {
                 case 1:
                     dropDatabase(dbName, true);
@@ -436,11 +436,11 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     private void btnCreateDbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateDbActionPerformed
         if (txtNewDbName.getText().isEmpty()) {
-            UIUtils.showErrorMessage("Error", "The database name cannot be empty.", getParent());
+            UIUtils.showErrorMessage("Error", "El nombre de la base de datos no puede estar vacío.", getParent());
             return;
         }
         if (TextUtils.startsWithNumber(txtNewDbName.getText())) {
-            UIUtils.showErrorMessage("Error", "The database name cannot start with a number.", getParent());
+            UIUtils.showErrorMessage("Error", "El nombre de la base de datos no puede comenzar con un número.", getParent());
             return;
         }
         if (dbExists(txtNewDbName.getText())) {
@@ -484,8 +484,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 UIUtils.sortTable(tableDb, 1);
                 newDatabases.add(newDbName);
                 
-                int opt = UIUtils.showConfirmationMessage("Database creation", "The database " + newDbName
-                        + " has been created successfully.\nWould you like SQLess to connect to it?", getParent());
+                int opt = UIUtils.showConfirmationMessage("Creación de base de datos", "La base de datos " + newDbName
+                        + " fue creada exitosamente.\n¿Te gustaría que SQLess se conecte a ella?", getParent());
                 if (opt == 0) {
                     SQLConnectionManager.getInstance().setNewConnection(newDbName, true, client);
                     client.createJTree();
@@ -526,8 +526,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
      * method is called.
      */
     public void dropDatabase(String dbName, boolean closeCurrentConnection) {
-        int confirmation = UIUtils.showConfirmationMessage("Drop database ",
-                "Are you sure you wish to permanently drop database " + dbName + "?", getParent());
+        int confirmation = UIUtils.showConfirmationMessage("Eliminar base de datos",
+                "¿Estás seguro que quieres eliminar permanentemente la base de datos '" + dbName + "'?", getParent());
         if (confirmation != 0) {
             return;
         }
@@ -546,7 +546,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
             @Override
             public void onFailure(String err) {
-                UIUtils.showErrorMessage("Drop database", err, getParent());
+                UIUtils.showErrorMessage("Eliminar base de datos", err, getParent());
             }
         };
         dropDatabaseQuery.exec();

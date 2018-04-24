@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * This class manages everything related to SQLess's connection with the SQLDB
+ * This class manages everything related to SQLess' connection with the SQLDB
  * engine. Whenever a connection is made, this class' {@code SQLDatabase} object
  * will hold the database to which SQLess is currently connected.
  * <p>
@@ -184,7 +184,7 @@ public class SQLConnectionManager {
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (java.net.UnknownHostException ex) {
-            System.out.println("Hostname can not be resolved");
+            System.err.println("Hostname can not be resolved");
         }
         return hostname;
     }

@@ -130,8 +130,8 @@ public class UIEditTable extends FrontPanel {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("Edit table", "Hubo un error al traer los datos de la tabla "
-                        + table.getName() + " desde la base de datos.\n" + errMessage, null);
+                UIUtils.showErrorMessage("Editar filas", "Hubo un error al traer los datos de la tabla "
+                        + table.getName() + " desde la base de datos.\nEl servidor respondió con el mensaje:\n" + errMessage, null);
             }
         };
         querySelect.exec();
@@ -291,20 +291,20 @@ public class UIEditTable extends FrontPanel {
         txtLog = new javax.swing.JTextPane();
 
         menuItemDeleteRow.setAction(actionDeleteRow);
-        menuItemDeleteRow.setText("Delete row(s)");
+        menuItemDeleteRow.setText("Eliminar fila(s)");
         popTable.add(menuItemDeleteRow);
         popTable.addSeparator();
 
         menuItemSetNull.setAction(actionSetToNull);
-        menuItemSetNull.setText("Set to NULL");
+        menuItemSetNull.setText("Poner en NULL");
         popTable.add(menuItemSetNull);
 
         menuItemSetEmpty.setAction(actionSetToEmpty);
-        menuItemSetEmpty.setText("Empty string");
+        menuItemSetEmpty.setText("Cadena de texto vacía");
         popTable.add(menuItemSetEmpty);
 
         menuItemClearLog.setAction(actionClearLog);
-        menuItemClearLog.setText("Clear");
+        menuItemClearLog.setText("Borrar");
         popLog.add(menuItemClearLog);
 
         splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -378,10 +378,10 @@ public class UIEditTable extends FrontPanel {
     @Override
     public Component[] getToolbarComponents() {
         if (toolbarComponents == null) {
-            btnAddRow = UIUtils.newToolbarBtn(actionAddRow, "Add a new row", UIUtils.icon(this, "ADD_ROW"));
-            btnDeleteRows = UIUtils.newToolbarBtn(actionDeleteRow, "Delete the selected row(s)", UIUtils.icon(this, "DELETE_ROWS"));
-            btnSave = UIUtils.newToolbarBtn(actionSaveChanges, "Commit all changes", UIUtils.icon(this, "SAVE"));
-            btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Reload the table to reflect external changes (F5)", UIUtils.icon(this, "REFRESH"));
+            btnAddRow = UIUtils.newToolbarBtn(actionAddRow, "Agregar una fila nueva", UIUtils.icon(this, "ADD_ROW"));
+            btnDeleteRows = UIUtils.newToolbarBtn(actionDeleteRow, "Eliminar la(s) fila(s) seleccionada(s)", UIUtils.icon(this, "DELETE_ROWS"));
+            btnSave = UIUtils.newToolbarBtn(actionSaveChanges, "Confirmar todos los cambios", UIUtils.icon(this, "SAVE"));
+            btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Cargar la tabla nuevamenete para reflejar cambios externos (F5)", UIUtils.icon(this, "REFRESH"));
             toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddRow, btnDeleteRows, UIUtils.newSeparator(), btnRefresh};
         }
         return toolbarComponents;
@@ -390,7 +390,7 @@ public class UIEditTable extends FrontPanel {
     @Override
     public JMenuItem[] getMenuItems() {
         if (menuItems == null) {
-            menuItemSave = new JMenuItem("Save");
+            menuItemSave = new JMenuItem("Guardar");
             menuItemSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
             menuItemSave.addActionListener(actionSaveChanges);
             menuItems = new JMenuItem[]{menuItemSave};
@@ -489,7 +489,7 @@ public class UIEditTable extends FrontPanel {
         public void actionPerformed(ActionEvent e) {
             UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
             if (tableHasChanges()) {
-                int opt = UIUtils.showYesNoOptionDialog("Actualizar la tabla", "Se han encontrado cambios no guardados en la tabla.\nSi refrescas ahora, esos cambios se perderán. ¿Deseas continuar?",
+                int opt = UIUtils.showYesNoOptionDialog("Actualizar la tabla", "Se han encontrado cambios no guardados en la tabla.\nSi refrescas ahora esos cambios se perderán. ¿Deseas continuar?",
                         JOptionPane.QUESTION_MESSAGE, false, null);
                 if (opt == 0) {
                     doRefresh();
@@ -742,7 +742,7 @@ public class UIEditTable extends FrontPanel {
                         DocStyler.of(txtLog).append("[" + MiscUtils.TIME_FORMAT.format(new Date()) + "] ", DocStyler.FontStyle.BOLD)
                                 .append("UPDATE: ", DocStyler.FontStyle.NORMAL)
                                 .append("'" + oldValue + "'", Color.RED).append(" -> ", Color.BLACK).append("'" + value + "'", Color.RED)
-                                .append(" at column ", Color.BLACK).append(col + "\n", Color.RED);
+                                .append(" en columna ", Color.BLACK).append(col + "\n", Color.RED);
                     }
                     queryResult = true;
                     commitNewValues();
@@ -751,7 +751,7 @@ public class UIEditTable extends FrontPanel {
                 @Override
                 public void onFailure(String errMessage) {
                     queryResult = false;
-                    UIUtils.showErrorMessage("Update row", "Could not update row.\n" + errMessage, null);
+                    UIUtils.showErrorMessage("Actualizar fila", "No se pudo actualizar fila.\nEl servidor respondió con mensaje: " + errMessage, null);
                     System.out.println(getSql());
                     if (uiTable.getCellEditor() != null) {
                         uiTable.getCellEditor().cancelCellEditing();
@@ -854,7 +854,7 @@ public class UIEditTable extends FrontPanel {
 
                 @Override
                 public void onFailure(String errMessage) {
-                    UIUtils.showErrorMessage("Insert row", "Could not insert row " + row + ".\n" + errMessage, null);
+                    UIUtils.showErrorMessage("Insertar fila", "No se pudo insertar fila " + row + ".\nEl servidor respondió con mensaje: " + errMessage, null);
                     queryResult = false;
                     if (uiTable.getCellEditor() != null) {
                         uiTable.getCellEditor().cancelCellEditing();
@@ -885,7 +885,7 @@ public class UIEditTable extends FrontPanel {
                 @Override
                 public void onFailure(String errMessage) {
                     System.out.println(getSql());
-                    UIUtils.showErrorMessage("Delete row(s)", "Could not remove row " + row + ".\n" + errMessage, null);
+                    UIUtils.showErrorMessage("Eliminar fila(s)", "No se pudo eliminar fila " + row + ".\nEl servidor respondió con mensaje: " + errMessage, null);
                     queryResult = false;
                 }
             };

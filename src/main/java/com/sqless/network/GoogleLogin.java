@@ -153,7 +153,7 @@ public class GoogleLogin {
 
             @Override
             public void onFailure(String message) {
-                UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
+                UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", null);
                 if (waitDialog != null) {
                     waitDialog.cancel();
                 } else {
@@ -168,7 +168,7 @@ public class GoogleLogin {
         try {
             startOauth2Service();
         } catch (IOException e) {
-            UIUtils.showErrorMessage("Autenticación Google", "Hubo un error al hacer la autenticación con Google.", null);
+            UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", null);
             waitDialog.cancel();
         } catch (NullPointerException e) {
             //va a saltar desde adentro de las librerías de Google si el usuario cancela el proceso de autenticación.

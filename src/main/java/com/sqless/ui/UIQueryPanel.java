@@ -109,7 +109,7 @@ public class UIQueryPanel extends FrontPanel {
      */
     public void addResultPanel(UIPanelResult panelResult) {
         resultPanels.add(panelResult);
-        tabPane.insertTab("Result_" + resultPanels.size(), null, panelResult, null, tabPane.getTabCount() == 0 ? 0 : tabPane.getTabCount() - 1);
+        tabPane.insertTab("Resultado_" + resultPanels.size(), null, panelResult, null, tabPane.getTabCount() == 0 ? 0 : tabPane.getTabCount() - 1);
         tabPane.setSelectedIndex(0);
     }
 
@@ -139,11 +139,11 @@ public class UIQueryPanel extends FrontPanel {
 
     public void initMessagesPanel() {
         panelMessages = new UIPanelMessages();
-        tabPane.addTab("Messages", panelMessages);
+        tabPane.addTab("Mensajes", panelMessages);
     }
 
     public void updateRowsLabel(int rows) {
-        lblRows.setText("Rows: " + rows + " |");
+        lblRows.setText("Filas: " + rows + " |");
     }
 
     public void updateRowsLabel() {
@@ -193,7 +193,7 @@ public class UIQueryPanel extends FrontPanel {
                 break;
             case STOPPED:
                 tabPane.setSelectedIndex(tabPane.getTabCount() - 1);
-                panelMessages.appendError("The query was interrupted.");
+                panelMessages.appendError("La ejecución fue interrumpida.");
                 break;
         }
     }
@@ -223,7 +223,7 @@ public class UIQueryPanel extends FrontPanel {
         lblTimer = new javax.swing.JLabel();
         lblRows = new javax.swing.JLabel();
 
-        menuItemCut.setText("Cut");
+        menuItemCut.setText("Cortar");
         menuItemCut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemCutActionPerformed(evt);
@@ -231,7 +231,7 @@ public class UIQueryPanel extends FrontPanel {
         });
         popMenuEditor.add(menuItemCut);
 
-        menuItemCopy.setText("Copy");
+        menuItemCopy.setText("Copiar");
         menuItemCopy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemCopyActionPerformed(evt);
@@ -239,7 +239,7 @@ public class UIQueryPanel extends FrontPanel {
         });
         popMenuEditor.add(menuItemCopy);
 
-        menuItemPaste.setText("Paste");
+        menuItemPaste.setText("Pegar");
         menuItemPaste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemPasteActionPerformed(evt);
@@ -249,7 +249,7 @@ public class UIQueryPanel extends FrontPanel {
         popMenuEditor.addSeparator();
 
         menuItemSelectAllEditor.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemSelectAllEditor.setText("Select all");
+        menuItemSelectAllEditor.setText("Seleccionar todo");
         menuItemSelectAllEditor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemSelectAllEditorActionPerformed(evt);
@@ -259,7 +259,7 @@ public class UIQueryPanel extends FrontPanel {
         popMenuEditor.addSeparator();
 
         menuItemFind.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemFind.setText("Find...");
+        menuItemFind.setText("Encontrar...");
         menuItemFind.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemFindActionPerformed(evt);
@@ -280,7 +280,7 @@ public class UIQueryPanel extends FrontPanel {
 
         lblTimer.setText("00:00:00,000");
 
-        lblRows.setText("Rows: 0 |");
+        lblRows.setText("Filas: 0 |");
 
         javax.swing.GroupLayout pnlStatusLayout = new javax.swing.GroupLayout(pnlStatus);
         pnlStatus.setLayout(pnlStatusLayout);
@@ -419,17 +419,17 @@ public class UIQueryPanel extends FrontPanel {
     @Override
     public Component[] getToolbarComponents() {
         if (toolbarComponents == null) {
-            btnSave = UIUtils.newToolbarBtn(actionSaveQuery, "", "Guardar esta query", UIUtils.icon("ui_general", "SAVE"));
-            btnRun = UIUtils.newToolbarBtn(actionRunQuery, "Run", "", UIUtils.icon(this, "EXECUTE"));
-            btnStop = UIUtils.newToolbarBtn(actionStopQuery, "Stop the execution of this query", UIUtils.icon(this, "STOP_EXECUTION"));
+            btnSave = UIUtils.newToolbarBtn(actionSaveQuery, "", "Guardar estas consultas", UIUtils.icon("ui_general", "SAVE"));
+            btnRun = UIUtils.newToolbarBtn(actionRunQuery, "Ejecutar", "", UIUtils.icon(this, "EXECUTE"));
+            btnStop = UIUtils.newToolbarBtn(actionStopQuery, "Parar la ejecución de esta consulta", UIUtils.icon(this, "STOP_EXECUTION"));
             btnStop.setEnabled(false);
-            btnUndo = UIUtils.newToolbarBtn(actionUndoQuery, "Undo", UIUtils.icon(this, "UNDO"));
-            btnRedo = UIUtils.newToolbarBtn(actionRedoQuery, "Redo", UIUtils.icon(this, "REDO"));
-            btnDelete = UIUtils.newToolbarBtn(actionDeleteQuery, "Delete the current query", UIUtils.icon(this, "BORRAR"));
-            btnComment = UIUtils.newToolbarBtn(actionCommentQuery, "Comment", UIUtils.icon(this, "COMMENT"));
-            btnUncomment = UIUtils.newToolbarBtn(actionUncommentQuery, "Uncomment", UIUtils.icon(this, "UNCOMMENT"));
-            btnIndent = UIUtils.newToolbarBtn(actionIndent, "Indent", UIUtils.icon(this, "INDENT"));
-            btnUnindent = UIUtils.newToolbarBtn(actionUnindent, "Unindent", UIUtils.icon(this, "UNINDENT"));
+            btnUndo = UIUtils.newToolbarBtn(actionUndoQuery, "Deshacer", UIUtils.icon(this, "UNDO"));
+            btnRedo = UIUtils.newToolbarBtn(actionRedoQuery, "Rehacer", UIUtils.icon(this, "REDO"));
+            btnDelete = UIUtils.newToolbarBtn(actionDeleteQuery, "Borrar la consulta actual", UIUtils.icon(this, "BORRAR"));
+            btnComment = UIUtils.newToolbarBtn(actionCommentQuery, "Comentar", UIUtils.icon(this, "COMMENT"));
+            btnUncomment = UIUtils.newToolbarBtn(actionUncommentQuery, "Descomentar", UIUtils.icon(this, "UNCOMMENT"));
+            btnIndent = UIUtils.newToolbarBtn(actionIndent, "Indentar", UIUtils.icon(this, "INDENT"));
+            btnUnindent = UIUtils.newToolbarBtn(actionUnindent, "Desindentar", UIUtils.icon(this, "UNINDENT"));
             toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop, UIUtils.newSeparator(), btnUndo, btnRedo, btnDelete, btnComment, btnUncomment, btnIndent, btnUnindent};
         }
         return toolbarComponents;
@@ -438,11 +438,11 @@ public class UIQueryPanel extends FrontPanel {
     @Override
     public JMenuItem[] getMenuItems() {
         if (menuItems == null) {
-            menuSave = new JMenuItem("Save");
+            menuSave = new JMenuItem("Guardar");
             menuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
             menuSave.addActionListener(actionSaveQuery);
 
-            menuSaveAs = new JMenuItem("Save as...");
+            menuSaveAs = new JMenuItem("Guardar como...");
             menuSaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK | java.awt.event.InputEvent.SHIFT_MASK));
             menuSaveAs.addActionListener(actionSaveQueryAs);
             menuItems = new JMenuItem[]{menuSave, menuSaveAs};

@@ -30,7 +30,7 @@ public class UIPanelMessages extends javax.swing.JPanel {
         scrPaneMessages = new javax.swing.JScrollPane();
         txtMessagesArea = new javax.swing.JTextPane();
 
-        menuItemCopyMessages.setText("Copy");
+        menuItemCopyMessages.setText("Copiar");
         menuItemCopyMessages.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemCopyMessagesActionPerformed(evt);
@@ -40,7 +40,7 @@ public class UIPanelMessages extends javax.swing.JPanel {
         popMenuMessages.addSeparator();
 
         menuItemSelectAllMessages.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemSelectAllMessages.setText("Select all");
+        menuItemSelectAllMessages.setText("Seleccionar todos");
         menuItemSelectAllMessages.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemSelectAllMessagesActionPerformed(evt);
@@ -49,7 +49,7 @@ public class UIPanelMessages extends javax.swing.JPanel {
         popMenuMessages.add(menuItemSelectAllMessages);
         popMenuMessages.addSeparator();
 
-        menuItemClearMessages.setText("Clear");
+        menuItemClearMessages.setText("Borrar");
         menuItemClearMessages.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemClearMessagesActionPerformed(evt);

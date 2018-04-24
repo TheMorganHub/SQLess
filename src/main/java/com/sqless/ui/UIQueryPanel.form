@@ -10,7 +10,7 @@
       <SubComponents>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemCut">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Cut"/>
+            <Property name="text" type="java.lang.String" value="Cortar"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemCutActionPerformed"/>
@@ -18,7 +18,7 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemCopy">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Copy"/>
+            <Property name="text" type="java.lang.String" value="Copiar"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemCopyActionPerformed"/>
@@ -26,7 +26,7 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemPaste">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Paste"/>
+            <Property name="text" type="java.lang.String" value="Pegar"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemPasteActionPerformed"/>
@@ -40,7 +40,7 @@
             <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
               <KeyStroke key="Ctrl+A"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Select all"/>
+            <Property name="text" type="java.lang.String" value="Seleccionar todo"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemSelectAllEditorActionPerformed"/>
@@ -54,7 +54,7 @@
             <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
               <KeyStroke key="Ctrl+H"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Find..."/>
+            <Property name="text" type="java.lang.String" value="Encontrar..."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemFindActionPerformed"/>
@@ -173,7 +173,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="lblRows">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Rows: 0 |"/>
+            <Property name="text" type="java.lang.String" value="Filas: 0 |"/>
           </Properties>
         </Component>
       </SubComponents>

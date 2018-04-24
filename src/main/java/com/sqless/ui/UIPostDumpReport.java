@@ -13,7 +13,7 @@ public class UIPostDumpReport extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(getParent());
         getRootPane().setDefaultButton(btnCount);
-        setTitle("Dump de base de datos '" + SQLUtils.getConnectedDBName() + "'");
+        setTitle("Exportar base de datos '" + SQLUtils.getConnectedDBName() + "'");
     }
 
     public void showDialog() {

@@ -44,14 +44,14 @@ public class UIClient extends javax.swing.JFrame {
 
             @Override
             protected Void doInBackground() {
-                publish("Loading SQLess preferences...");
+                publish("Cargando preferencias...");
                 prefLoader = PreferenceLoader.getInstance();
                 if (prefLoader.wasFirstTime()) {
-                    publish("Preparing for first time use...");
+                    publish("Preparando para primer uso...");
                 }
                 initPrefs();
 
-                publish("Loading user preferences...");
+                publish("Cargando preferencias de usuario...");
                 userPrefLoader = UserPreferencesLoader.getInstance();
                 if (userPrefLoader.isFirstTime()) {
                     UIConnectionWizard uiConWizard = new UIConnectionWizard(splash,
@@ -63,7 +63,7 @@ public class UIClient extends javax.swing.JFrame {
 
                 SQLConnectionManager conManager = SQLConnectionManager.getInstance();
 
-                publish("Connecting to DB engine at: " + conManager.getClientHostname());
+                publish("Conectando a motor de base de datos: " + conManager.getClientHostname());
 
                 conManager.setNewConnection("mysql", UIClient.this);
                 return null;
@@ -142,10 +142,10 @@ public class UIClient extends javax.swing.JFrame {
 
     public void createJTree() {
         SQLessTreeNode root = new SQLessTreeNode(SQLUtils.getConnectedDB(), DATABASE);
-        SQLessTreeNode tables = new SQLessTreeNode("Tables", CAT_TABLES);
-        SQLessTreeNode views = new SQLessTreeNode("Views", CAT_VIEWS);
-        SQLessTreeNode functions = new SQLessTreeNode("Functions", CAT_FUNCTIONS);
-        SQLessTreeNode procedures = new SQLessTreeNode("Procedures", CAT_PROCEDURES);
+        SQLessTreeNode tables = new SQLessTreeNode("Tablas", CAT_TABLES);
+        SQLessTreeNode views = new SQLessTreeNode("Vistas", CAT_VIEWS);
+        SQLessTreeNode functions = new SQLessTreeNode("Funciones", CAT_FUNCTIONS);
+        SQLessTreeNode procedures = new SQLessTreeNode("Procedimientos", CAT_PROCEDURES);
         tables.add(UIUtils.dummyNode());
 
         views.add(UIUtils.dummyNode());
@@ -199,7 +199,7 @@ public class UIClient extends javax.swing.JFrame {
         submenuLoggedInGoogle.setName("submenuLoggedInGoogle"); // NOI18N
 
         menuLogOutGoogle.setAction(actionLogOutGoogle);
-        menuLogOutGoogle.setText("Log out");
+        menuLogOutGoogle.setText("Cerrar sesión");
         menuLogOutGoogle.setName("menuLogOutGoogle"); // NOI18N
         submenuLoggedInGoogle.add(menuLogOutGoogle);
 
@@ -325,11 +325,11 @@ public class UIClient extends javax.swing.JFrame {
 
         barMenu.setName("barMenu"); // NOI18N
 
-        submenuArchivo.setText("File");
+        submenuArchivo.setText("Archivo");
         submenuArchivo.setName("submenuArchivo"); // NOI18N
 
         menuNewFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-        menuNewFile.setText("New SQL file...");
+        menuNewFile.setText("Nuevo archivo SQL...");
         menuNewFile.setName("menuNewFile"); // NOI18N
         menuNewFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -339,7 +339,7 @@ public class UIClient extends javax.swing.JFrame {
         submenuArchivo.add(menuNewFile);
 
         menuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
-        menuOpen.setText("Open...");
+        menuOpen.setText("Abrir...");
         menuOpen.setName("menuOpen"); // NOI18N
         menuOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -350,10 +350,10 @@ public class UIClient extends javax.swing.JFrame {
 
         barMenu.add(submenuArchivo);
 
-        submenuTools.setText("Tools");
+        submenuTools.setText("Herramientas");
         submenuTools.setName("submenuTools"); // NOI18N
 
-        menuSettings.setText("Settings");
+        menuSettings.setText("Preferencias");
         menuSettings.setName("menuSettings"); // NOI18N
         menuSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -364,10 +364,10 @@ public class UIClient extends javax.swing.JFrame {
 
         barMenu.add(submenuTools);
 
-        submenuHelp.setText("Help");
+        submenuHelp.setText("Ayuda");
         submenuHelp.setName("submenuHelp"); // NOI18N
 
-        menuAbout.setText("About");
+        menuAbout.setText("Acerca de");
         menuAbout.setName("menuAbout"); // NOI18N
         menuAbout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -379,11 +379,11 @@ public class UIClient extends javax.swing.JFrame {
         barMenu.add(submenuHelp);
         barMenu.add(Box.createHorizontalGlue());
 
-        submenuLogin.setText("Log in");
+        submenuLogin.setText("Iniciar sesión");
         submenuLogin.setName("submenuLogin"); // NOI18N
 
         menuLoginGoogle.setAction(actionLogInGoogle);
-        menuLoginGoogle.setText("Log in (Google)");
+        menuLoginGoogle.setText("Iniciar sesión (Google)");
         menuLoginGoogle.setName("menuLoginGoogle"); // NOI18N
         submenuLogin.add(menuLoginGoogle);
 

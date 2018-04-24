@@ -21,8 +21,8 @@ public class UISelectRange extends javax.swing.JDialog {
         int start = (int) spinnerStart.getValue();
         int end = (int) spinnerEnd.getValue();
         if (start > end) {
-            UIUtils.showErrorMessage("Range selection", "The start of the selection "
-                    + "cannot be a number larger than the end.", getParent());
+            UIUtils.showErrorMessage("Selección por rango", "El comienzo de la selección "
+                    + "no puede ser un número más grande que el final.", getParent());
             return new int[]{-1, -1};
         }
         return new int[]{start - 1, end - 1};
@@ -48,12 +48,12 @@ public class UISelectRange extends javax.swing.JDialog {
         btnGo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Range selection");
+        setTitle("Selección por rango");
         setResizable(false);
 
-        iLblSelStart.setText("Selection start");
+        iLblSelStart.setText("Comienzo de la selección");
 
-        iLblSelEnd.setText("Selection end");
+        iLblSelEnd.setText("Fin de la selección");
 
         spinnerStart.setModel(new javax.swing.SpinnerNumberModel(1, null, null, 1));
         spinnerStart.setFocusable(false);
@@ -61,7 +61,7 @@ public class UISelectRange extends javax.swing.JDialog {
         spinnerEnd.setModel(new javax.swing.SpinnerNumberModel());
         spinnerEnd.setFocusable(false);
 
-        btnGo.setText("Go");
+        btnGo.setText("Seleccionar");
         btnGo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGoActionPerformed(evt);
@@ -76,14 +76,14 @@ public class UISelectRange extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(iLblSelEnd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(iLblSelStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(iLblSelStart, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
                     .addGroup(pnlContainerLayout.createSequentialGroup()
                         .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(spinnerEnd)
                                 .addComponent(spinnerStart, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(btnGo))
-                        .addGap(0, 54, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlContainerLayout.setVerticalGroup(
@@ -97,9 +97,9 @@ public class UISelectRange extends javax.swing.JDialog {
                 .addComponent(iLblSelEnd)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spinnerEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGo)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

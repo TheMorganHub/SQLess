@@ -46,7 +46,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
         });
 
         lblDumping.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblDumping.setText("Dumping...");
+        lblDumping.setText("Exportando...");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -108,7 +108,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
         @Override
         protected Void doInBackground() throws Exception {
             EventQueue.invokeLater(() -> {
-                lblDumping.setText("Creando dump de base de datos '" + SQLUtils.getConnectedDBName() + "'...");
+                lblDumping.setText("Exportando base de datos '" + SQLUtils.getConnectedDBName() + "'...");
                 setVisible(true);
             });
             String filePath = mysqldumpFile.getPath().replace(".exe", "");
@@ -127,7 +127,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
             } catch (ExecutionException ex) {
                 Throwable thrown = ex.getCause();
                 if (thrown.getMessage().contains("error=2")) {
-                    UIUtils.showErrorMessage("Error", "Hubo un error al cargar el módulo de dumpeo de base de datos.\nPor favor, cierra SQLess e intenta nuevamente.", UIDatabaseDumper.this);
+                    UIUtils.showErrorMessage("Exportar base de datos", "Hubo un error al cargar el módulo de exportación de base de datos.\nPor favor, cierra SQLess e intenta nuevamente.", UIDatabaseDumper.this);
                 }
             } catch (InterruptedException | CancellationException ex) {
                 proc.destroy();
@@ -148,7 +148,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
             if (FileManager.dirOrFileExists(chosenPath)) {
                 try {
                     FileManager.deleteFile(chosenPath);
-                    UIUtils.showMessage("Database dump", "El usuario canceló la operación", UIDatabaseDumper.this);
+                    UIUtils.showMessage("Exportar base de datos", "El usuario canceló la operación", UIDatabaseDumper.this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

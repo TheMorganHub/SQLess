@@ -51,33 +51,33 @@ public class UIPanelResult extends javax.swing.JPanel {
             }
         };
 
-        menuItemCopyCategory.setText("Copy");
+        menuItemCopyCategory.setText("Copiar");
 
         menuItemCopyRowsWithHeaders.setAction(actionCopyRowsWithHeaders);
         menuItemCopyRowsWithHeaders.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/COPYTABLEWITHHEADERS_ICON.png"))); // NOI18N
-        menuItemCopyRowsWithHeaders.setText("With headers");
+        menuItemCopyRowsWithHeaders.setText("Con encabezados");
         menuItemCopyCategory.add(menuItemCopyRowsWithHeaders);
 
         menuItemCopyRows.setAction(actionCopyRows);
         menuItemCopyRows.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/COPYTABLEICON.png"))); // NOI18N
-        menuItemCopyRows.setText("Without headers");
+        menuItemCopyRows.setText("Sin encabezados");
         menuItemCopyCategory.add(menuItemCopyRows);
 
         popMenuTable.add(menuItemCopyCategory);
         popMenuTable.addSeparator();
 
         menuItemSelectRange.setAction(actionSelectRange);
-        menuItemSelectRange.setText("Select range...");
+        menuItemSelectRange.setText("Seleccionar por rango...");
         popMenuTable.add(menuItemSelectRange);
 
         menuItemSelectAllTable.setAction(actionSelectAll);
-        menuItemSelectAllTable.setText("Select all");
+        menuItemSelectAllTable.setText("Seleccionar todo");
         popMenuTable.add(menuItemSelectAllTable);
         popMenuTable.addSeparator();
 
         menuItemSaveTableAs.setAction(actionSaveTableAs);
         menuItemSaveTableAs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_general/SAVE_ICON.png"))); // NOI18N
-        menuItemSaveTableAs.setText("Save table as...");
+        menuItemSaveTableAs.setText("Guardar tabla como...");
         popMenuTable.add(menuItemSaveTableAs);
 
         scrTableResult.setBorder(null);
@@ -203,8 +203,7 @@ public class UIPanelResult extends javax.swing.JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (tableResult.getRowCount() == 0) {
-                UIUtils.showErrorMessage("Not enough rows", "The number of rows must "
-                        + "be at least one in order to use this feature.", null);
+                UIUtils.showErrorMessage("No hay suficientes filas", "El número de filas debe ser al menos uno para hacer uso de esta funcionalidad.", null);
                 return;
             }
             UISelectRange uISelectRange = new UISelectRange(tableResult.getRowCount());

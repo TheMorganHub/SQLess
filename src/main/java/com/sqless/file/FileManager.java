@@ -108,7 +108,7 @@ public class FileManager {
      */
     public void acceptAndOpenFile(File file) {
         if (!dirOrFileExists(file.getPath())) {
-            UIUtils.showErrorMessage("File not found", file.getName() + " does not exist.", client);
+            UIUtils.showErrorMessage("Archivo no encontrado", file.getName() + " no existe.", client);
             openFile();
             return;
         }
@@ -118,7 +118,7 @@ public class FileManager {
             client.sendToNewTab(new UIQueryPanel(client.getTabPaneContent(), file.getPath(), contents));
             addFile(file);
         } catch (java.io.IOException e) {
-            UIUtils.showErrorMessage("Error", "Could not open file at " + file, client);
+            UIUtils.showErrorMessage("Error", "No se pudo abrir el archivo en " + file, client);
             System.err.println("FILE MANAGER: " + e.getMessage());
         }
     }
@@ -164,7 +164,7 @@ public class FileManager {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "SQL File (.sql)", "SQL");
-        chooser.setDialogTitle("Open...");
+        chooser.setDialogTitle("Abrir...");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
 
@@ -198,7 +198,7 @@ public class FileManager {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "SQL File (.sql)", "SQL");
-        chooser.setDialogTitle("Open...");
+        chooser.setDialogTitle("Abrir...");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
 
@@ -246,7 +246,7 @@ public class FileManager {
         try (FileWriter fw = new FileWriter(getFile(filePath))) {
             fw.write(new String(contents.getBytes()));
         } catch (java.io.IOException ex) {
-            UIUtils.showErrorMessage("Save file", "Could not save file", client);
+            UIUtils.showErrorMessage("Guardar archivo", "No se pudo guardar el archivo", client);
             ex.printStackTrace();
         }
     }
@@ -263,7 +263,7 @@ public class FileManager {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "SQL File (.sql)", "SQL");
-        chooser.setDialogTitle("Save as...");
+        chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
         chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
@@ -290,7 +290,7 @@ public class FileManager {
                 fw.write(new String(contents.getBytes()));
                 success = true;
             } catch (java.io.IOException ex) {
-                UIUtils.showErrorMessage("Error", "Could not save file", client);
+                UIUtils.showErrorMessage("Error", "No se pudo guardar archivo", client);
             }
 
             if (success) {
@@ -307,7 +307,7 @@ public class FileManager {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 extension + " File (." + extension + ")", extension);
-        chooser.setDialogTitle("Save as...");
+        chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
         chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
@@ -330,7 +330,7 @@ public class FileManager {
             try (FileWriter fw = new FileWriter(selFileFullPath)) {
                 fw.write(new String(contents.getBytes()));
             } catch (java.io.IOException ex) {
-                UIUtils.showErrorMessage("Error", "Could not save file", client);
+                UIUtils.showErrorMessage("Error", "No se pudo guardar archivo", client);
             }
         }
     }
@@ -349,7 +349,7 @@ public class FileManager {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 extension + " File (." + extension + ")", extension);
-        chooser.setDialogTitle("Save as...");
+        chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
         chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
@@ -374,8 +374,8 @@ public class FileManager {
     }
 
     public int overwriteFile(String fileName) {
-        return UIUtils.showYesNoOptionDialog("Overwrite file?", fileName + " already exists."
-                + "\nWould you like to overwrite the file with this one?", JOptionPane.WARNING_MESSAGE,
+        return UIUtils.showYesNoOptionDialog("¿Sobrescribir archivo?", fileName + " ya existe."
+                + "\n¿Te gustaría sobrescribir el archivo con este?", JOptionPane.WARNING_MESSAGE,
                 false, client);
     }
 
@@ -391,10 +391,10 @@ public class FileManager {
     public void saveTableAs(JTable table) {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filterCsv = new FileNameExtensionFilter(
-                "Comma delimited file (.csv)", "csv");
+                "Archivo delimitado por comas (.csv)", "csv");
         FileNameExtensionFilter filterTxt = new FileNameExtensionFilter(
-                "Plain text (.txt)", "txt");
-        chooser.setDialogTitle("Save...");
+                "Texto plano (.txt)", "txt");
+        chooser.setDialogTitle("Guardar...");
         chooser.addChoosableFileFilter(filterCsv);
         chooser.addChoosableFileFilter(filterTxt);
         chooser.setAcceptAllFileFilterUsed(false);
@@ -408,7 +408,7 @@ public class FileManager {
             try (FileWriter fw = new FileWriter(appendExtension(file.getPath(), extension))) {
                 fw.write(TextUtils.tableToString(table, true, commaDelimited, true));
             } catch (IOException ex) {
-                UIUtils.showErrorMessage("Error", "Could not save file " + file.getName(), UIClient.getInstance());
+                UIUtils.showErrorMessage("Error", "No se pudo guardar el archivo " + file.getName(), UIClient.getInstance());
             }
         }
     }
@@ -491,7 +491,7 @@ public class FileManager {
             }
         }
         if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
+            throw new FileNotFoundException("No se pudo guardar el archivo: " + f);
         }
     }
 

@@ -66,14 +66,14 @@ public class UISettings extends javax.swing.JDialog {
         btnApply = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Settings");
+        setTitle("Preferencias");
 
         tabSettings.setFocusable(false);
 
-        pnlAuthentication.setBorder(javax.swing.BorderFactory.createTitledBorder("Authentication"));
+        pnlAuthentication.setBorder(javax.swing.BorderFactory.createTitledBorder("Autenticación"));
         pnlAuthentication.setName("pnlAuthentication"); // NOI18N
 
-        btnModifySettings.setText("Click here to manage your connection settings");
+        btnModifySettings.setText("Edita la configuración de tu conexión");
         btnModifySettings.setFocusable(false);
         btnModifySettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -88,7 +88,7 @@ public class UISettings extends javax.swing.JDialog {
             .addGroup(pnlAuthenticationLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnModifySettings)
-                .addContainerGap(257, Short.MAX_VALUE))
+                .addContainerGap(316, Short.MAX_VALUE))
         );
         pnlAuthenticationLayout.setVerticalGroup(
             pnlAuthenticationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,13 +98,13 @@ public class UISettings extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlDatabases.setBorder(javax.swing.BorderFactory.createTitledBorder("Databases"));
+        pnlDatabases.setBorder(javax.swing.BorderFactory.createTitledBorder("Bases de datos"));
 
         comboDatabases.setFocusable(false);
         comboDatabases.setName("Default.Database"); // NOI18N
         comboDatabases.addActionListener(new ActionAddToQueue(comboDatabases));
 
-        iLblDefaultDbs.setText("Default database:");
+        iLblDefaultDbs.setText("Base de datos predeterminada");
 
         javax.swing.GroupLayout pnlDatabasesLayout = new javax.swing.GroupLayout(pnlDatabases);
         pnlDatabases.setLayout(pnlDatabasesLayout);
@@ -148,28 +148,28 @@ public class UISettings extends javax.swing.JDialog {
                 .addContainerGap(197, Short.MAX_VALUE))
         );
 
-        tabSettings.addTab("Connection", pnlConnection);
+        tabSettings.addTab("Conexión", pnlConnection);
 
-        iLblDefaultSaveDir.setText("Default save directory:");
+        iLblDefaultSaveDir.setText("Directorio de almacenamiento de archivos");
 
         txtDefaultSaveDir.setName("Default.SaveDir"); // NOI18N
         txtDefaultSaveDir.getDocument().addDocumentListener(new TextFieldChangeListener(txtDefaultSaveDir));
 
-        btnBrowseDir.setText("Browse...");
+        btnBrowseDir.setText("Explorar...");
         btnBrowseDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBrowseDirActionPerformed(evt);
             }
         });
 
-        btnRestoreDefaults.setText("Restore defaults");
+        btnRestoreDefaults.setText("Restaurar predeterminado");
         btnRestoreDefaults.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRestoreDefaultsActionPerformed(evt);
             }
         });
 
-        btnOpen.setText("Open");
+        btnOpen.setText("Abrir");
         btnOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOpenActionPerformed(evt);
@@ -182,36 +182,39 @@ public class UISettings extends javax.swing.JDialog {
             pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDirectoriesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(iLblDefaultSaveDir)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDefaultSaveDir, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBrowseDir)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnOpen)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDirectoriesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnRestoreDefaults)
+                .addGroup(pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDirectoriesLayout.createSequentialGroup()
+                        .addComponent(txtDefaultSaveDir)
+                        .addGap(8, 8, 8)
+                        .addComponent(btnBrowseDir)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnOpen))
+                    .addGroup(pnlDirectoriesLayout.createSequentialGroup()
+                        .addGroup(pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(iLblDefaultSaveDir)
+                            .addComponent(btnRestoreDefaults))
+                        .addGap(0, 348, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlDirectoriesLayout.setVerticalGroup(
             pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDirectoriesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(iLblDefaultSaveDir)
-                    .addComponent(txtDefaultSaveDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBrowseDir)
+                .addComponent(iLblDefaultSaveDir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlDirectoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDefaultSaveDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnBrowseDir))
                     .addComponent(btnOpen))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 284, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRestoreDefaults)
-                .addContainerGap())
+                .addContainerGap(269, Short.MAX_VALUE))
         );
 
-        tabSettings.addTab("Directories", pnlDirectories);
+        tabSettings.addTab("Directorios", pnlDirectories);
 
-        btnSave.setText("Save");
+        btnSave.setText("Guardar");
         btnSave.setFocusable(false);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -219,7 +222,7 @@ public class UISettings extends javax.swing.JDialog {
             }
         });
 
-        btnCancel.setText("Cancel");
+        btnCancel.setText("Cancelar");
         btnCancel.setFocusable(false);
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,7 +230,7 @@ public class UISettings extends javax.swing.JDialog {
             }
         });
 
-        btnApply.setText("Apply");
+        btnApply.setText("Aplicar");
         btnApply.setEnabled(false);
         btnApply.setFocusable(false);
         btnApply.addActionListener(new java.awt.event.ActionListener() {
@@ -256,7 +259,7 @@ public class UISettings extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(6, 6, 6)
                 .addComponent(tabSettings, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -330,8 +333,7 @@ public class UISettings extends javax.swing.JDialog {
         try {
             Runtime.getRuntime().exec("explorer.exe /select," + txtDefaultSaveDir.getText());
         } catch (IOException ex) {
-            UIUtils.showErrorMessage("Error", "Could not open directory", getParent());
-            System.err.println("Could not open directory.");
+            UIUtils.showErrorMessage("Error", "No se pudo abrir el directorio.", getParent());
         }
     }//GEN-LAST:event_btnOpenActionPerformed
 
@@ -344,8 +346,8 @@ public class UISettings extends javax.swing.JDialog {
         String dir = (String) userPreferences.getProperty("Default.SaveDir");
         fc.setCurrentDirectory(new File(dir));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setDialogTitle("Choose folder...");
-        int returnVal = fc.showDialog(client, "Confirm");
+        fc.setDialogTitle("Elige una carpeta...");
+        int returnVal = fc.showDialog(client, "Confirmar");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File newSaveDir = fc.getSelectedFile();
             txtDefaultSaveDir.setText(newSaveDir.getPath());

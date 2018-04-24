@@ -57,15 +57,15 @@ public class UIAbout extends javax.swing.JDialog {
         Map<String, String> sqlInfo = SQLUtils.getMySQLInfo();
         Properties systemInfo = MiscUtils.getSystemInfo();
         appendCategory("SQLess");
-        appendItem("Designed by", "David Orquin, Tomás Casir, Valeria Fornieles");
+        appendItem("Diseñado por", "David Orquin, Tomás Casir, Valeria Fornieles");
         appendSeparator();
-        appendCategory("System");
-        appendItem("OS", systemInfo.getProperty("os.name") + " x" + systemInfo.getProperty("sun.arch.data.model"));
-        appendItem("User", systemInfo.getProperty("user.name"));
+        appendCategory("Sistema");
+        appendItem("Sistema operativo", systemInfo.getProperty("os.name") + " x" + systemInfo.getProperty("sun.arch.data.model"));
+        appendItem("Usuario", systemInfo.getProperty("user.name"));
         appendSeparator();
         appendCategory("MySQL");
-        appendItem("MySQL version", sqlInfo.get("version"));
-        appendItem("MySQL directory", sqlInfo.get("basedir"));
+        appendItem("Version MySQL", sqlInfo.get("version"));
+        appendItem("Directorio MySQL", sqlInfo.get("basedir"));
         appendSeparator();
         appendCategory("Java (TM)");
         appendItem("Home", systemInfo.getProperty("java.home"));
@@ -85,7 +85,7 @@ public class UIAbout extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("About SQLess");
+        setTitle("Acerca de SQLess");
 
         lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ui_splash/SQLess_SPLASH.png"))); // NOI18N

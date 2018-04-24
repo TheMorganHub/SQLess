@@ -89,8 +89,8 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     }
 
     public void doDrop(SQLessTreeNode node) {
-        int confirmacion = UIUtils.showConfirmationMessage("Drop object",
-                "Would you like to permanently drop this object?", client);
+        int confirmacion = UIUtils.showConfirmationMessage("Eliminar objeto",
+                "¿Estás seguro que deseas eliminar permanentemente este objeto?", client);
         if (confirmacion != 0) {
             return;
         }
@@ -139,7 +139,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                 if (uiEditTable.tableAllowsModifications()) {
                     client.sendToNewTab(uiEditTable);
                 } else {
-                    UIUtils.showErrorMessage("Edit rows", "Para usar esta funcionalidad, la tabla debe tener una columna marcada como primary key.", null);
+                    UIUtils.showErrorMessage("Editar filas", "Para usar esta funcionalidad, la tabla debe tener una columna marcada como primary key.", null);
                 }
                 break;
         }

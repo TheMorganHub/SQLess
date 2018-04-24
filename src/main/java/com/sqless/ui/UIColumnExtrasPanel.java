@@ -47,10 +47,10 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
 
     public void init() {
         chkAutoIncrement = new JCheckBox("Autoincrement");
-        chkUnsigned = new JCheckBox("Unsigned");
+        chkUnsigned = new JCheckBox("No signado");
         lblDefault = new JLabel("Default:");
         txtDefault = new JTextField();
-        lblEnumSetValues = new JLabel("Values:");
+        lblEnumSetValues = new JLabel("Valores:");
         txtEnumSetValues = new JTextField();
         btnEditValues = new JButton("...");
         btnEditValues.setMargin(new Insets(1, 4, 1, 4));

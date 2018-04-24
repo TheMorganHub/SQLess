@@ -162,7 +162,7 @@ public class UICreateTableSQLess extends FrontPanel {
         SwingUtilities.invokeLater(() -> {
             uiTable.setRowSelectionInterval(0, 0);
             if (task == TABLE_CREATE) {
-                uiTable.editCellAt(0, 1);
+                SwingUtilities.invokeLater(() -> uiTable.editCellAt(0, 1));
             }
             if (task == TABLE_UPDATE) {
                 getTableModel().setRowCount(columnList.size());

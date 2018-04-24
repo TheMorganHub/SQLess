@@ -20,6 +20,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 import javax.swing.event.DocumentEvent;
@@ -171,6 +172,10 @@ public class UIQueryPanel extends FrontPanel {
 
     public void updateTimerLabel(String time) {
         lblTimer.setText(time);
+    }
+
+    public JLabel getLblTimer() {
+        return lblTimer;
     }
 
     public List<UIPanelResult> getResultPanels() {

@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -41,7 +42,6 @@ public class SQLUIQuery extends SQLQuery {
 
     @Override
     public void exec() {
-        long startTime = System.currentTimeMillis();
         if (queryPanel != null) {
             queryPanel.clearMessages();
             queryStatus = Status.LOADING;
@@ -58,11 +58,13 @@ public class SQLUIQuery extends SQLQuery {
         queryThread = new Thread(new Runnable() {
             private int rowsTotalAffected = 0;
             private String errorMessage = "";
+            long startTime;
 
             @Override
             public void run() {
                 try {
                     filterDelimiterKeyword();
+                    startTime = System.currentTimeMillis();
                     queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
                     statement = queryConnection.createStatement();
                     int updateCount = 0;
@@ -85,7 +87,7 @@ public class SQLUIQuery extends SQLQuery {
                 if (queryPanel != null) {
                     queryTimer.stop();
                     long elapsed = System.currentTimeMillis() - startTime;
-                    if (elapsed <= 76) {
+                    if (elapsed <= 150) {
                         ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceMs(elapsed);
                     }
                     EventQueue.invokeLater(() -> {
@@ -208,7 +210,7 @@ public class SQLUIQuery extends SQLQuery {
                     tableColumn.setCellRenderer(nullCellRenderer);
                 }
                 queryPanel.updateRowsLabel();
-                
+
                 if (!packed) {
                     packTable();
                 }

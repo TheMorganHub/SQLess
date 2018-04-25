@@ -83,7 +83,7 @@ public class UIClient extends javax.swing.JFrame {
 
                 initSecondaryComponents();
                 UIDBExplorer uiConDB = new UIDBExplorer();
-                uiConDB.setVisible(true);                
+                uiConDB.setVisible(true);
             }
 
         };
@@ -140,6 +140,12 @@ public class UIClient extends javax.swing.JFrame {
         queryPanel.runContents();
     }
 
+    public void createNewMapleQueryPanelAndRun(String maple) {
+        UIMapleQueryPanel queryPanel = new UIMapleQueryPanel(tabPaneContent, maple);
+        sendToNewTab(queryPanel);
+        queryPanel.runContents();
+    }
+
     public void createJTree() {
         SQLessTreeNode root = new SQLessTreeNode(SQLUtils.getConnectedDB(), DATABASE);
         SQLessTreeNode tables = new SQLessTreeNode("Tablas", CAT_TABLES);
@@ -173,6 +179,7 @@ public class UIClient extends javax.swing.JFrame {
         menuLogOutGoogle = new javax.swing.JMenuItem();
         toolbarTop = new javax.swing.JToolBar();
         btnNewQuery = new javax.swing.JButton();
+        btnNewMapleQuery = new javax.swing.JButton();
         btnOpenFile = new javax.swing.JButton();
         topSeparator = new javax.swing.JToolBar.Separator();
         splitMain = new javax.swing.JSplitPane();
@@ -222,10 +229,10 @@ public class UIClient extends javax.swing.JFrame {
         toolbarTop.setName("toolbarTop"); // NOI18N
 
         btnNewQuery.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/NEW_QUERY_ICON.png"))); // NOI18N
-        btnNewQuery.setToolTipText("New SQL file...");
+        btnNewQuery.setToolTipText("Nuevo archivo SQL");
         btnNewQuery.setFocusable(false);
         btnNewQuery.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnNewQuery.setMargin(new java.awt.Insets(2, 5, 2, 5));
+        btnNewQuery.setMargin(new java.awt.Insets(2, 8, 2, 8));
         btnNewQuery.setName("btnNewQuery"); // NOI18N
         btnNewQuery.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnNewQuery.addActionListener(new java.awt.event.ActionListener() {
@@ -235,11 +242,25 @@ public class UIClient extends javax.swing.JFrame {
         });
         toolbarTop.add(btnNewQuery);
 
+        btnNewMapleQuery.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/NEW_MAPLE_QUERY_ICON.png"))); // NOI18N
+        btnNewMapleQuery.setToolTipText("Nuevo archivo Maple");
+        btnNewMapleQuery.setFocusable(false);
+        btnNewMapleQuery.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnNewMapleQuery.setMargin(new java.awt.Insets(2, 8, 2, 8));
+        btnNewMapleQuery.setName("btnNewMapleQuery"); // NOI18N
+        btnNewMapleQuery.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNewMapleQuery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewMapleQueryActionPerformed(evt);
+            }
+        });
+        toolbarTop.add(btnNewMapleQuery);
+
         btnOpenFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/OPEN_FILE_ICON.png"))); // NOI18N
-        btnOpenFile.setToolTipText("Open SQL file...");
+        btnOpenFile.setToolTipText("Abrir archivo SQL (.sql)...");
         btnOpenFile.setFocusable(false);
         btnOpenFile.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnOpenFile.setMargin(new java.awt.Insets(2, 5, 2, 5));
+        btnOpenFile.setMargin(new java.awt.Insets(2, 8, 2, 8));
         btnOpenFile.setName("btnOpenFile"); // NOI18N
         btnOpenFile.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnOpenFile.addActionListener(new java.awt.event.ActionListener() {
@@ -282,7 +303,7 @@ public class UIClient extends javax.swing.JFrame {
         toolbarDiagrama.setName("toolbarDiagrama"); // NOI18N
 
         btnDbManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/DB_MANAGER_ICON.png"))); // NOI18N
-        btnDbManager.setToolTipText("Database explorer");
+        btnDbManager.setToolTipText("Administrador de bases de datos");
         btnDbManager.setFocusable(false);
         btnDbManager.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDbManager.setName("btnDbManager"); // NOI18N
@@ -296,7 +317,7 @@ public class UIClient extends javax.swing.JFrame {
 
         btnRefreshJTree.setAction(actionRefreshJTree);
         btnRefreshJTree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/REFRESH_ICON.png"))); // NOI18N
-        btnRefreshJTree.setToolTipText("Refresh");
+        btnRefreshJTree.setToolTipText("Refrescar");
         btnRefreshJTree.setFocusable(false);
         btnRefreshJTree.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnRefreshJTree.setName("btnRefreshJTree"); // NOI18N
@@ -465,6 +486,10 @@ public class UIClient extends javax.swing.JFrame {
         actionSettings();
     }//GEN-LAST:event_menuSettingsActionPerformed
 
+    private void btnNewMapleQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewMapleQueryActionPerformed
+        sendToNewTab(new UIMapleQueryPanel(tabPaneContent, ""));
+    }//GEN-LAST:event_btnNewMapleQueryActionPerformed
+
     public void updateMenuBarForGoogleUser(GoogleUser user) {
         barMenu.remove(submenuLogin);
         submenuLoggedInGoogle.setText(user.getNombre());
@@ -476,7 +501,7 @@ public class UIClient extends javax.swing.JFrame {
         UISettings uiSettings = new UISettings(this);
         uiSettings.setVisible(true);
     }
-    
+
     public void onNewConnection() {
         if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {
             HintsManager hintsManager = new HintsManager();
@@ -496,6 +521,16 @@ public class UIClient extends javax.swing.JFrame {
         for (int i = 0; i < tabPaneContent.getTabCount(); i++) {
             if (tabPaneContent.getComponentAt(i) instanceof UIQueryPanel) {
                 queryContentPanels.add((UIQueryPanel) tabPaneContent.getComponentAt(i));
+            }
+        }
+        return queryContentPanels;
+    }
+
+    public List<UIMapleQueryPanel> getMapleQueryPanels() {
+        List<UIMapleQueryPanel> queryContentPanels = new ArrayList<>();
+        for (int i = 0; i < tabPaneContent.getTabCount(); i++) {
+            if (tabPaneContent.getComponentAt(i) instanceof UIMapleQueryPanel) {
+                queryContentPanels.add((UIMapleQueryPanel) tabPaneContent.getComponentAt(i));
             }
         }
         return queryContentPanels;
@@ -640,6 +675,7 @@ public class UIClient extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barMenu;
     private javax.swing.JButton btnDbManager;
+    private javax.swing.JButton btnNewMapleQuery;
     private javax.swing.JButton btnNewQuery;
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnRefreshJTree;

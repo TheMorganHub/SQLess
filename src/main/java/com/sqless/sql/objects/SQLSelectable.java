@@ -22,4 +22,6 @@ public interface SQLSelectable {
      * @return an SQL {@code SELECT} statement ready to be executed.
      */
     String getSelectStatement(int limit);
+    
+    String getMapleSelectStatement(int limit);
 }

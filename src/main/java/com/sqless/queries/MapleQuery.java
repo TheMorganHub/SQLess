@@ -1,11 +1,15 @@
 package com.sqless.queries;
 
 import com.mysql.jdbc.Blob;
+import com.sqless.network.PostRequest;
+import com.sqless.network.RestRequest;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.ui.UIClient;
+import com.sqless.ui.UIMapleQueryPanel;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.DataTypeUtils;
+import com.sqless.utils.FinalValue;
 import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -14,32 +18,36 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXTable;
+import us.monoid.web.JSONResource;
 
-public class SQLUIQuery extends SQLQuery {
+public class MapleQuery {
 
     private Status queryStatus;
-    private UIQueryPanel queryPanel;
+    private UIMapleQueryPanel queryPanel;
     private Thread queryThread;
     private Timer queryTimer;
     private Connection queryConnection;
     private TableFiller currentTableFiller;
+    private String mapleStatement;
+    private String convertedSQL;
+    private Statement statement;
 
     public enum Status {
         LOADING, STOPPED, SUCCESSFUL, FAILED;
     }
 
-    public SQLUIQuery(String sql, UIQueryPanel queryPanel) {
-        super(sql);
+    public MapleQuery(String mapleStatement, UIMapleQueryPanel queryPanel) {
+        this.mapleStatement = mapleStatement;
         this.queryPanel = queryPanel;
     }
 
-    @Override
     public void exec() {
         if (queryPanel != null) {
             queryPanel.clearMessages();
@@ -49,9 +57,9 @@ public class SQLUIQuery extends SQLQuery {
             queryPanel.enableStopBtn(true);
             queryPanel.enableRunBtn(false);
 
-            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
-            queryTimer.setInitialDelay(0);
-            queryTimer.start();
+//            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
+//            queryTimer.setInitialDelay(0);
+//            queryTimer.start();
         }
 
         queryThread = new Thread(new Runnable() {
@@ -62,20 +70,39 @@ public class SQLUIQuery extends SQLQuery {
             @Override
             public void run() {
                 try {
-                    filterDelimiterKeyword();
-                    startTime = System.currentTimeMillis();
-                    queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
-                    statement = queryConnection.createStatement();
-                    int updateCount = 0;
-                    boolean hasResult = statement.execute(getSql());
-                    while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
-                        if (hasResult) {
-                            fillTable(statement.getResultSet());
+                    FinalValue<Boolean> requestSuccess = new FinalValue<>(Boolean.FALSE);
+                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, "maple_statement=" + mapleStatement) {
+                        @Override
+                        public void onSuccess(JSONResource json) throws Exception {
+                            String convertedSql = (String) json.get("CONVERTED_SQL");
+                            MapleQuery.this.convertedSQL = convertedSql;
+                            queryPanel.setConvertedSQL(convertedSql);
+                            requestSuccess.set(true);
                         }
-                        hasResult = statement.getMoreResults();
-                        rowsTotalAffected += updateCount;
+
+                        @Override
+                        public void onFailure(String message) {
+                            errorMessage = message;
+                            requestSuccess.set(false);
+                        }
+                    };
+                    rest.exec();
+                    if (requestSuccess.get()) {
+                        startTime = System.currentTimeMillis();
+                        queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
+                        statement = queryConnection.createStatement();
+
+                        int updateCount = 0;
+                        boolean hasResult = statement.execute(convertedSQL);
+                        while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
+                            if (hasResult) {
+                                fillTable(statement.getResultSet());
+                            }
+                            hasResult = statement.getMoreResults();
+                            rowsTotalAffected += updateCount;
+                        }
+                        queryStatus = Status.SUCCESSFUL;
                     }
-                    queryStatus = Status.SUCCESSFUL;
                 } catch (SQLException | InterruptedException e) {
                     queryStatus = queryStatus.equals(Status.STOPPED) ? Status.STOPPED : Status.FAILED;
                     errorMessage = e.getMessage();
@@ -84,14 +111,15 @@ public class SQLUIQuery extends SQLQuery {
                 }
 
                 if (queryPanel != null) {
-                    queryTimer.stop();
-                    long elapsed = System.currentTimeMillis() - startTime;
-                    if (elapsed <= 150) {
-                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceMs(elapsed);
-                    }
+//                    queryTimer.stop();
+//                    long elapsed = System.currentTimeMillis() - startTime;
+//                    if (elapsed <= 150) {
+//                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceMs(elapsed);
+//                    }
                     EventQueue.invokeLater(() -> {
                         queryPanel.enableStopBtn(false);
                         queryPanel.enableRunBtn(true);
+                        queryPanel.setMs(System.currentTimeMillis() - startTime);
                         queryPanel.updateStatusLabel(queryStatus);
                         queryPanel.setMessage(queryStatus, errorMessage);
                     });
@@ -101,7 +129,6 @@ public class SQLUIQuery extends SQLQuery {
         queryThread.start();
     }
 
-    @Override
     public void closeQuery() {
         try {
             if (statement != null) {
@@ -185,7 +212,7 @@ public class SQLUIQuery extends SQLQuery {
                     }
 
                     if (rowCount == MAX_ROWS) {
-                        queryTimer.stop();
+//                        queryTimer.stop();
                         UIUtils.showWarning("Número máximo de filas excedido", "El número máximo de filas (" + MAX_ROWS + ") que SQLess puede mostrar para esta query será excedido. "
                                 + "SQLess mostrará los resultados hasta ahora y pasará a la siguiente query en cola.", UIClient.getInstance());
                         break;
@@ -215,8 +242,8 @@ public class SQLUIQuery extends SQLQuery {
                 }
             }
 
-            synchronized (SQLUIQuery.this) {
-                SQLUIQuery.this.notify();
+            synchronized (MapleQuery.this) {
+                MapleQuery.this.notify();
             }
         }
 

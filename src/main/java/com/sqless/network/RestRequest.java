@@ -10,10 +10,17 @@ public abstract class RestRequest {
     protected String url;
     protected Resty rest;
     public static final String AUTH_URL = "http://sqless.ddns.net:8080/ws/auth_google";
+    public static final String MAPLE_URL = "http://sqless.ddns.net:8080/ws/maple";
+    protected boolean newThread = true;
 
     public RestRequest(String url) {
         this.rest = new Resty();
         this.url = url;
+    }
+
+    public RestRequest(String url, boolean newThread) {
+        this(url);
+        this.newThread = newThread;
     }
 
     /**
@@ -68,7 +75,7 @@ public abstract class RestRequest {
      * el request.
      */
     protected final void executePostExec(JSONResource json) {
-        EventQueue.invokeLater(() -> {
+        Runnable runnable = () -> {
             try {
                 onSuccess(json);
 //                int tokenStatus = Integer.parseInt(json.get("user_id").toString());
@@ -79,7 +86,12 @@ public abstract class RestRequest {
                 onFailure(e.getMessage());
                 e.printStackTrace();
             }
-        });
+        };
+        if (newThread) {
+            EventQueue.invokeLater(runnable);
+        } else {
+            runnable.run();
+        }
     }
 
     /**

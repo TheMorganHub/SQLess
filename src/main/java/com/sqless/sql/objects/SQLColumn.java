@@ -545,6 +545,11 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
     }
 
     @Override
+    public String getMapleSelectStatement(int limit) {
+        return "$" + getParentTable().getName() + " > " + getName() + (limit == SQLSelectable.ALL ? "" : " [" + limit + "]");
+    }
+
+    @Override
     public int compareTo(SQLColumn col) {
         return getName().compareTo(col.getName());
     }

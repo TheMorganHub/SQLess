@@ -37,6 +37,7 @@ public class TreeContextMenuHandler {
 
         TreeMenuItemSet selectableContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW, VIEW_COLUMN);
         selectableContext.add(new TreeContextMenuItem("SELECT (LIMIT 1000)", ContextItemFunctionality.SELECT));
+        selectableContext.add(new TreeContextMenuItem("SELECT (Maple)", "SELECT_AS_MAPLE"));
 
         TreeMenuItemSet tableObjectContext = new TreeMenuItemSet(TABLE);
         tableObjectContext.add(new TreeContextMenuItem("Modificar tabla", ContextItemFunctionality.MODIFY));

@@ -170,4 +170,9 @@ public abstract class SQLDataObject extends SQLObject implements SQLSelectable {
         return "SELECT * FROM `" + SQLUtils.getConnectedDBName() + "`.`" + getName() + "`" + (limit == SQLSelectable.ALL ? "" : " LIMIT " + limit);
     }
 
+    @Override
+    public String getMapleSelectStatement(int limit) {
+        return "$" + getName() + (limit == SQLSelectable.ALL ? "" : " [" + limit + "]");
+    }    
+
 }

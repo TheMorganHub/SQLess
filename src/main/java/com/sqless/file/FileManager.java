@@ -3,6 +3,7 @@ package com.sqless.file;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.settings.UserPreferencesLoader;
+import com.sqless.ui.UIMapleQueryPanel;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.Callback;
 import com.sqless.utils.TextUtils;
@@ -36,6 +37,8 @@ public class FileManager {
      * in the {@code UIClient}
      */
     private List<File> openedFiles;
+    
+    private List<File> openedMapleFiles;
 
     private UIClient client;
 
@@ -45,9 +48,12 @@ public class FileManager {
      * The number of <b>new</b> files that were created this session.
      */
     private int filesCreatedThisSession;
+    
+    private int mapleFilesCreatedThisSession;
 
     private FileManager() {
         this.openedFiles = new ArrayList<>();
+        this.openedMapleFiles = new ArrayList<>();
         this.client = UIClient.getInstance();
     }
 
@@ -62,6 +68,10 @@ public class FileManager {
      */
     private void addFile(File file) {
         openedFiles.add(file);
+    }
+    
+    private void addMapleFile(File file) {
+        openedMapleFiles.add(file);
     }
 
     /**
@@ -81,9 +91,22 @@ public class FileManager {
     public void replaceFileAtIndex(int index, File file) {
         openedFiles.set(index, file);
     }
+    
+    public void replaceMapleFileAtIndex(int index, File file) {
+        openedMapleFiles.set(index, file);
+    }
 
     public boolean fileIsAlreadyOpen(File file) {
         for (File openedFile : openedFiles) {
+            if (file.getPath().equals(openedFile.getPath())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean mapleFileIsAlreadyOpen(File file) {
+        for (File openedFile : openedMapleFiles) {
             if (file.getPath().equals(openedFile.getPath())) {
                 return true;
             }
@@ -122,6 +145,23 @@ public class FileManager {
             System.err.println("FILE MANAGER: " + e.getMessage());
         }
     }
+    
+    public void acceptAndOpenMapleFile(File file) {
+        if (!dirOrFileExists(file.getPath())) {
+            UIUtils.showErrorMessage("Archivo no encontrado", file.getName() + " no existe.", client);
+            openMapleFile();
+            return;
+        }
+
+        try {
+            String contents = new String(Files.readAllBytes(Paths.get(file.getPath())));
+            client.sendToNewTab(new UIMapleQueryPanel(client.getTabPaneContent(), file.getPath(), contents));
+            addMapleFile(file);
+        } catch (java.io.IOException e) {
+            UIUtils.showErrorMessage("Error", "No se pudo abrir el archivo en " + file, client);
+            System.err.println("FILE MANAGER: " + e.getMessage());
+        }
+    }
 
     /**
      * Crea un nuevo archivo con su path siguiendo la nomenclatura
@@ -132,6 +172,13 @@ public class FileManager {
     public String newFile() {
         filesCreatedThisSession++;
         File file = new File("SQL_File_" + filesCreatedThisSession);
+        addFile(file);
+        return file.getPath();
+    }
+    
+    public String newMapleFile() {
+        mapleFilesCreatedThisSession++;
+        File file = new File("Maple_File_" + mapleFilesCreatedThisSession);
         addFile(file);
         return file.getPath();
     }
@@ -192,6 +239,41 @@ public class FileManager {
             }
         }
     }
+    
+    public void openMapleFile() {
+        JTabbedPane tabPane = client.getTabPaneContent();
+        UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "MAPLE File (.mpl)", "MPL");
+        chooser.setDialogTitle("Abrir...");
+        chooser.setFileFilter(filter);
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
+        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+                ? new File(defSaveDir)
+                : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        int returnVal = chooser.showOpenDialog(client);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (fileIsAlreadyOpen(chooser.getSelectedFile())) { //el archivo ya existe
+                String filePath = chooser.getSelectedFile().getPath();
+                List<UIMapleQueryPanel> queryPanels = UIClient.getInstance().getMapleQueryPanels();
+                for (UIMapleQueryPanel queryPanel : queryPanels) {
+                    String queryPaneFilePath = queryPanel.getFilePath();
+                    if (queryPaneFilePath != null && queryPaneFilePath.equals(filePath)) {
+                        int tabIndex = queryPanel.getTabIndex();
+                        tabPane.setSelectedIndex(tabIndex);
+                        break;
+                    }
+                }
+            } else {
+                acceptAndOpenFile(chooser.getSelectedFile());
+            }
+        }
+    }
 
     public void loadFile(Callback<String> callback) {
         UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
@@ -230,6 +312,25 @@ public class FileManager {
                 }
             } else {
                 acceptAndOpenFile(file);
+            }
+        }
+    }
+    
+    public void dragNDropMapleFile(File file) {
+        JTabbedPane tabPane = client.getTabPaneContent();
+        if (fileIsMaple(file)) {
+            if (mapleFileIsAlreadyOpen(file)) { //el archivo ya existe
+                List<UIMapleQueryPanel> queryPanels = UIClient.getInstance().getMapleQueryPanels();
+                for (UIMapleQueryPanel queryPanel : queryPanels) {
+                    String queryPaneFilePath = queryPanel.getFilePath();
+                    if (queryPaneFilePath != null && queryPaneFilePath.equals(file.getPath())) {
+                        int tabIndex = queryPanel.getTabIndex();
+                        tabPane.setSelectedIndex(tabIndex);
+                        break;
+                    }
+                }
+            } else {
+                acceptAndOpenMapleFile(file);
             }
         }
     }
@@ -416,6 +517,10 @@ public class FileManager {
     public int getFilesCreatedThisSession() {
         return filesCreatedThisSession;
     }
+    
+    public int getMapleFilesCreatedThisSession() {
+        return mapleFilesCreatedThisSession;
+    }
 
     /**
      * Evaluates whether a {@code File} is of type SQL.
@@ -426,9 +531,17 @@ public class FileManager {
     public boolean fileIsSQL(File file) {
         return fileIsSQL(file.getPath());
     }
+    
+    public boolean fileIsMaple(File file) {
+        return fileIsMaple(file.getPath());
+    }
 
     public boolean fileIsSQL(String filepath) {
         return filepath.endsWith(".sql");
+    }
+    
+    public boolean fileIsMaple(String filepath) {
+        return filepath.endsWith(".mpl");
     }
 
     /**

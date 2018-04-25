@@ -17,6 +17,7 @@ import com.sqless.ui.UIDatabaseDumper;
 import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
 import com.sqless.ui.UIExecuteFromScript;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -77,7 +78,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                 doEdit(node);
                 break;
             case OTHER:
-                actionOther(source);
+                actionOther(node, source);
                 break;
         }
     }
@@ -86,6 +87,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         actionMap = new HashMap<>();
         actionMap.put("EXPORT_DB", actionExportDb);
         actionMap.put("EXECUTE_FROM_SCRIPT", actionExecuteFromScript);
+        actionMap.put("SELECT_AS_MAPLE", actionSelectAsMaple);
     }
 
     public void doDrop(SQLessTreeNode node) {
@@ -159,11 +161,11 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         client.getTree().startEditingAtPath(new TreePath(node.getPath()));
     }
 
-    public void actionOther(TreeContextMenuItem source) {
+    public void actionOther(SQLessTreeNode node, TreeContextMenuItem source) {
         String key = source.getActionKey();
         ActionListener action = actionMap.get(key);
         if (action != null) {
-            action.actionPerformed(null);
+            action.actionPerformed(new ActionEvent(node, 0, key));
         }
     }
 
@@ -199,5 +201,10 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(fileContents);
             uiExecuteFromScript.start();
         });
+    };
+    
+    private ActionListener actionSelectAsMaple = e -> {
+        SQLessTreeNode node = (SQLessTreeNode) e.getSource();
+        client.createNewMapleQueryPanelAndRun(((SQLSelectable) node.getUserObject()).getMapleSelectStatement(1000));
     };
 }

@@ -17,6 +17,8 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     private UserPreferencesLoader userPrefLoader;
     private Frame parent;
     private Task task;
+    public static int CONNECTION_CHANGED = 641;
+    private int outcome = -1;
 
     public UIConnectionWizard(java.awt.Frame parent, Task task) {
         super(parent, true);
@@ -79,6 +81,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
 
         btnContinue.setText("Continuar");
         btnContinue.setEnabled(false);
+        btnContinue.setFocusable(false);
         btnContinue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnContinueActionPerformed(evt);
@@ -86,6 +89,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         });
 
         btnCancel.setText("Cancelar");
+        btnCancel.setFocusable(false);
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
@@ -93,6 +97,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         });
 
         btnTestConnection.setText("Probar conexión");
+        btnTestConnection.setFocusable(false);
         btnTestConnection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnTestConnectionActionPerformed(evt);
@@ -191,6 +196,11 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         testConnection(true);
     }//GEN-LAST:event_btnContinueActionPerformed
 
+    public int showDialog() {
+        setVisible(true);
+        return outcome;
+    }
+
     /**
      * Hace un test de la conexión utilizando los valores dados en los campos de
      * texto.
@@ -211,9 +221,31 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         lblConnectionStatus.setText("Probando...");
 
         SwingWorker<Boolean, Void> tester = new SwingWorker<Boolean, Void>() {
+            boolean replaceCon;
+            SQLConnectionManager conManager = SQLConnectionManager.getInstance();
+
             @Override
             protected Boolean doInBackground() throws Exception {
-                boolean result = SQLConnectionManager.getInstance().testConnection(username, password, hostName, port, parent);
+                boolean result = conManager.testConnection(username, password, hostName, port, parent);
+                String oldHostName = conManager.getHostName();
+                String oldPort = conManager.getPort();
+                String oldUsername = conManager.getUsername();
+                String oldPassword = conManager.getPassword();
+                if (result && andContinue) { //si el test fue exitoso y el usuario presionó el boton continue/aplicar
+                    userPrefLoader.makeDir();
+                    userPrefLoader.set("Connection.Host", hostName);
+                    userPrefLoader.set("Connection.Port", port);
+                    userPrefLoader.set("Connection.Username", username);
+                    userPrefLoader.set("Connection.Password", password);
+                    userPrefLoader.set("Default.Database", userPrefLoader.getDefaultFor("Default.Database"));
+                    userPrefLoader.flushFile();
+
+                    if (isTask(Task.MODIFY) && (!hostName.equals(oldHostName) || !port.equals(oldPort) || !username.equals(oldUsername) || !password.equals(oldPassword))) {
+                        conManager.closeConnection();
+                        conManager.setNewConnection("mysql", parent);
+                        outcome = CONNECTION_CHANGED;
+                    }
+                }
                 return result;
             }
 
@@ -227,14 +259,8 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                     setCursor(UIUtils.DEFAULT_CURSOR);
                     enableInputFields(true);
                     if (success) {
-                        btnContinue.requestFocus();
+                        getRootPane().setDefaultButton(btnContinue);
                         if (andContinue) {
-                            userPrefLoader.makeDir();
-                            userPrefLoader.set("Connection.Host", hostName);
-                            userPrefLoader.set("Connection.Port", port);
-                            userPrefLoader.set("Connection.Username", username);
-                            userPrefLoader.set("Connection.Password", password);
-                            userPrefLoader.flushFile();
                             dispose();
                         }
                     }

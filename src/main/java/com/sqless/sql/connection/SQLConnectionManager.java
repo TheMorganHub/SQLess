@@ -77,7 +77,7 @@ public class SQLConnectionManager {
                     + " as " + username + " in " + elapsed + "ms");
             return true;
         } catch (SQLException e) {
-            UIUtils.showErrorMessage("Error connecting to DB Engine", e.getMessage(), parent);
+            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
             System.err.println(e.getMessage());
         }
         return false;
@@ -158,7 +158,7 @@ public class SQLConnectionManager {
             System.out.println("Test successful.");
             return true;
         } catch (SQLException e) {
-            UIUtils.showErrorMessage("Error connecting to DB Engine", e.getMessage(), parent);
+            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
             System.out.println("Test failed.");
             System.err.println(e.getMessage());
         }

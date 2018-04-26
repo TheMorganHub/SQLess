@@ -293,15 +293,7 @@ public class UISettings extends javax.swing.JDialog {
 
         for (Component component : pnlDatabases.getComponents()) {
             if (component instanceof JComboBox) {
-                JComboBox combo = (JComboBox) component;
-                String defaultDB = userPreferences.getProperty(combo.getName());
-                combo.addItem(userPreferences.getDefaultFor(combo.getName()));
-                for (String dbName : SQLUtils.retrieveDBNamesFromServer()) {
-                    combo.addItem(dbName);
-                    if (defaultDB.equals(dbName)) {
-                        combo.setSelectedItem(dbName);
-                    }
-                }
+                populateDefaultDbCombobox((JComboBox) component);
             }
         }
 
@@ -318,6 +310,18 @@ public class UISettings extends javax.swing.JDialog {
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
+
+    public void populateDefaultDbCombobox(JComboBox combo) {
+        combo.removeAllItems();
+        String defaultDB = userPreferences.getProperty(combo.getName());
+        combo.addItem(userPreferences.getDefaultFor(combo.getName()));
+        for (String dbName : SQLUtils.retrieveDBNamesFromServer()) {
+            combo.addItem(dbName);
+            if (defaultDB.equals(dbName)) {
+                combo.setSelectedItem(dbName);
+            }
+        }
+    }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         commitSave();
@@ -356,7 +360,11 @@ public class UISettings extends javax.swing.JDialog {
 
     private void btnModifySettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModifySettingsActionPerformed
         UIConnectionWizard modifyConnection = new UIConnectionWizard(client, UIConnectionWizard.Task.MODIFY);
-        modifyConnection.setVisible(true);
+        int outcome = modifyConnection.showDialog();
+        if (outcome == UIConnectionWizard.CONNECTION_CHANGED) {
+            populateDefaultDbCombobox(comboDatabases);
+            client.clearJTree();
+        }
     }//GEN-LAST:event_btnModifySettingsActionPerformed
 
     /**

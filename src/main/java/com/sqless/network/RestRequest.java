@@ -2,7 +2,7 @@ package com.sqless.network;
 
 import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
-import us.monoid.web.JSONResource;
+import us.monoid.json.JSONObject;
 import us.monoid.web.Resty;
 
 public abstract class RestRequest {
@@ -24,7 +24,7 @@ public abstract class RestRequest {
     }
 
     /**
-     * Es llamado por {@link #executePostExec(us.monoid.web.JSONResource)} al
+     * Es llamado por {@link #executePostExec(us.monoid.json.JSONObject)} al
      * completarse el request contra el servidor sin errores.
      *
      * @param json
@@ -32,11 +32,11 @@ public abstract class RestRequest {
      * si el usuario manipula el JSON de manera erronea. Todas las excepciones
      * de este método serán atrapadas por {@link #onFailure(java.lang.String)}
      */
-    public void onSuccess(JSONResource json) throws Exception {
+    public void onSuccess(JSONObject json) throws Exception {
     }
 
     /**
-     * Es llamado por {@link #executePostExec(us.monoid.web.JSONResource)} al
+     * Es llamado por {@link #executePostExec(us.monoid.json.JSONObject)} al
      * completarse el request contra el servidor <b>exitosamente</b> y si la
      * autenticación del token de usuario fue exitosa.
      *
@@ -45,7 +45,7 @@ public abstract class RestRequest {
      * si el usuario manipula el JSON de manera erronea. Todas las excepciones
      * de este método serán atrapadas por {@link #onFailure(java.lang.String)}
      */
-    public void onTokenSuccess(JSONResource json) throws Exception {
+    public void onTokenSuccess(JSONObject json) throws Exception {
     }
 
     /**
@@ -67,14 +67,14 @@ public abstract class RestRequest {
      * Nota: este método se llamará dentro del <i>Event Dispatch Thread</i> de
      * Swing.
      *
-     * @see #onSuccess(us.monoid.web.JSONResource)
-     * @see #onTokenSuccess(us.monoid.web.JSONResource)
+     * @see #onSuccess(us.monoid.json.JSONObject)
+     * @see #onTokenSuccess(us.monoid.json.JSONObject)
      * @see #onFailure(java.lang.String)
      *
      * @param json El JSON resultante que el servidor devolvió al ser ejecutado
      * el request.
      */
-    protected final void executePostExec(JSONResource json) {
+    protected final void executePostExec(JSONObject json) {
         Runnable runnable = () -> {
             try {
                 onSuccess(json);
@@ -84,7 +84,6 @@ public abstract class RestRequest {
 //                }
             } catch (Exception e) {
                 onFailure(e.getMessage());
-                e.printStackTrace();
             }
         };
         if (newThread) {
@@ -98,7 +97,7 @@ public abstract class RestRequest {
      * Ejecuta este HTTP request contra el servidor. Para el correcto
      * funcionamiento de este método, es indispensable que toda implementación
      * de éste incluya una llamada a
-     * {@link #executePostExec(us.monoid.web.JSONResource)}.
+     * {@link #executePostExec(us.monoid.json.JSONObject)}.
      */
     public abstract void exec();
 }

@@ -25,7 +25,7 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXTable;
-import us.monoid.web.JSONResource;
+import us.monoid.json.JSONObject;
 
 public class MapleQuery {
 
@@ -73,20 +73,26 @@ public class MapleQuery {
                     FinalValue<Boolean> requestSuccess = new FinalValue<>(Boolean.FALSE);
                     RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, "maple_statement=" + mapleStatement) {
                         @Override
-                        public void onSuccess(JSONResource json) throws Exception {
-                            String convertedSql = (String) json.get("CONVERTED_SQL");
-                            MapleQuery.this.convertedSQL = convertedSql;
-                            queryPanel.setConvertedSQL(convertedSql);
+                        public void onSuccess(JSONObject json) throws Exception {
+                            if (json.has("err")) { //hubo un error interno en el server
+                                onFailure(json.getString("err"));
+                                return;
+                            }
+
+                            MapleQuery.this.convertedSQL = json.getString("CONVERTED_SQL");
+                            queryPanel.setConvertedSQL(MapleQuery.this.convertedSQL);
                             requestSuccess.set(true);
                         }
 
                         @Override
                         public void onFailure(String message) {
                             errorMessage = message;
+                            queryStatus = Status.FAILED;
                             requestSuccess.set(false);
                         }
                     };
                     rest.exec();
+
                     if (requestSuccess.get()) {
                         startTime = System.currentTimeMillis();
                         queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
@@ -111,15 +117,10 @@ public class MapleQuery {
                 }
 
                 if (queryPanel != null) {
-//                    queryTimer.stop();
-//                    long elapsed = System.currentTimeMillis() - startTime;
-//                    if (elapsed <= 150) {
-//                        ((ActionQueryTimer) queryTimer.getActionListeners()[0]).forceMs(elapsed);
-//                    }
                     EventQueue.invokeLater(() -> {
                         queryPanel.enableStopBtn(false);
                         queryPanel.enableRunBtn(true);
-                        queryPanel.setMs(System.currentTimeMillis() - startTime);
+                        queryPanel.setMs(startTime != 0 ? System.currentTimeMillis() - startTime : 0);
                         queryPanel.updateStatusLabel(queryStatus);
                         queryPanel.setMessage(queryStatus, errorMessage);
                     });

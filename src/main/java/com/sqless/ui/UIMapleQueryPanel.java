@@ -235,7 +235,7 @@ public class UIMapleQueryPanel extends FrontPanel {
 
         lblFilas.setText("Filas: 0 |");
 
-        lblMs.setText("#ms");
+        lblMs.setText("0ms");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

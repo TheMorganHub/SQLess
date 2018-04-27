@@ -1,7 +1,7 @@
 package com.sqless.network;
 
+import us.monoid.json.JSONObject;
 import us.monoid.web.FormContent;
-import us.monoid.web.JSONResource;
 import us.monoid.web.Resty;
 
 public class PostRequest extends RestRequest {
@@ -25,11 +25,10 @@ public class PostRequest extends RestRequest {
     public void exec() {
         Runnable runnable = () -> {
             try {
-                JSONResource json = rest.json(url, form);
+                JSONObject json = rest.json(url, form).object();
                 executePostExec(json);
             } catch (Exception e) {
                 onFailure(e.getMessage());
-                e.printStackTrace();
             }
         };
         if (newThread) {

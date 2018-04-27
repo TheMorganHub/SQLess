@@ -1,6 +1,6 @@
 package com.sqless.network;
 
-import us.monoid.web.JSONResource;
+import us.monoid.json.JSONObject;
 
 public class GetRequest extends RestRequest {
 
@@ -8,17 +8,26 @@ public class GetRequest extends RestRequest {
         super(url);
     }
 
+    public GetRequest(String url, boolean newThread) {
+        super(url, newThread);
+    }
+
     @Override
     public void exec() {
-        Thread networkThread = new Thread(() -> {
+        Runnable runnable = () -> {
             try {
-                JSONResource json = rest.json(url);
+                JSONObject json = rest.json(url).object();
                 executePostExec(json);
             } catch (Exception e) {
                 onFailure(e.getMessage());
             }
-        });
-        networkThread.start();
+        };
+        if (newThread) {
+            Thread networkThread = new Thread(runnable);
+            networkThread.start();
+        } else {
+            runnable.run();
+        }
     }
-    
+
 }

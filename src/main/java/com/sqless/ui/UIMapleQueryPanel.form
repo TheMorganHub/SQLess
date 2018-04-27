@@ -132,7 +132,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblMs">
       <Properties>
-        <Property name="text" type="java.lang.String" value="#ms"/>
+        <Property name="text" type="java.lang.String" value="0ms"/>
       </Properties>
     </Component>
   </SubComponents>

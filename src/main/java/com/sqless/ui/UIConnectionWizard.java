@@ -221,7 +221,6 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         lblConnectionStatus.setText("Probando...");
 
         SwingWorker<Boolean, Void> tester = new SwingWorker<Boolean, Void>() {
-            boolean replaceCon;
             SQLConnectionManager conManager = SQLConnectionManager.getInstance();
 
             @Override

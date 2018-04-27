@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
-import us.monoid.web.JSONResource;
+import us.monoid.json.JSONObject;
 
 public class GoogleLogin {
 
@@ -146,7 +146,7 @@ public class GoogleLogin {
         //ejecute esta sección
         RestRequest rest = new PostRequest(RestRequest.AUTH_URL, "access_token=" + credential.getAccessToken()) {
             @Override
-            public void onSuccess(JSONResource json) throws Exception {
+            public void onSuccess(JSONObject json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
                 json.get("token_info");
             }

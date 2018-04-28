@@ -109,9 +109,8 @@ public class SQLConnectionManager {
     }
 
     /**
-     * Convenience method for
-     * {@link #setNewConnection(String, boolean, Frame)}. The
-     * DB will not be considered brand new.
+     * Convenience method for {@link #setNewConnection(String, boolean, Frame)}.
+     * The DB will not be considered brand new.
      *
      * @param dbName The DB name to connect to.
      * @param parent The {@code Frame} that will display any errors that occur

@@ -1,6 +1,7 @@
 package com.sqless.ui;
 
-import com.sqless.file.FileManager;
+import com.sqless.file.FileManagerAdapter;
+import com.sqless.file.MapleFileManager;
 import com.sqless.queries.MapleQuery;
 import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
@@ -10,18 +11,17 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -45,7 +45,7 @@ public class UIMapleQueryPanel extends FrontPanel {
      * @param contents
      */
     public UIMapleQueryPanel(JTabbedPane parentPane, String contents) {
-        this(parentPane, FileManager.getInstance().newMapleFile(), contents);
+        this(parentPane, MapleFileManager.getInstance().newFile(), contents);
     }
 
     public UIMapleQueryPanel(JTabbedPane parentPane, String filePath, String contents) {
@@ -274,8 +274,8 @@ public class UIMapleQueryPanel extends FrontPanel {
             try {
                 evt.acceptDrop(DnDConstants.ACTION_COPY);
                 List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                for (File file : droppedFiles) {
-                    FileManager.getInstance().dragNDropMapleFile(file);
+                if (!droppedFiles.isEmpty()) {
+                    FileManagerAdapter.dragNDropFile(droppedFiles.get(0));
                 }
             } catch (java.awt.datatransfer.UnsupportedFlavorException | java.io.IOException ex) {
                 ex.printStackTrace();
@@ -313,6 +313,14 @@ public class UIMapleQueryPanel extends FrontPanel {
         }
     };
 
+    public JTextArea getMapleEditorPane() {
+        return txtMapleQuery;
+    }
+
+    public void updateFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
@@ -327,30 +335,49 @@ public class UIMapleQueryPanel extends FrontPanel {
     // End of variables declaration//GEN-END:variables
     private JButton btnRun;
     private JButton btnStop;
+    private JButton btnSave;
+    private JMenuItem menuSave;
+    private JMenuItem menuSaveAs;
 
     @Override
     public Component[] getToolbarComponents() {
         if (toolbarComponents == null) {
+            btnSave = UIUtils.newToolbarBtn(actionSaveQuery, "", "Guardar estas consultas", UIUtils.icon("ui_general", "SAVE"));
             btnRun = UIUtils.newToolbarBtn(actionRunQuery, "Ejecutar", "", UIUtils.icon(this, "EXECUTE"));
             btnStop = UIUtils.newToolbarBtn(actionStopQuery, "Parar la ejecución de esta consulta", UIUtils.icon(this, "STOP_EXECUTION"));
             btnStop.setEnabled(false);
-            toolbarComponents = new Component[]{btnRun, btnStop};
+            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop};
         }
         return toolbarComponents;
     }
-    
+
+    @Override
+    public JMenuItem[] getMenuItems() {
+        if (menuItems == null) {
+            menuSave = new JMenuItem("Guardar");
+            menuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+            menuSave.addActionListener(actionSaveQuery);
+
+            menuSaveAs = new JMenuItem("Guardar como...");
+            menuSaveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK | java.awt.event.InputEvent.SHIFT_MASK));
+            menuSaveAs.addActionListener(actionSaveQueryAs);
+            menuItems = new JMenuItem[]{menuSave, menuSaveAs};
+        }
+        return menuItems;
+    }
+
     @Override
     public void tabClosing(int tabNum) {
         super.tabClosing(tabNum);
         if (filePath != null) {
-            FileManager.getInstance().removeMapleFile(filePath);
+            MapleFileManager.getInstance().removeFile(filePath);
         }
     }
 
     @Override
     public String getTabTitle() {
-        return FileManager.getInstance().isNewFile(filePath)
-                ? "Maple_File_" + (FileManager.getInstance().getMapleFilesCreatedThisSession()) + ".mpl" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
+        return MapleFileManager.getInstance().isNewFile(filePath)
+                ? "Maple_File_" + (MapleFileManager.getInstance().getFilesCreatedThisSession()) + ".mpl" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
     }
 
     @Override
@@ -372,6 +399,14 @@ public class UIMapleQueryPanel extends FrontPanel {
     };
     private ActionListener actionStopQuery = (e) -> {
         stopQuery();
+    };
+    private ActionListener actionSaveQuery = e -> {
+        MapleFileManager.getInstance().saveFile(this);
+        setTabToolTipText(filePath);
+    };
+    private ActionListener actionSaveQueryAs = e -> {
+        MapleFileManager.getInstance().saveFileAs(this);
+        setTabToolTipText(filePath);
     };
 
 }

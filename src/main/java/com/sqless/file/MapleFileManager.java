@@ -3,7 +3,7 @@ package com.sqless.file;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.settings.UserPreferencesLoader;
-import com.sqless.ui.UIQueryPanel;
+import com.sqless.ui.UIMapleQueryPanel;
 import com.sqless.utils.Callback;
 import com.sqless.utils.TextUtils;
 import java.io.File;
@@ -24,11 +24,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The class that handles interactions between the {@code UIClient} and the
- * Files it opens, closes, and saves.
+ * Maple Files it opens, closes, and saves. This class mirrors EXACTLY
+ * {@link FileManager}, except instead of SQL files, it manages MPL files.
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public class FileManager {
+public class MapleFileManager {
 
     /**
      * The {@code List} that contains the paths of all opened files. The order
@@ -39,19 +40,19 @@ public class FileManager {
 
     private UIClient client;
 
-    private static FileManager instance = new FileManager();
+    private static MapleFileManager instance = new MapleFileManager();
 
     /**
      * The number of <b>new</b> files that were created this session.
      */
     private int filesCreatedThisSession;
 
-    private FileManager() {
+    private MapleFileManager() {
         this.openedFiles = new ArrayList<>();
         this.client = UIClient.getInstance();
     }
 
-    public static FileManager getInstance() {
+    public static MapleFileManager getInstance() {
         return instance;
     }
 
@@ -115,11 +116,11 @@ public class FileManager {
 
         try {
             String contents = new String(Files.readAllBytes(Paths.get(file.getPath())));
-            client.sendToNewTab(new UIQueryPanel(client.getTabPaneContent(), file.getPath(), contents));
+            client.sendToNewTab(new UIMapleQueryPanel(client.getTabPaneContent(), file.getPath(), contents));
             addFile(file);
         } catch (java.io.IOException e) {
             UIUtils.showErrorMessage("Error", "No se pudo abrir el archivo en " + file, client);
-            System.err.println("FILE MANAGER: " + e.getMessage());
+            System.err.println("MAPLE FILE MANAGER: " + e.getMessage());
         }
     }
 
@@ -131,7 +132,7 @@ public class FileManager {
      */
     public String newFile() {
         filesCreatedThisSession++;
-        File file = new File("SQL_File_" + filesCreatedThisSession);
+        File file = new File("Maple_File_" + filesCreatedThisSession);
         addFile(file);
         return file.getPath();
     }
@@ -158,32 +159,11 @@ public class FileManager {
         return !filePath.contains("\\");
     }
 
-//    public void openFile() {
-//        JTabbedPane tabPane = client.getTabPaneContent();
-//        UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
-//        JFileChooser chooser = new JFileChooser();
-//        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-//                "SQL File (.sql)", "SQL");
-//        chooser.setDialogTitle("Abrir...");
-//        chooser.setFileFilter(filter);
-//        chooser.setAcceptAllFileFilterUsed(false);
-//
-//        String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-//        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
-//                ? new File(defSaveDir)
-//                : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
-//        chooser.setAcceptAllFileFilterUsed(false);
-//
-//        int returnVal = chooser.showOpenDialog(client);
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//
-//        }
-//    }
     public void doOpenFile(JTabbedPane tabPane, File selectedFile) {
         if (fileIsAlreadyOpen(selectedFile)) { //el archivo ya existe
             String filePath = selectedFile.getPath();
-            List<UIQueryPanel> queryPanels = UIClient.getInstance().getQueryPanels();
-            for (UIQueryPanel queryPanel : queryPanels) {
+            List<UIMapleQueryPanel> queryPanels = UIClient.getInstance().getMapleQueryPanels();
+            for (UIMapleQueryPanel queryPanel : queryPanels) {
                 String queryPaneFilePath = queryPanel.getFilePath();
                 if (queryPaneFilePath != null && queryPaneFilePath.equals(filePath)) {
                     int tabIndex = queryPanel.getTabIndex();
@@ -200,13 +180,13 @@ public class FileManager {
         UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "SQL File (.sql)", "SQL");
+                "MAPLE File (.mpl)", "MPL");
         chooser.setDialogTitle("Abrir...");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
 
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+        chooser.setCurrentDirectory(dirOrFileExists(defSaveDir)
                 ? new File(defSaveDir)
                 : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
         chooser.setAcceptAllFileFilterUsed(false);
@@ -220,10 +200,10 @@ public class FileManager {
 
     public void processDragNDrop(File file) {
         JTabbedPane tabPane = client.getTabPaneContent();
-        if (fileIsSQL(file)) {
+        if (fileIsMaple(file)) {
             if (fileIsAlreadyOpen(file)) { //el archivo ya existe
-                List<UIQueryPanel> queryPanels = UIClient.getInstance().getQueryPanels();
-                for (UIQueryPanel queryPanel : queryPanels) {
+                List<UIMapleQueryPanel> queryPanels = UIClient.getInstance().getMapleQueryPanels();
+                for (UIMapleQueryPanel queryPanel : queryPanels) {
                     String queryPaneFilePath = queryPanel.getFilePath();
                     if (queryPaneFilePath != null && queryPaneFilePath.equals(file.getPath())) {
                         int tabIndex = queryPanel.getTabIndex();
@@ -237,9 +217,9 @@ public class FileManager {
         }
     }
 
-    public void saveFile(UIQueryPanel queryPanel) {
+    public void saveFile(UIMapleQueryPanel queryPanel) {
         String filePath = queryPanel.getFilePath();
-        String contents = queryPanel.getSqlEditorPane().getText();
+        String contents = queryPanel.getMapleEditorPane().getText();
         if (isNewFile(filePath)) { //si es un archivo nuevo
             saveFileAs(queryPanel);
             return;
@@ -254,9 +234,9 @@ public class FileManager {
         }
     }
 
-    public void saveFileAs(UIQueryPanel queryPanel) {
+    public void saveFileAs(UIMapleQueryPanel queryPanel) {
         String filePath = queryPanel.getFilePath();
-        String contents = queryPanel.getSqlEditorPane().getText();
+        String contents = queryPanel.getMapleEditorPane().getText();
         JTabbedPane tabPane = queryPanel.getParentPane();
         UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
         if (tabPane.getTabCount() == 0) {
@@ -264,11 +244,11 @@ public class FileManager {
         }
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "SQL File (.sql)", "SQL");
+                "MAPLE File (.mpl)", "MPL");
         chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+        chooser.setCurrentDirectory(dirOrFileExists(defSaveDir)
                 ? new File(defSaveDir)
                 : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
         chooser.setAcceptAllFileFilterUsed(false);
@@ -279,9 +259,9 @@ public class FileManager {
         int returnVal = chooser.showSaveDialog(client);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selFile = chooser.getSelectedFile();
-            String selFileFullPath = FileManager.appendExtension(selFile.getPath(), "sql");
-            String selFileName = FileManager.appendExtension(selFile.getName(), "sql");
-            if (FileManager.dirOrFileExists(selFileFullPath)) {
+            String selFileFullPath = appendExtension(selFile.getPath(), "mpl");
+            String selFileName = appendExtension(selFile.getName(), "mpl");
+            if (dirOrFileExists(selFileFullPath)) {
                 int overwrite = overwriteFile(selFileName);
                 if (overwrite != 0) {
                     saveFileAs(queryPanel);
@@ -312,7 +292,7 @@ public class FileManager {
         chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+        chooser.setCurrentDirectory(dirOrFileExists(defSaveDir)
                 ? new File(defSaveDir)
                 : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
         chooser.setAcceptAllFileFilterUsed(false);
@@ -320,9 +300,9 @@ public class FileManager {
         int returnVal = chooser.showSaveDialog(client);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selFile = chooser.getSelectedFile();
-            String selFileFullPath = FileManager.appendExtension(selFile.getPath(), "sql");
-            String selFileName = FileManager.appendExtension(selFile.getName(), "sql");
-            if (FileManager.dirOrFileExists(selFileFullPath)) {
+            String selFileFullPath = appendExtension(selFile.getPath(), "mpl");
+            String selFileName = appendExtension(selFile.getName(), "mpl");
+            if (dirOrFileExists(selFileFullPath)) {
                 int overwrite = overwriteFile(selFileName);
                 if (overwrite != 0) {
                     saveFileAs(extension, contents);
@@ -354,7 +334,7 @@ public class FileManager {
         chooser.setDialogTitle("Guardar como...");
         chooser.setFileFilter(filter);
         String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
+        chooser.setCurrentDirectory(dirOrFileExists(defSaveDir)
                 ? new File(defSaveDir)
                 : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
         chooser.setAcceptAllFileFilterUsed(false);
@@ -362,9 +342,9 @@ public class FileManager {
         int returnVal = chooser.showSaveDialog(client);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selFile = chooser.getSelectedFile();
-            String selFileFullPath = FileManager.appendExtension(selFile.getPath(), extension);
-            String selFileName = FileManager.appendExtension(selFile.getName(), extension);
-            if (FileManager.dirOrFileExists(selFileFullPath)) {
+            String selFileFullPath = MapleFileManager.appendExtension(selFile.getPath(), extension);
+            String selFileName = MapleFileManager.appendExtension(selFile.getName(), extension);
+            if (dirOrFileExists(selFileFullPath)) {
                 int overwrite = overwriteFile(selFileName);
                 if (overwrite != 0) {
                     saveFileAs(extension, callback);
@@ -419,18 +399,12 @@ public class FileManager {
         return filesCreatedThisSession;
     }
 
-    /**
-     * Evaluates whether a {@code File} is of type SQL.
-     *
-     * @param file The {@code File} to evaluate.
-     * @return {@code true} if the file has a .sql extension.
-     */
-    public boolean fileIsSQL(File file) {
-        return fileIsSQL(file.getPath());
+    public boolean fileIsMaple(File file) {
+        return fileIsMaple(file.getPath());
     }
 
-    public boolean fileIsSQL(String filepath) {
-        return filepath.endsWith(".sql");
+    public boolean fileIsMaple(String filepath) {
+        return filepath.endsWith(".mpl");
     }
 
     /**

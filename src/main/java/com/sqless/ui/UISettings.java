@@ -156,6 +156,7 @@ public class UISettings extends javax.swing.JDialog {
         txtDefaultSaveDir.getDocument().addDocumentListener(new TextFieldChangeListener(txtDefaultSaveDir));
 
         btnBrowseDir.setText("Explorar...");
+        btnBrowseDir.setFocusable(false);
         btnBrowseDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBrowseDirActionPerformed(evt);
@@ -163,6 +164,7 @@ public class UISettings extends javax.swing.JDialog {
         });
 
         btnRestoreDefaults.setText("Restaurar predeterminado");
+        btnRestoreDefaults.setFocusable(false);
         btnRestoreDefaults.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRestoreDefaultsActionPerformed(evt);
@@ -170,6 +172,7 @@ public class UISettings extends javax.swing.JDialog {
         });
 
         btnOpen.setText("Abrir");
+        btnOpen.setFocusable(false);
         btnOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOpenActionPerformed(evt);

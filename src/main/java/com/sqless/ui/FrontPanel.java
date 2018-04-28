@@ -76,7 +76,7 @@ public abstract class FrontPanel extends javax.swing.JPanel {
     }
 
     public void setTabToolTipText(String text) {
-        parentPane.setToolTipTextAt(getTabIndex(), text);        
+        parentPane.setToolTipTextAt(getTabIndex(), text);
     }
 
     /**

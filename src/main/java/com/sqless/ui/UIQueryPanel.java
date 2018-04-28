@@ -1,6 +1,7 @@
 package com.sqless.ui;
 
 import com.sqless.file.FileManager;
+import com.sqless.file.FileManagerAdapter;
 import com.sqless.queries.SQLUIQuery;
 import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
@@ -65,7 +66,7 @@ public class UIQueryPanel extends FrontPanel {
                 updateRowsLabel(panelResult.getRowCount());
             }
         });
-        this.filePath = filePath;        
+        this.filePath = filePath;
     }
 
     @Override
@@ -369,8 +370,8 @@ public class UIQueryPanel extends FrontPanel {
             try {
                 evt.acceptDrop(DnDConstants.ACTION_COPY);
                 List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                for (File file : droppedFiles) {
-                    FileManager.getInstance().dragNDropFile(file);
+                if (!droppedFiles.isEmpty()) {
+                    FileManagerAdapter.dragNDropFile(droppedFiles.get(0));
                 }
             } catch (java.awt.datatransfer.UnsupportedFlavorException | java.io.IOException ex) {
                 ex.printStackTrace();

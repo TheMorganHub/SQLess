@@ -80,7 +80,7 @@ public class OAuth2TokenRefreshService {
     public Credential getCurrentCredential() {
         return credential;
     }
-    
+
     public static boolean isRunning() {
         return instance != null;
     }

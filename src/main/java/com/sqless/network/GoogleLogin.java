@@ -13,9 +13,9 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.Oauth2Scopes;
 import com.google.api.services.oauth2.model.Userinfoplus;
+import com.sqless.ui.UIClient;
 import com.sqless.ui.UIGoogleWaitDialog;
 import com.sqless.userdata.GoogleUser;
-import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.Callback;
 import com.sqless.utils.UIUtils;
 
@@ -33,24 +33,15 @@ public class GoogleLogin {
     private Callback<GoogleUser> callback;
     private UIGoogleWaitDialog waitDialog;
 
-    public GoogleLogin(Callback<GoogleUser> callback) {
-        initTransportAndStore();
-        this.callback = callback;
-    }
-
     /**
-     * Construye una nueva instancia de Log in. Se interactuará directamente con
-     * el {@link UIGoogleWaitDialog} dado en caso de que haya algún error de
-     * autenticación. Si no es necesaria la interacción entre esta clase y un
-     * {@code UIGoogleWaitDialog}, es recomendable utilizar el constructor
-     * normal.
+     * Construye una nueva instancia de Log in.
      *
      * @param callback el callback que se ejecutará si la operación fue exitosa.
      * @param waitDialog el {@code UIGoogleWaitDialog} que interactuará con esta
-     * clase en caso de error.
+     * clase.
      */
     public GoogleLogin(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
-        this(callback);
+        this.callback = callback;
         this.waitDialog = waitDialog;
     }
 
@@ -136,11 +127,6 @@ public class GoogleLogin {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         Userinfoplus userinfo = oauth2.userinfo().get().execute(); //esto actualiza el access token usando el refresh token si es necesario automáticamente
-        if (callback != null) {
-            callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
-        }
-
-        OAuth2TokenRefreshService.startInstance(flow);
 
         //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
@@ -150,15 +136,17 @@ public class GoogleLogin {
             public void onSuccess(JSONObject json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
                 json.get("token_info");
+                if (callback != null) {
+                    callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
+                }
+                OAuth2TokenRefreshService.startInstance(flow);
             }
 
             @Override
             public void onFailure(String message) {
-                UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", null);
+                UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", UIClient.getInstance());
                 if (waitDialog != null) {
                     waitDialog.cancel();
-                } else {
-                    GoogleUserManager.getInstance().logOut();
                 }
             }
         };
@@ -167,14 +155,15 @@ public class GoogleLogin {
 
     public void start() {
         try {
+            initTransportAndStore();
             startOauth2Service();
         } catch (IOException e) {
-            UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", null);
+            UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.\nEs probable que el token haya sido revocado o no sea válido.", UIClient.getInstance());
             waitDialog.cancel();
         } catch (NullPointerException e) {
             //va a saltar desde adentro de las librerías de Google si el usuario cancela el proceso de autenticación.
             //el proceso de cancelación consiste en darle stop() al LocalServerReceiver
-            UIUtils.showMessage("Autenticación con Google", "El usuario canceló el inicio de sesión", null);
+            UIUtils.showMessage("Autenticación con Google", "El usuario canceló el inicio de sesión", UIClient.getInstance());
         }
     }
 

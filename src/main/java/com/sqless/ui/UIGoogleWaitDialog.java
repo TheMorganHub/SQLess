@@ -25,6 +25,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
     public UIGoogleWaitDialog() {
         super(UIClient.getInstance(), true);
         initComponents();
+        setLocationRelativeTo(getParent());
     }
 
     public void waitForLogin() {
@@ -34,7 +35,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
                 GoogleUserManager.getInstance().addNew(googleUser);
                 UIClient.getInstance().updateMenuBarForGoogleUser(googleUser);
                 dispose();
-            });
+            }, UIGoogleWaitDialog.this);
             serverReceiver = login.getServerReceiver();
             login.start();
         });

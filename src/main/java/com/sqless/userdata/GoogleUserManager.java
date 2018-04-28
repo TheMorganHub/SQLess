@@ -65,9 +65,9 @@ public class GoogleUserManager {
             if (serviceIsRunning) {
                 OAuth2TokenRefreshService.getInstance().stop();
             }
-            active = null;
-            cleanUp();
         }
+        active = null;
+        cleanUp();
     }
 
     public void cleanUp() {

@@ -644,7 +644,7 @@ public class UIClient extends javax.swing.JFrame {
     private Action actionLogInGoogle = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            UIGoogleWaitDialog waitDialog = new UIGoogleWaitDialog();
+            UIGoogleWaitDialog waitDialog = new UIGoogleWaitDialog();            
             waitDialog.waitForLogin();
         }
     };

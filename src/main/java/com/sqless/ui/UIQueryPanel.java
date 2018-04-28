@@ -65,13 +65,15 @@ public class UIQueryPanel extends FrontPanel {
                 updateRowsLabel(panelResult.getRowCount());
             }
         });
-        this.filePath = filePath;
+        this.filePath = filePath;        
     }
 
     @Override
     public void onCreate() {
         setSQLText(tabOriginalContents);
         sqlEditorPane.requestFocus();
+        String tooltipText = filePath != null && !filePath.endsWith(".sql") ? filePath + ".sql" : filePath;
+        setTabToolTipText(tooltipText);
         EventQueue.invokeLater(() -> splitPane.setDividerLocation(0.65));
     }
 
@@ -461,6 +463,11 @@ public class UIQueryPanel extends FrontPanel {
     }
 
     @Override
+    public ImageIcon getTabIcon() {
+        return UIUtils.icon(this, "SQL_QUERY");
+    }
+
+    @Override
     public String getTabTitle() {
         return FileManager.getInstance().isNewFile(filePath) ? "SQL_File_" + (FileManager.getInstance().getFilesCreatedThisSession()) + ".sql" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
     }
@@ -499,12 +506,12 @@ public class UIQueryPanel extends FrontPanel {
 
     private ActionListener actionSaveQuery = e -> {
         FileManager.getInstance().saveFile(this);
-        parentPane.setToolTipTextAt(getTabIndex(), getTabTitle());
+        setTabToolTipText(filePath);
     };
 
     private ActionListener actionSaveQueryAs = e -> {
         FileManager.getInstance().saveFileAs(this);
-        parentPane.setToolTipTextAt(getTabIndex(), getTabTitle());
+        setTabToolTipText(filePath);
     };
 
     private ActionListener actionRunQuery = e -> {

@@ -26,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXTable;
 import us.monoid.json.JSONObject;
+import us.monoid.web.Resty;
 
 public class MapleQuery {
 
@@ -56,10 +57,6 @@ public class MapleQuery {
             queryPanel.updateRowsLabel(0);
             queryPanel.enableStopBtn(true);
             queryPanel.enableRunBtn(false);
-
-//            queryTimer = new Timer(75, new ActionQueryTimer(queryPanel));
-//            queryTimer.setInitialDelay(0);
-//            queryTimer.start();
         }
 
         queryThread = new Thread(new Runnable() {
@@ -71,7 +68,7 @@ public class MapleQuery {
             public void run() {
                 try {
                     FinalValue<Boolean> requestSuccess = new FinalValue<>(Boolean.FALSE);
-                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, "maple_statement=" + mapleStatement) {
+                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, Resty.form(Resty.data("maple_statement", mapleStatement))) {
                         @Override
                         public void onSuccess(JSONObject json) throws Exception {
                             if (json.has("err")) { //hubo un error interno en el server

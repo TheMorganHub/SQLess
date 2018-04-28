@@ -181,6 +181,7 @@ public class UIClient extends javax.swing.JFrame {
         btnNewQuery = new javax.swing.JButton();
         btnNewMapleQuery = new javax.swing.JButton();
         btnOpenFile = new javax.swing.JButton();
+        btnOpenMapleFile = new javax.swing.JButton();
         topSeparator = new javax.swing.JToolBar.Separator();
         splitMain = new javax.swing.JSplitPane();
         tabPaneContent = new javax.swing.JTabbedPane();
@@ -269,6 +270,19 @@ public class UIClient extends javax.swing.JFrame {
             }
         });
         toolbarTop.add(btnOpenFile);
+
+        btnOpenMapleFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/OPEN_MAPLE_FILE_ICON.png"))); // NOI18N
+        btnOpenMapleFile.setFocusable(false);
+        btnOpenMapleFile.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnOpenMapleFile.setMargin(new java.awt.Insets(2, 8, 2, 8));
+        btnOpenMapleFile.setName("btnOpenMapleFile"); // NOI18N
+        btnOpenMapleFile.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnOpenMapleFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOpenMapleFileActionPerformed(evt);
+            }
+        });
+        toolbarTop.add(btnOpenMapleFile);
 
         topSeparator.setName("topSeparator"); // NOI18N
         toolbarTop.add(topSeparator);
@@ -490,6 +504,10 @@ public class UIClient extends javax.swing.JFrame {
         sendToNewTab(new UIMapleQueryPanel(tabPaneContent, ""));
     }//GEN-LAST:event_btnNewMapleQueryActionPerformed
 
+    private void btnOpenMapleFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenMapleFileActionPerformed
+        FileManager.getInstance().openMapleFile();
+    }//GEN-LAST:event_btnOpenMapleFileActionPerformed
+
     public void updateMenuBarForGoogleUser(GoogleUser user) {
         barMenu.remove(submenuLogin);
         submenuLoggedInGoogle.setText(user.getNombre());
@@ -514,6 +532,7 @@ public class UIClient extends javax.swing.JFrame {
         tabPaneContent.setTabComponentAt(tabPaneContent.getTabCount() - 1, new UIButtonTabComponent(tabPaneContent));
         tabPaneContent.setSelectedIndex(tabPaneContent.getTabCount() - 1);
         frontUI.onCreate();
+        frontUI.getTabLabel().setIcon(frontUI.getTabIcon());
     }
 
     public List<UIQueryPanel> getQueryPanels() {
@@ -580,7 +599,7 @@ public class UIClient extends javax.swing.JFrame {
 
     public void removeNonStandardToolbarIcons() {
         int componentCount = toolbarTop.getComponentCount();
-        for (int i = componentCount - 1; i > 2; i--) {
+        for (int i = componentCount - 1; i > 3; i--) {
             toolbarTop.remove(i);
         }
         toolbarTop.revalidate();
@@ -678,6 +697,7 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JButton btnNewMapleQuery;
     private javax.swing.JButton btnNewQuery;
     private javax.swing.JButton btnOpenFile;
+    private javax.swing.JButton btnOpenMapleFile;
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
     private javax.swing.JMenuItem menuLogOutGoogle;

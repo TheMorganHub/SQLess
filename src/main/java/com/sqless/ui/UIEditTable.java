@@ -596,7 +596,7 @@ public class UIEditTable extends FrontPanel {
 
     @Override
     public String getTabTitle() {
-        return "Editing " + table.getName();
+        return "Editando " + table.getName();
     }
 
     @Override

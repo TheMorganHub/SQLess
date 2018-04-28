@@ -842,7 +842,7 @@ public class UICreateTableSQLess extends FrontPanel {
      */
     @Override
     public String getTabTitle() {
-        return task == TABLE_CREATE ? "New table" : "Modify table " + sqlTable.getName();
+        return task == TABLE_CREATE ? "Nueva tabla" : "Modificar tabla " + sqlTable.getName();
     }
 
     @Override

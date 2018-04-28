@@ -88,6 +88,8 @@ public class UIMapleQueryPanel extends FrontPanel {
     public void onCreate() {
         setMapleText(tabOriginalContents);
         txtMapleQuery.requestFocus();
+        String tooltipText = filePath != null && !filePath.endsWith(".mpl") ? filePath + ".mpl" : filePath;
+        setTabToolTipText(tooltipText);
         EventQueue.invokeLater(() -> splitPane.setDividerLocation(0.65));
     }
 
@@ -325,18 +327,24 @@ public class UIMapleQueryPanel extends FrontPanel {
     // End of variables declaration//GEN-END:variables
     private JButton btnRun;
     private JButton btnStop;
-    private JButton btnOpenMapleFile;
 
     @Override
     public Component[] getToolbarComponents() {
         if (toolbarComponents == null) {
-            btnOpenMapleFile = UIUtils.newToolbarBtn(actionOpenFile, "", "Abrir archivo Maple (.mpl)...", UIUtils.icon(this, "OPEN_MAPLE_FILE"));
             btnRun = UIUtils.newToolbarBtn(actionRunQuery, "Ejecutar", "", UIUtils.icon(this, "EXECUTE"));
             btnStop = UIUtils.newToolbarBtn(actionStopQuery, "Parar la ejecución de esta consulta", UIUtils.icon(this, "STOP_EXECUTION"));
             btnStop.setEnabled(false);
-            toolbarComponents = new Component[]{btnOpenMapleFile, UIUtils.newSeparator(), btnRun, btnStop};
+            toolbarComponents = new Component[]{btnRun, btnStop};
         }
         return toolbarComponents;
+    }
+    
+    @Override
+    public void tabClosing(int tabNum) {
+        super.tabClosing(tabNum);
+        if (filePath != null) {
+            FileManager.getInstance().removeMapleFile(filePath);
+        }
     }
 
     @Override
@@ -350,6 +358,11 @@ public class UIMapleQueryPanel extends FrontPanel {
         return "ui_maplequery";
     }
 
+    @Override
+    public ImageIcon getTabIcon() {
+        return UIUtils.icon(this, "MAPLE_SMALL");
+    }
+
     private ActionListener actionRunQuery = e -> {
         clearResults();
         String toExec = txtMapleQuery.getSelectedText() != null ? txtMapleQuery.getSelectedText() : txtMapleQuery.getText();
@@ -359,13 +372,6 @@ public class UIMapleQueryPanel extends FrontPanel {
     };
     private ActionListener actionStopQuery = (e) -> {
         stopQuery();
-    };
-
-    private Action actionOpenFile = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            FileManager.getInstance().openMapleFile();
-        }
     };
 
 }

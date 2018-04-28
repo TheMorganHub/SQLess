@@ -1,6 +1,7 @@
 package com.sqless.ui;
 
 import com.sqless.utils.UIUtils;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
@@ -70,6 +71,12 @@ public abstract class FrontPanel extends javax.swing.JPanel {
      */
     public void setTabTitle(String title) {
         ((UIButtonTabComponent) parentPane.getTabComponentAt(parentPane.getSelectedIndex())).setTitle(title);
+        parentPane.revalidate();
+        parentPane.repaint();
+    }
+
+    public void setTabToolTipText(String text) {
+        parentPane.setToolTipTextAt(getTabIndex(), text);        
     }
 
     /**
@@ -108,6 +115,10 @@ public abstract class FrontPanel extends javax.swing.JPanel {
             }
         }
         return -1;
+    }
+
+    public ImageIcon getTabIcon() {
+        return null;
     }
 
     /**

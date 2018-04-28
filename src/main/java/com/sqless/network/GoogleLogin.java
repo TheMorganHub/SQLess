@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import us.monoid.json.JSONObject;
+import us.monoid.web.Resty;
 
 public class GoogleLogin {
 
@@ -144,7 +145,7 @@ public class GoogleLogin {
         //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
-        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, "access_token=" + credential.getAccessToken()) {
+        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()))) {
             @Override
             public void onSuccess(JSONObject json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()

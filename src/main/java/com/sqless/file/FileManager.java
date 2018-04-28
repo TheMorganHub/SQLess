@@ -37,7 +37,7 @@ public class FileManager {
      * in the {@code UIClient}
      */
     private List<File> openedFiles;
-    
+
     private List<File> openedMapleFiles;
 
     private UIClient client;
@@ -48,7 +48,7 @@ public class FileManager {
      * The number of <b>new</b> files that were created this session.
      */
     private int filesCreatedThisSession;
-    
+
     private int mapleFilesCreatedThisSession;
 
     private FileManager() {
@@ -69,7 +69,7 @@ public class FileManager {
     private void addFile(File file) {
         openedFiles.add(file);
     }
-    
+
     private void addMapleFile(File file) {
         openedMapleFiles.add(file);
     }
@@ -91,7 +91,7 @@ public class FileManager {
     public void replaceFileAtIndex(int index, File file) {
         openedFiles.set(index, file);
     }
-    
+
     public void replaceMapleFileAtIndex(int index, File file) {
         openedMapleFiles.set(index, file);
     }
@@ -104,7 +104,7 @@ public class FileManager {
         }
         return false;
     }
-    
+
     public boolean mapleFileIsAlreadyOpen(File file) {
         for (File openedFile : openedMapleFiles) {
             if (file.getPath().equals(openedFile.getPath())) {
@@ -145,7 +145,7 @@ public class FileManager {
             System.err.println("FILE MANAGER: " + e.getMessage());
         }
     }
-    
+
     public void acceptAndOpenMapleFile(File file) {
         if (!dirOrFileExists(file.getPath())) {
             UIUtils.showErrorMessage("Archivo no encontrado", file.getName() + " no existe.", client);
@@ -175,11 +175,11 @@ public class FileManager {
         addFile(file);
         return file.getPath();
     }
-    
+
     public String newMapleFile() {
         mapleFilesCreatedThisSession++;
         File file = new File("Maple_File_" + mapleFilesCreatedThisSession);
-        addFile(file);
+        addMapleFile(file);
         return file.getPath();
     }
 
@@ -239,7 +239,7 @@ public class FileManager {
             }
         }
     }
-    
+
     public void openMapleFile() {
         JTabbedPane tabPane = client.getTabPaneContent();
         UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
@@ -258,7 +258,7 @@ public class FileManager {
 
         int returnVal = chooser.showOpenDialog(client);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            if (fileIsAlreadyOpen(chooser.getSelectedFile())) { //el archivo ya existe
+            if (mapleFileIsAlreadyOpen(chooser.getSelectedFile())) { //el archivo ya existe
                 String filePath = chooser.getSelectedFile().getPath();
                 List<UIMapleQueryPanel> queryPanels = UIClient.getInstance().getMapleQueryPanels();
                 for (UIMapleQueryPanel queryPanel : queryPanels) {
@@ -270,7 +270,7 @@ public class FileManager {
                     }
                 }
             } else {
-                acceptAndOpenFile(chooser.getSelectedFile());
+                acceptAndOpenMapleFile(chooser.getSelectedFile());
             }
         }
     }
@@ -315,7 +315,7 @@ public class FileManager {
             }
         }
     }
-    
+
     public void dragNDropMapleFile(File file) {
         JTabbedPane tabPane = client.getTabPaneContent();
         if (fileIsMaple(file)) {
@@ -360,7 +360,6 @@ public class FileManager {
         if (tabPane.getTabCount() == 0) {
             return;
         }
-        int selectedIndex = tabPane.getSelectedIndex();
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "SQL File (.sql)", "SQL");
@@ -373,7 +372,7 @@ public class FileManager {
         chooser.setAcceptAllFileFilterUsed(false);
 
         //"suggests" a file name name based on the name of the selected index
-        chooser.setSelectedFile(new File(tabPane.getTitleAt(selectedIndex)));
+        chooser.setSelectedFile(new File(queryPanel.getTabTitle()));
         boolean success = false;
         int returnVal = chooser.showSaveDialog(client);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -395,7 +394,7 @@ public class FileManager {
             }
 
             if (success) {
-                tabPane.setTitleAt(selectedIndex, selFileName);
+                queryPanel.setTabTitle(selFileName);
                 replaceFileAtIndex(getFileIndex(filePath), new File(selFileFullPath));
                 queryPanel.updateFilePath(selFileFullPath);
                 queryPanel.unboldTitleLabel();
@@ -489,6 +488,15 @@ public class FileManager {
         }
     }
 
+    public void removeMapleFile(String filePath) {
+        for (File openedFile : openedMapleFiles) {
+            if (openedFile.getPath().equals(filePath)) {
+                openedMapleFiles.remove(openedFile);
+                break;
+            }
+        }
+    }
+
     public void saveTableAs(JTable table) {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filterCsv = new FileNameExtensionFilter(
@@ -517,7 +525,7 @@ public class FileManager {
     public int getFilesCreatedThisSession() {
         return filesCreatedThisSession;
     }
-    
+
     public int getMapleFilesCreatedThisSession() {
         return mapleFilesCreatedThisSession;
     }
@@ -531,7 +539,7 @@ public class FileManager {
     public boolean fileIsSQL(File file) {
         return fileIsSQL(file.getPath());
     }
-    
+
     public boolean fileIsMaple(File file) {
         return fileIsMaple(file.getPath());
     }
@@ -539,7 +547,7 @@ public class FileManager {
     public boolean fileIsSQL(String filepath) {
         return filepath.endsWith(".sql");
     }
-    
+
     public boolean fileIsMaple(String filepath) {
         return filepath.endsWith(".mpl");
     }

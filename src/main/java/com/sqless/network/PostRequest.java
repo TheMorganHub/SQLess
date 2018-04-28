@@ -1,23 +1,19 @@
 package com.sqless.network;
 
 import us.monoid.json.JSONObject;
-import us.monoid.web.FormContent;
-import us.monoid.web.Resty;
+import us.monoid.web.mime.MultipartContent;
 
 public class PostRequest extends RestRequest {
 
-    private FormContent form;
+    private MultipartContent form;
 
-    public PostRequest(String url, String... formData) {
+    public PostRequest(String url, MultipartContent data) {
         super(url);
-        for (int i = 0; i < formData.length; i++) {
-            formData[i] = encodeSpecialChars(formData[i]);
-        }
-        this.form = Resty.form(formData.length > 1 ? String.join("&", formData) : formData[0]);
+        form = data;
     }
 
-    public PostRequest(String url, boolean newThread, String... formData) {
-        this(url, formData);
+    public PostRequest(String url, boolean newThread, MultipartContent data) {
+        this(url, data);
         super.newThread = newThread;
     }
 
@@ -38,9 +34,4 @@ public class PostRequest extends RestRequest {
             runnable.run();
         }
     }
-    
-    private String encodeSpecialChars(String data) {
-        return data.replaceAll("\\&", "%26");
-    }
-
 }

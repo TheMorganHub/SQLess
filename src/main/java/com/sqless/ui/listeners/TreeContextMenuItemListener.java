@@ -86,6 +86,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     private void loadActions() {
         actionMap = new HashMap<>();
         actionMap.put("EXPORT_DB", actionExportDb);
+        actionMap.put("EXPORT_DB_NO_DATA", actionExportDbNoData);
         actionMap.put("EXECUTE_FROM_SCRIPT", actionExecuteFromScript);
         actionMap.put("SELECT_AS_MAPLE", actionSelectAsMaple);
     }
@@ -184,6 +185,29 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                     System.out.println("El archivo ya existe");
                 }
                 UIDatabaseDumper dbDumper = new UIDatabaseDumper(tempFile);
+                dbDumper.start();
+            } else {
+                if (tempDirectory.mkdir()) {
+                    Files.copy(link, tempFile.getAbsoluteFile().toPath());
+                }
+            }
+            tempFile.deleteOnExit();
+        } catch (IOException ex) {
+            UIUtils.showErrorMessage("Error", ex.getMessage(), null);
+        }
+    };
+    
+    private ActionListener actionExportDbNoData = e -> {
+        try (InputStream link = getClass().getResourceAsStream("/sqldump/mysqldump.exe")) {
+            File tempDirectory = new File(System.getProperty("java.io.tmpdir") + "/SQLess");
+            File tempFile = new File(tempDirectory.getPath() + "/mysqldump.exe");
+            if (tempDirectory.exists()) {
+                if (!tempFile.exists()) {
+                    Files.copy(link, tempFile.getAbsoluteFile().toPath());
+                } else {
+                    System.out.println("El archivo ya existe");
+                }
+                UIDatabaseDumper dbDumper = new UIDatabaseDumper(tempFile, true);
                 dbDumper.start();
             } else {
                 if (tempDirectory.mkdir()) {

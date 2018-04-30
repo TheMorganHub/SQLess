@@ -96,6 +96,7 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent e) {
             getModel().addRow(new String[]{""});
             UIUtils.scrollToBottom(scrTable);
+            uiTable.setRowSelectionInterval(uiTable.getRowCount() - 1, uiTable.getRowCount() - 1);
         }
     };
 
@@ -110,6 +111,15 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
                         getModel().removeRow(selectedRows[i]);
                     }
                     valuesChanged = true;
+                    if (uiTable.getRowCount() > 0) {
+                        int selRowStart = selectedRows[0];
+                        //si la fila a remover fue la última en la tabla, seleccionamos la que ahora es última
+                        if (selRowStart == uiTable.getRowCount()) {
+                            uiTable.setRowSelectionInterval(selRowStart - 1, selRowStart - 1);
+                        } else { //de lo contrario, seleccionamos la que nos cae de arriba, que ahora va a ocupar el lugar de la removida
+                            uiTable.setRowSelectionInterval(selRowStart, selRowStart);
+                        }
+                    }
                 }
             }
         }
@@ -186,7 +196,8 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
         tbButtons.setRollover(true);
 
         btnAdd.setAction(actionAdd);
-        btnAdd.setText("+");
+        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_createtable/ADD_VALUE_ICON.png"))); // NOI18N
+        btnAdd.setText("");
         btnAdd.setFocusable(false);
         btnAdd.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnAdd.setMargin(new java.awt.Insets(2, 4, 2, 4));
@@ -194,7 +205,8 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
         tbButtons.add(btnAdd);
 
         btnDelete.setAction(actionRemove);
-        btnDelete.setText("-");
+        btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_createtable/DELETE_VALUE_ICON.png"))); // NOI18N
+        btnDelete.setText("");
         btnDelete.setFocusable(false);
         btnDelete.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDelete.setMargin(new java.awt.Insets(2, 4, 2, 4));

@@ -84,7 +84,7 @@ public class UIEditTable extends FrontPanel {
 
         uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "REFRESH_TABLE");
         uiTable.getActionMap().put("REFRESH_TABLE", actionRefreshTable);
-        
+
         uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_ROW");
         uiTable.getActionMap().put("DELETE_ROW", actionDeleteRow);
     }
@@ -373,6 +373,7 @@ public class UIEditTable extends FrontPanel {
     private JButton btnAddRow;
     private JButton btnDeleteRows;
     private JButton btnRefresh;
+    private JButton btnTruncate;
     private JMenuItem menuItemSave;
 
     @Override
@@ -382,7 +383,8 @@ public class UIEditTable extends FrontPanel {
             btnDeleteRows = UIUtils.newToolbarBtn(actionDeleteRow, "Eliminar la(s) fila(s) seleccionada(s)", UIUtils.icon(this, "DELETE_ROWS"));
             btnSave = UIUtils.newToolbarBtn(actionSaveChanges, "Confirmar todos los cambios", UIUtils.icon(this, "SAVE"));
             btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Cargar la tabla nuevamenete para reflejar cambios externos (F5)", UIUtils.icon(this, "REFRESH"));
-            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddRow, btnDeleteRows, UIUtils.newSeparator(), btnRefresh};
+            btnTruncate = UIUtils.newToolbarBtn(actionTruncateTable, "Eliminar todas las filas en esta tabla (TRUNCATE)", UIUtils.icon(this, "TRUNCATE"));
+            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddRow, btnDeleteRows, UIUtils.newSeparator(), btnRefresh, UIUtils.newSeparator(), btnTruncate};
         }
         return toolbarComponents;
     }
@@ -416,6 +418,34 @@ public class UIEditTable extends FrontPanel {
             }
         }
         uiTable.repaint();
+    };
+
+    private ActionListener actionTruncateTable = e -> {
+        if (!UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.CANCEL)) {
+            return;
+        }
+
+        if (uiTable.getRowCount() == 0) {
+            UIUtils.showErrorMessage("Truncar tabla", "La tabla no tiene filas.", UIClient.getInstance());
+            return;
+        }
+
+        int opt = UIUtils.showConfirmationMessage("Truncar la tabla", "¿Estás seguro que deseas eliminar permanentemente las filas de esta tabla?", UIClient.getInstance());
+        if (opt == 0) {
+            SQLQuery truncateTable = new SQLUpdateQuery(table.getTruncateStatement()) {
+                @Override
+                public void onSuccess(int updateCount) {
+                    ((DefaultTableModel) uiTable.getModel()).setRowCount(0);
+                    rows.clear();
+                }
+
+                @Override
+                public void onFailure(String errMessage) {
+                    UIUtils.showErrorMessage("Error", "No se pudo truncar la tabla.\nEl servidor respondió con mensaje: " + errMessage, UIClient.getInstance());
+                }
+            };
+            truncateTable.exec();
+        }
     };
 
     private Action actionAddRowTab = new AbstractAction() {

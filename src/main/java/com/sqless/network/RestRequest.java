@@ -14,7 +14,7 @@ public abstract class RestRequest {
     protected boolean newThread = true;
 
     public RestRequest(String url) {
-        this.rest = new Resty(Resty.Option.timeout(3000));
+        this.rest = new Resty(Resty.Option.timeout(5000));
         this.url = url;
     }
 

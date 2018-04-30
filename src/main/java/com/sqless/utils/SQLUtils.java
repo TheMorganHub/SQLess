@@ -525,7 +525,7 @@ public class SQLUtils {
         return rows;
     }
 
-    public static Map<String, Integer> getDbStats() {
+    public static Map<String, Integer> getDbStats(boolean skipRows) {
         Map<String, Integer> mapStats = new HashMap<>();
         SQLQuery rowCountQuery = new SQLSelectQuery("SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + getConnectedDBName() + "';") {
             @Override
@@ -579,7 +579,9 @@ public class SQLUtils {
             }
         };
 
-        rowCountQuery.exec();
+        if (!skipRows) {
+            rowCountQuery.exec();
+        }        
         tableCountQuery.exec();
         routinesCountQuery.exec();
         return mapStats;

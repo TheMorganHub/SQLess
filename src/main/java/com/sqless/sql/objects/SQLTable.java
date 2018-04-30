@@ -238,6 +238,10 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
     public String getRetrievePKStatement() {
         return "SHOW KEYS FROM `" + getName() + "` WHERE Key_name = 'PRIMARY'";
     }
+    
+    public String getTruncateStatement() {
+        return "TRUNCATE TABLE `" + getName() + "`";
+    }
 
     public String getRetrieveDetailedFKsStatement() {
         String connectedDb = SQLUtils.getConnectedDBName();

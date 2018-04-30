@@ -1,6 +1,8 @@
 package com.sqless.ui;
 
 import com.sqless.file.FileManagerAdapter;
+import com.sqless.queries.SQLQuery;
+import com.sqless.queries.SQLUpdateQuery;
 import com.sqless.ui.tree.NodeCellEditor;
 import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.ui.tree.NodeTreeModel;
@@ -16,13 +18,12 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.tree.*;
 import com.sqless.sql.connection.SQLConnectionManager;
-import com.sqless.file.FileManager;
-import com.sqless.file.MapleFileManager;
 import com.sqless.settings.PreferenceLoader;
 import com.sqless.ui.listeners.TreeExpandListener;
 import com.sqless.ui.listeners.TreeMouseListener;
 import com.sqless.settings.UserPreferencesLoader;
 import static com.sqless.settings.PreferenceLoader.PrefKey.*;
+import com.sqless.sql.objects.SQLDroppable;
 import static com.sqless.ui.tree.SQLessTreeNode.NodeType.*;
 import com.sqless.userdata.GoogleUser;
 import com.sqless.userdata.GoogleUserManager;
@@ -125,10 +126,46 @@ public class UIClient extends javax.swing.JFrame {
         NodeCellRenderer treeNodeCellRenderer = new NodeCellRenderer();
         treeDiagram.setCellRenderer(treeNodeCellRenderer);
         treeDiagram.setCellEditor(new NodeCellEditor(treeDiagram, treeNodeCellRenderer));
+        treeDiagram.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         treeDiagram.addTreeWillExpandListener(new TreeExpandListener());
         jTreeContextMenuHandler = new TreeContextMenuHandler(treeDiagram);
         treeDiagram.addMouseListener(new TreeMouseListener(treeDiagram, jTreeContextMenuHandler));
+        treeDiagram.getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "ACTION_DROP_OBJECT");
+        treeDiagram.getActionMap().put("ACTION_DROP_OBJECT", actionDropObject);
     }
+
+    private Action actionDropObject = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            TreePath selectedPath = treeDiagram.getSelectionPath();
+            if (selectedPath == null) {
+                return;
+            }
+
+            SQLessTreeNode selectedNode = (SQLessTreeNode) selectedPath.getLastPathComponent();
+            if (selectedNode.getUserObject() instanceof SQLDroppable) {
+                int opt = UIUtils.showConfirmationMessage("Eliminar objeto", "¿Estás seguro que deseas eliminar permanentemente este objeto?", UIClient.this);
+                if (opt == 0) {
+                    SQLDroppable droppable = (SQLDroppable) selectedNode.getUserObject();
+                    SQLQuery dropQuery = new SQLUpdateQuery(droppable.getDropStatement(), true) {
+                        @Override
+                        public void onSuccess(int updateCount) {
+                            SwingUtilities.invokeLater(() -> {
+                                if (selectedNode.isOfType(SQLessTreeNode.NodeType.DATABASE)) {
+                                    clearJTree();
+                                    SQLConnectionManager.getInstance().setNewConnection("mysql", null);
+                                } else {
+                                    UIUtils.selectTreeNode(treeDiagram, selectedNode.getParent());
+                                    refreshJTree();
+                                }
+                            });
+                        }
+                    };
+                    dropQuery.exec();
+                }
+            }
+        }
+    };
 
     /**
      * Creates a new {@code UIQueryPanel} and sends it the given SQL statement.

@@ -157,28 +157,7 @@ public class FileManager {
     public boolean isNewFile(String filePath) {
         return !filePath.contains("\\");
     }
-
-//    public void openFile() {
-//        JTabbedPane tabPane = client.getTabPaneContent();
-//        UserPreferencesLoader userPrefLoader = UserPreferencesLoader.getInstance();
-//        JFileChooser chooser = new JFileChooser();
-//        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-//                "SQL File (.sql)", "SQL");
-//        chooser.setDialogTitle("Abrir...");
-//        chooser.setFileFilter(filter);
-//        chooser.setAcceptAllFileFilterUsed(false);
-//
-//        String defSaveDir = userPrefLoader.getProperty("Default.SaveDir");
-//        chooser.setCurrentDirectory(FileManager.dirOrFileExists(defSaveDir)
-//                ? new File(defSaveDir)
-//                : new File(userPrefLoader.getDefaultFor("Default.SaveDir")));
-//        chooser.setAcceptAllFileFilterUsed(false);
-//
-//        int returnVal = chooser.showOpenDialog(client);
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//
-//        }
-//    }
+    
     public void doOpenFile(JTabbedPane tabPane, File selectedFile) {
         if (fileIsAlreadyOpen(selectedFile)) { //el archivo ya existe
             String filePath = selectedFile.getPath();

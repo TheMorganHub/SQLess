@@ -15,12 +15,18 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
 
     private File mysqldumpFile;
     private DumperWorker worker;
+    private boolean noData;
 
     public UIDatabaseDumper(File mysqldumpFile) {
         super(UIClient.getInstance(), true);
         initComponents();
         this.mysqldumpFile = mysqldumpFile;
         setLocationRelativeTo(getParent());
+    }
+
+    public UIDatabaseDumper(File mysqldumpFile, boolean noData) {
+        this(mysqldumpFile);
+        this.noData = noData;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,7 +118,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
                 setVisible(true);
             });
             String filePath = mysqldumpFile.getPath().replace(".exe", "");
-            proc = Runtime.getRuntime().exec(new String[]{filePath, "-h" + conManager.getHostName(), "--port=" + conManager.getPort(), "-u" + conManager.getUsername(),
+            proc = Runtime.getRuntime().exec(new String[]{filePath, (noData ? "--no-data" : ""), "-h" + conManager.getHostName(), "--port=" + conManager.getPort(), "-u" + conManager.getUsername(),
                 (conManager.getPassword().isEmpty() ? "" : "-p" + conManager.getPassword()), SQLUtils.getConnectedDBName(), "--routines", "-r" + chosenPath});
 
             proc.waitFor();
@@ -139,7 +145,7 @@ public class UIDatabaseDumper extends javax.swing.JDialog {
 
         public void cleanUpAfterSuccess() {
             setVisible(false);
-            UIPostDumpReport postDumpReport = new UIPostDumpReport();
+            UIPostDumpReport postDumpReport = new UIPostDumpReport(noData);
             postDumpReport.showDialog();
         }
 

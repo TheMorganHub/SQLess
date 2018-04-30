@@ -97,7 +97,8 @@ public class HintsManager {
                                             + "y que ese valor no sea null.", UIClient.getInstance());
                                     return;
                                 }
-                                SQLForeignKey newFk = new SQLForeignKey("fk_" + potentialRefTableName, parentTable.getName(),
+                                String newFkName = "fk_" + (parentTable.getName().isEmpty() ? MiscUtils.random(100000, 900000) + "" : parentTable.getName()) + "_" + potentialRefTableName;
+                                SQLForeignKey newFk = new SQLForeignKey(newFkName, parentTable.getName(),
                                         newName, potentialRefTableName, potentialRefTableCol.getName(), SQLForeignKey.RULE_CASCADE, SQLForeignKey.RULE_CASCADE);
                                 newFk.isBrandNew(true);
                                 parentTable.addFK(newFk);

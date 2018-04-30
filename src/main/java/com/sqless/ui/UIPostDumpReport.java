@@ -7,9 +7,12 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 public class UIPostDumpReport extends javax.swing.JDialog {
+    
+    private boolean noData;
 
-    public UIPostDumpReport() {
+    public UIPostDumpReport(boolean noData) {
         super(UIClient.getInstance(), true);
+        this.noData = noData;
         initComponents();
         setLocationRelativeTo(getParent());
         getRootPane().setDefaultButton(btnCount);
@@ -21,14 +24,14 @@ public class UIPostDumpReport extends javax.swing.JDialog {
             @Override
             protected Map<String, Integer> doInBackground() throws Exception {
                 EventQueue.invokeLater(() -> setVisible(true));
-                return SQLUtils.getDbStats();
+                return SQLUtils.getDbStats(noData);
             }
 
             @Override
             protected void done() {
                 try {
                     Map<String, Integer> stats = get();
-                    lblCountFilas.setText(stats.get("ROW_COUNT") + "");
+                    lblCountFilas.setText(noData ? "N/A" : stats.get("ROW_COUNT") + "");
                     lblCountTablas.setText(stats.get("TABLE_COUNT") + "");
                     lblCountVistas.setText(stats.get("VIEW_COUNT") + "");
                     lblCountProcedures.setText(stats.get("PROCEDURE_COUNT") + "");

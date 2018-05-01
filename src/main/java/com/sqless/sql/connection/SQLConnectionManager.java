@@ -40,10 +40,11 @@ public class SQLConnectionManager {
     public Connection newQueryConnection() {
         Connection newCon = null;
         try {
-            DriverManager.setLoginTimeout(3);
+            DriverManager.setLoginTimeout(5);
             newCon = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + connectedDB.getName()
                     + "?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true", username, password);
         } catch (SQLException e) {
+            System.err.println("Connection timed out.");
         }
         return newCon;
     }

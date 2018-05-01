@@ -65,17 +65,22 @@ public class SQLUIQuery extends SQLQuery {
                     filterDelimiterKeyword();
                     startTime = System.currentTimeMillis();
                     queryConnection = SQLConnectionManager.getInstance().newQueryConnection();
-                    statement = queryConnection.createStatement();
-                    int updateCount = 0;
-                    boolean hasResult = statement.execute(getSql());
-                    while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
-                        if (hasResult) {
-                            fillTable(statement.getResultSet());
+                    if (queryConnection != null) {
+                        statement = queryConnection.createStatement();
+                        int updateCount = 0;
+                        boolean hasResult = statement.execute(getSql());
+                        while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
+                            if (hasResult) {
+                                fillTable(statement.getResultSet());
+                            }
+                            hasResult = statement.getMoreResults();
+                            rowsTotalAffected += updateCount;
                         }
-                        hasResult = statement.getMoreResults();
-                        rowsTotalAffected += updateCount;
+                        queryStatus = Status.SUCCESSFUL;
+                    } else {
+                        queryStatus = Status.FAILED;
+                        errorMessage = "El tiempo de espera para la conexión se agotó.";
                     }
-                    queryStatus = Status.SUCCESSFUL;
                 } catch (SQLException | InterruptedException e) {
                     queryStatus = queryStatus.equals(Status.STOPPED) ? Status.STOPPED : Status.FAILED;
                     errorMessage = e.getMessage();

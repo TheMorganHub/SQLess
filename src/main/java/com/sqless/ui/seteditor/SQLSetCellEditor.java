@@ -1,4 +1,4 @@
-package com.sqless.ui.enumeditor;
+package com.sqless.ui.seteditor;
 
 import java.awt.Component;
 import javax.swing.AbstractCellEditor;

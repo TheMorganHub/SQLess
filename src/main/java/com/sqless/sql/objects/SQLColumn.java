@@ -515,15 +515,16 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
                 + " " + (isStringBased() ? "CHARACTER SET " + characterSet + " " + "COLLATE " + collation : "")
                 + " " + (nullable ? "NULL" : "NOT NULL")
                 + " " + (autoincrement ? "AUTO_INCREMENT " : "")
-                + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT " + (isStringBased() ? "'" + defaultVal + "'" : defaultVal))
+                + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT "
+                + (isStringBased() ? "'" + defaultVal + "'" : isTimeBased() && defaultVal.startsWith("CURRENT") ? defaultVal : "'" + defaultVal + "'"))
                 + (onUpdateCurrentTimeStamp ? " ON UPDATE CURRENT_TIMESTAMP" : "")
                 + " " + getAfterStatement()).trim();
     }
 
     @Override
     public String getCreateStatement() {
-        return "`" + getUncommittedName() + "` " 
-                + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision()) 
+        return "`" + getUncommittedName() + "` "
+                + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision())
                 + " " + (nullable ? "NULL" : "NOT NULL") + " "
                 + (autoincrement ? "AUTO_INCREMENT " : "")
                 + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT " + (isStringBased() ? "'" + defaultVal + "'" : defaultVal));

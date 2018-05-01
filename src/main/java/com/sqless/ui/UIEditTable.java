@@ -1,6 +1,6 @@
 package com.sqless.ui;
 
-import com.sqless.ui.enumeditor.SQLSetCellEditor;
+import com.sqless.ui.seteditor.SQLSetCellEditor;
 import com.mysql.jdbc.Blob;
 import com.sqless.queries.*;
 import com.sqless.sql.objects.*;

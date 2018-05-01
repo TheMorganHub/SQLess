@@ -1,11 +1,11 @@
-package com.sqless.ui.enumeditor;
+package com.sqless.ui.seteditor;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 
 public class UISQLSetPanelInner extends javax.swing.JPanel {
 
@@ -26,14 +26,31 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
      * All the values available in the set.
      */
     private String[] defaultVals;
-    private Component parent;
+    private JPopupMenu parent;
+    private JTextField txtFieldOnConfirm;
 
-    public UISQLSetPanelInner(Component parent, String[] defaultVals, String originalColumnValues) {
+    public UISQLSetPanelInner(JPopupMenu parent, String[] defaultVals, String originalColumnValues) {
         initComponents();
         this.originalColumnValues = originalColumnValues.split(",");
         this.defaultVals = defaultVals;
         this.parent = parent;
         fillPanel();
+    }
+
+    /**
+     * Crea un nuevo panel. Usar este constructor para ocasiones en las que se
+     * utilice este panel en conjunto con un componente que no sea una JTable.
+     *
+     * @param parent El JPopupMenu padre de este panel.
+     * @param defaultVals Los valores que esta columna puede aceptar en su set.
+     * @param originalColumnValues Los valores que la columna tiene asignado en
+     * su set actualmente al abrirse esta ventana.
+     * @param txtFieldOnConfirm Un panel de texto en el cual se podrían ver
+     * reflejados los cambios al presionar el botón de confirmación.
+     */
+    public UISQLSetPanelInner(JPopupMenu parent, String[] defaultVals, String originalColumnValues, JTextField txtFieldOnConfirm) {
+        this(parent, defaultVals, originalColumnValues);
+        this.txtFieldOnConfirm = txtFieldOnConfirm;
     }
 
     private void fillPanel() {
@@ -78,7 +95,7 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
             }
         });
 
-        btnCancel.setText("Cancel");
+        btnCancel.setText("Cancelar");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
@@ -90,8 +107,8 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
         panelBackLayout.setHorizontalGroup(
             panelBackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBackLayout.createSequentialGroup()
-                .addGap(46, 46, 46)
-                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(41, 41, 41)
+                .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOK, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
                 .addGap(6, 6, 6))
@@ -134,12 +151,19 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
                 selected.add(chk.getText());
             }
         }
-        userSelectedValues = selected.toArray(new String[selected.size()]);
-        ((JPopupMenu) parent).setVisible(false);
+
+        if (txtFieldOnConfirm == null) {
+            String[] toArray = selected.toArray(new String[selected.size()]);
+            userSelectedValues = toArray;
+        } else {
+            txtFieldOnConfirm.setText(String.join(",", selected));
+        }
+
+        parent.setVisible(false);
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        ((JPopupMenu) parent).setVisible(false);
+        parent.setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
 

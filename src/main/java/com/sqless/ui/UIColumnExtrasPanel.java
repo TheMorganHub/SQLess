@@ -1,11 +1,15 @@
 package com.sqless.ui;
 
 import com.sqless.sql.objects.SQLColumn;
+import com.sqless.ui.dateeditor.UISQLDatePanelInner;
+import com.sqless.ui.enumeditor.UISQLEnumPanelInner;
+import com.sqless.ui.seteditor.UISQLSetPanelInner;
 import com.sqless.utils.SQLUtils;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
@@ -14,10 +18,12 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.jdesktop.swingx.JXDatePicker;
 
 /**
  * Un {@code JPanel} que sirve para representar, visualizar, y cambiar
@@ -56,6 +62,10 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         btnEditValues.setMargin(new Insets(1, 4, 1, 4));
         btnEditValues.setFocusable(false);
         btnEditValues.addActionListener(actionEditValues);
+        btnEditDefaultVals = new JButton("...");
+        btnEditDefaultVals.setMargin(new Insets(1, 4, 1, 4));
+        btnEditDefaultVals.setFocusable(false);
+        btnEditDefaultVals.addActionListener(actionEditDefaultVals);
 
         setLayout(new java.awt.GridBagLayout());
     }
@@ -93,6 +103,7 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
                 break;
             case "set":
             case "enum":
+                addToPnl(btnEditDefaultVals, 0);
                 addToPnl(lblEnumSetValues, 1);
                 addToPnl(txtEnumSetValues, 1);
                 addToPnl(btnEditValues, 1);
@@ -100,7 +111,11 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
                 txtEnumSetValues.setText(selectedColumn.getEnumLikeValues(false));
                 txtEnumSetValues.getDocument().addDocumentListener(enumSetValueChangeListener);
                 break;
+            case "datetime":
+                addToPnl(btnEditDefaultVals, 0);
+                break;
         }
+
         //estos siempre van a estar
         addToPnl(lblDefault, 0);
         addToPnl(txtDefault, 0);
@@ -214,6 +229,7 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
             }
         }
     };
+    private JButton btnEditDefaultVals;
     private JButton btnEditValues;
     private JTextField txtDefault;
     private JTextField txtEnumSetValues;
@@ -221,4 +237,26 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
     private JLabel lblDefault;
     private JCheckBox chkAutoIncrement;
     private JCheckBox chkUnsigned;
+
+    private ActionListener actionEditDefaultVals = e -> {
+        SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow() == -1 ? 0 : uiTable.getSelectedRow());
+        switch (selectedColumn.getDataType()) {
+            case "enum":
+                JPopupMenu enumPop = new JPopupMenu();
+                UISQLEnumPanelInner enumPanelInnerPopUp = new UISQLEnumPanelInner(enumPop, SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
+                enumPop.add(enumPanelInnerPopUp);
+                enumPop.show(this, btnEditDefaultVals.getLocation().x - 95, btnEditDefaultVals.getLocation().y + 20);
+                break;
+            case "set":
+                JPopupMenu setPop = new JPopupMenu();
+                UISQLSetPanelInner setPanelInnerPopUp = new UISQLSetPanelInner(setPop, SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
+                setPop.add(setPanelInnerPopUp);
+                setPop.show(this, btnEditDefaultVals.getLocation().x - 95, btnEditDefaultVals.getLocation().y + 20);
+                break;
+            case "datetime":
+                UISQLDatePanelInner datePanelInnerPopUp = new UISQLDatePanelInner(selectedColumn, txtDefault.getText(), txtDefault);
+                datePanelInnerPopUp.setVisible(true);
+                break;
+        }
+    };
 }

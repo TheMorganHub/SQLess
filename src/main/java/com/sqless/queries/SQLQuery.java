@@ -49,6 +49,10 @@ public abstract class SQLQuery {
         return sql;
     }
 
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
     /**
      * Called upon execution failure of a query IF {@code defaultErrorHandling}
      * is false. This method is empty by default. Children are free to override

@@ -21,23 +21,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.SwingWorker;
-import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JXTable;
 import us.monoid.json.JSONObject;
 import us.monoid.web.Resty;
 
-public class MapleQuery {
+public class MapleQuery extends SQLQuery {
 
     private Status queryStatus;
     private UIMapleQueryPanel queryPanel;
     private Thread queryThread;
-    private Timer queryTimer;
     private Connection queryConnection;
     private TableFiller currentTableFiller;
     private String mapleStatement;
-    private String convertedSQL;
     private Statement statement;
 
     public enum Status {
@@ -49,6 +46,7 @@ public class MapleQuery {
         this.queryPanel = queryPanel;
     }
 
+    @Override
     public void exec() {
         if (queryPanel != null) {
             queryPanel.clearMessages();
@@ -75,15 +73,16 @@ public class MapleQuery {
                                 onFailure(json.getString("err"));
                                 return;
                             }
-
-                            MapleQuery.this.convertedSQL = json.getString("CONVERTED_SQL");
-                            queryPanel.setConvertedSQL(MapleQuery.this.convertedSQL);
+                            
+                            setSql(json.getString("CONVERTED_SQL"));
+                            filterDelimiterKeyword();
+                            queryPanel.setConvertedSQL(getSql());
                             requestSuccess.set(true);
                         }
 
                         @Override
                         public void onFailure(String message) {
-                            errorMessage = message;
+                            errorMessage = message.equalsIgnoreCase("connect timed out") ? "El servidor no se encuentra disponible en estos momentos (el tiempo de espera se agotó)." : message;
                             queryStatus = Status.FAILED;
                             requestSuccess.set(false);
                         }
@@ -96,7 +95,7 @@ public class MapleQuery {
                         statement = queryConnection.createStatement();
 
                         int updateCount = 0;
-                        boolean hasResult = statement.execute(convertedSQL);
+                        boolean hasResult = statement.execute(getSql());
                         while (hasResult || (updateCount = statement.getUpdateCount()) != -1) {
                             if (hasResult) {
                                 fillTable(statement.getResultSet());
@@ -127,6 +126,7 @@ public class MapleQuery {
         queryThread.start();
     }
 
+    @Override
     public void closeQuery() {
         try {
             if (statement != null) {
@@ -210,7 +210,6 @@ public class MapleQuery {
                     }
 
                     if (rowCount == MAX_ROWS) {
-//                        queryTimer.stop();
                         UIUtils.showWarning("Número máximo de filas excedido", "El número máximo de filas (" + MAX_ROWS + ") que SQLess puede mostrar para esta query será excedido. "
                                 + "SQLess mostrará los resultados hasta ahora y pasará a la siguiente query en cola.", UIClient.getInstance());
                         break;

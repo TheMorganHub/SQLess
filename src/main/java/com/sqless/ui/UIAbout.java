@@ -17,6 +17,8 @@ public class UIAbout extends javax.swing.JDialog {
         initComponents();
         loadInfo();
         setLocationRelativeTo(getParent());
+        getRootPane().setDefaultButton(btnClose);
+        btnClose.requestFocus();
     }
 
     public void appendCategory(String cat) {

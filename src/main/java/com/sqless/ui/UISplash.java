@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,9 +22,10 @@ public class UISplash extends JFrame {
 
     public UISplash() {
         try {
-            setUndecorated(true);
+            setIconImage(new ImageIcon(getClass().getResource("/images/ui_general/SQLess_logo_mini.png")).getImage());
+            setUndecorated(true);            
             setLayout(new GridBagLayout());
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);           
 
             ImagePane pane = new ImagePane(ImageIO.read(getClass().getResource("/images/ui_splash/SQLess_SPLASH.png")));
             pane.setLayout(new BorderLayout());

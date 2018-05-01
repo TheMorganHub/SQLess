@@ -3,6 +3,7 @@ package com.sqless.ui;
 import com.sqless.file.FileManagerAdapter;
 import com.sqless.file.MapleFileManager;
 import com.sqless.queries.MapleQuery;
+import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Component;
@@ -19,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import jsyntaxpane.DefaultSyntaxKit;
@@ -69,7 +70,9 @@ public class UIMapleQueryPanel extends FrontPanel {
     public void initEditor() {
         DefaultSyntaxKit.initKit();
         txtSQLQuery.setContentType("text/sql");
-//        txtMapleQuery.setComponentPopupMenu(popMenuEditor);
+        txtSQLQuery.setComponentPopupMenu(null);
+        txtMapleQuery.setContentType("text/sql");
+        txtMapleQuery.setComponentPopupMenu(popMenuEditor);
         txtMapleQuery.getDocument().addDocumentListener(queryDocumentListener);
         txtMapleQuery.addKeyListener(editorListener);
         txtMapleQuery.setDropTarget(fileDragNDrop);
@@ -202,15 +205,65 @@ public class UIMapleQueryPanel extends FrontPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popMenuEditor = new javax.swing.JPopupMenu();
+        menuItemCut = new javax.swing.JMenuItem();
+        menuItemCopy = new javax.swing.JMenuItem();
+        menuItemPaste = new javax.swing.JMenuItem();
+        menuItemSelectAllEditor = new javax.swing.JMenuItem();
+        menuItemFind = new javax.swing.JMenuItem();
         splitPane = new javax.swing.JSplitPane();
         tabPaneQuery = new javax.swing.JTabbedPane();
-        scrPane = new javax.swing.JScrollPane();
-        txtMapleQuery = new javax.swing.JTextArea();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrPaneMaple = new javax.swing.JScrollPane();
+        txtMapleQuery = new javax.swing.JEditorPane();
+        scrPaneSQL = new javax.swing.JScrollPane();
         txtSQLQuery = new javax.swing.JEditorPane();
         tabPane = new javax.swing.JTabbedPane();
         lblFilas = new javax.swing.JLabel();
         lblMs = new javax.swing.JLabel();
+
+        menuItemCut.setText("Cortar");
+        menuItemCut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemCutActionPerformed(evt);
+            }
+        });
+        popMenuEditor.add(menuItemCut);
+
+        menuItemCopy.setText("Copiar");
+        menuItemCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemCopyActionPerformed(evt);
+            }
+        });
+        popMenuEditor.add(menuItemCopy);
+
+        menuItemPaste.setText("Pegar");
+        menuItemPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemPasteActionPerformed(evt);
+            }
+        });
+        popMenuEditor.add(menuItemPaste);
+        popMenuEditor.addSeparator();
+
+        menuItemSelectAllEditor.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        menuItemSelectAllEditor.setText("Seleccionar todo");
+        menuItemSelectAllEditor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSelectAllEditorActionPerformed(evt);
+            }
+        });
+        popMenuEditor.add(menuItemSelectAllEditor);
+        popMenuEditor.addSeparator();
+
+        menuItemFind.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+        menuItemFind.setText("Encontrar...");
+        menuItemFind.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemFindActionPerformed(evt);
+            }
+        });
+        popMenuEditor.add(menuItemFind);
 
         splitPane.setBorder(null);
         splitPane.setDividerLocation(450);
@@ -219,16 +272,15 @@ public class UIMapleQueryPanel extends FrontPanel {
 
         tabPaneQuery.setFocusable(false);
 
-        txtMapleQuery.setColumns(20);
-        txtMapleQuery.setRows(5);
-        scrPane.setViewportView(txtMapleQuery);
+        txtMapleQuery.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        scrPaneMaple.setViewportView(txtMapleQuery);
 
-        tabPaneQuery.addTab("Maple", scrPane);
+        tabPaneQuery.addTab("Maple", scrPaneMaple);
 
         txtSQLQuery.setEditable(false);
-        jScrollPane1.setViewportView(txtSQLQuery);
+        scrPaneSQL.setViewportView(txtSQLQuery);
 
-        tabPaneQuery.addTab("SQL", jScrollPane1);
+        tabPaneQuery.addTab("SQL", scrPaneSQL);
 
         splitPane.setLeftComponent(tabPaneQuery);
 
@@ -262,6 +314,26 @@ public class UIMapleQueryPanel extends FrontPanel {
 
         UIUtils.flattenPane(splitPane);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void menuItemCutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCutActionPerformed
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_X);
+    }//GEN-LAST:event_menuItemCutActionPerformed
+
+    private void menuItemCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCopyActionPerformed
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_C);
+    }//GEN-LAST:event_menuItemCopyActionPerformed
+
+    private void menuItemPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPasteActionPerformed
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_V);
+    }//GEN-LAST:event_menuItemPasteActionPerformed
+
+    private void menuItemSelectAllEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSelectAllEditorActionPerformed
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_A);
+    }//GEN-LAST:event_menuItemSelectAllEditorActionPerformed
+
+    private void menuItemFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemFindActionPerformed
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_H);
+    }//GEN-LAST:event_menuItemFindActionPerformed
 
     public void setConvertedSQL(String converted) {
         txtSQLQuery.setText(converted);
@@ -313,7 +385,7 @@ public class UIMapleQueryPanel extends FrontPanel {
         }
     };
 
-    public JTextArea getMapleEditorPane() {
+    public JEditorPane getMapleEditorPane() {
         return txtMapleQuery;
     }
 
@@ -323,14 +395,20 @@ public class UIMapleQueryPanel extends FrontPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFilas;
     private javax.swing.JLabel lblMs;
-    private javax.swing.JScrollPane scrPane;
+    private javax.swing.JMenuItem menuItemCopy;
+    private javax.swing.JMenuItem menuItemCut;
+    private javax.swing.JMenuItem menuItemFind;
+    private javax.swing.JMenuItem menuItemPaste;
+    private javax.swing.JMenuItem menuItemSelectAllEditor;
+    private javax.swing.JPopupMenu popMenuEditor;
+    private javax.swing.JScrollPane scrPaneMaple;
+    private javax.swing.JScrollPane scrPaneSQL;
     private javax.swing.JSplitPane splitPane;
     private javax.swing.JTabbedPane tabPane;
     private javax.swing.JTabbedPane tabPaneQuery;
-    private javax.swing.JTextArea txtMapleQuery;
+    private javax.swing.JEditorPane txtMapleQuery;
     private javax.swing.JEditorPane txtSQLQuery;
     // End of variables declaration//GEN-END:variables
     private JButton btnRun;

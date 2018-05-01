@@ -53,7 +53,7 @@ public class HintsManager {
             return;
         }
         if (tableChangeListener.getNewValue().equals("id")) {
-            int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría identificar a esta tabla.\n"
+            int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría identificar a esta tabla. "
                     + "¿Deseas que SQLess la transforme en una Primary Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
             if (opt == 0) {
                 col.getParentTable().getPrimaryKey().addColumn(col);

@@ -527,7 +527,8 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
                 + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision())
                 + " " + (nullable ? "NULL" : "NOT NULL") + " "
                 + (autoincrement ? "AUTO_INCREMENT " : "")
-                + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT " + (isStringBased() ? "'" + defaultVal + "'" : defaultVal));
+                + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT "
+                + (isStringBased() ? "'" + defaultVal + "'" : isTimeBased() && defaultVal.startsWith("CURRENT") ? defaultVal : "'" + defaultVal + "'"));
     }
 
     public String getCreateStatement(boolean addColumnKeywords) {

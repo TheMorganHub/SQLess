@@ -139,10 +139,14 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             case TABLE:
                 SQLTable table = (SQLTable) node.getUserObject();
                 UIEditTable uiEditTable = new UIEditTable(client.getTabPaneContent(), table);
+                if (!uiEditTable.checkIntegrity()) {
+                    break;
+                }
                 if (uiEditTable.tableAllowsModifications()) {
                     client.sendToNewTab(uiEditTable);
                 } else {
-                    UIUtils.showErrorMessage("Editar filas", "Para usar esta funcionalidad, la tabla debe tener una columna marcada como primary key.", null);
+                    UIUtils.showErrorMessage("Editar filas", "Para usar esta funcionalidad, la tabla debe tener una columna marcada como primary key.\nSi la tabla tiene una PK, "
+                            + "asegúrate que la conexión con la base de datos esté activa.", UIClient.getInstance());
                 }
                 break;
         }
@@ -196,7 +200,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             UIUtils.showErrorMessage("Error", ex.getMessage(), null);
         }
     };
-    
+
     private ActionListener actionExportDbNoData = e -> {
         try (InputStream link = getClass().getResourceAsStream("/sqldump/mysqldump.exe")) {
             File tempDirectory = new File(System.getProperty("java.io.tmpdir") + "/SQLess");
@@ -226,7 +230,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
             uiExecuteFromScript.start();
         });
     };
-    
+
     private ActionListener actionSelectAsMaple = e -> {
         SQLessTreeNode node = (SQLessTreeNode) e.getSource();
         client.createNewMapleQueryPanelAndRun(((SQLSelectable) node.getUserObject()).getMapleSelectStatement(1000));

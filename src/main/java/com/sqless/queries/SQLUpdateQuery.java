@@ -39,9 +39,13 @@ public class SQLUpdateQuery extends SQLQuery {
     public void exec() {
         try {
             standaloneUpdateConnection = SQLConnectionManager.getInstance().newQueryConnection();
-            statement = standaloneUpdateConnection.createStatement();
-            int affectedRows = statement.executeUpdate(getSql());
-            onSuccess(affectedRows);
+            if (standaloneUpdateConnection != null && !standaloneUpdateConnection.isClosed()) {
+                statement = standaloneUpdateConnection.createStatement();
+                int affectedRows = statement.executeUpdate(getSql());
+                onSuccess(affectedRows);
+            } else {
+                onFailure("La conexión con el servidor no se pudo realizar.");
+            }
         } catch (SQLException ex) {
             if (defaultErrorHandling) {
                 onFailureStandard(ex.getMessage());

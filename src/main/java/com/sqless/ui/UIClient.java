@@ -66,7 +66,7 @@ public class UIClient extends javax.swing.JFrame {
 
                 SQLConnectionManager conManager = SQLConnectionManager.getInstance();
 
-                publish("Conectando a motor de base de datos: " + conManager.getClientHostname());
+                publish("Conectando a motor de base de datos...");
 
                 conManager.setNewConnection("mysql", UIClient.this);
                 return null;
@@ -552,8 +552,12 @@ public class UIClient extends javax.swing.JFrame {
         tabPaneContent.addTab(frontUI.getTabTitle(), null, frontUI, frontUI.getTabTitle());
         tabPaneContent.setTabComponentAt(tabPaneContent.getTabCount() - 1, new UIButtonTabComponent(tabPaneContent));
         tabPaneContent.setSelectedIndex(tabPaneContent.getTabCount() - 1);
-        frontUI.onCreate();
-        frontUI.getTabLabel().setIcon(frontUI.getTabIcon());
+        if (frontUI.checkIntegrity()) {
+            frontUI.onCreate();
+            frontUI.getTabLabel().setIcon(frontUI.getTabIcon());
+        } else {
+            tabPaneContent.removeTabAt(tabPaneContent.getTabCount() - 1);
+        }
     }
 
     public List<UIQueryPanel> getQueryPanels() {
@@ -625,6 +629,12 @@ public class UIClient extends javax.swing.JFrame {
         }
         toolbarTop.revalidate();
         toolbarTop.repaint();
+    }
+
+    public void refreshEntireJTree() {
+        DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode) treeDiagram.getModel().getRoot());
+        treeDiagram.setSelectionPath(new TreePath(firstLeaf.getPath()));
+        refreshJTree();
     }
 
     public void refreshJTree() {

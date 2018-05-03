@@ -88,7 +88,9 @@ public class UIFKCellEditor extends javax.swing.JPanel {
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
-                panelInnerPopUp.setCancelled(true);
+                if (panelInnerPopUp != null) {
+                    panelInnerPopUp.setCancelled(true);
+                }                
             }
         });
     }//GEN-LAST:event_btnShowPopupActionPerformed

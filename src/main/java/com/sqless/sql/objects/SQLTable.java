@@ -1,8 +1,11 @@
 package com.sqless.sql.objects;
 
+import com.sqless.ui.GenericWaitingDialog;
 import com.sqless.utils.SQLUtils;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingUtilities;
+import com.sqless.utils.AsyncAction;
 
 public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable,
         SQLCreatable, SQLDroppable {
@@ -130,12 +133,12 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
     public List<SQLForeignKey> getForeignKeys() {
         return foreignKeys;
     }
-    
+
     public SQLForeignKey getForeignKeyFromColumn(SQLColumn column) {
         if (foreignKeys == null || foreignKeys.isEmpty() || column == null || !column.isFK()) {
             return null;
         }
-        
+
         for (SQLForeignKey foreignKey : foreignKeys) {
             if (foreignKey.getField().equals(column.getName())) {
                 return foreignKey;
@@ -238,7 +241,7 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
     public String getRetrievePKStatement() {
         return "SHOW KEYS FROM `" + getName() + "` WHERE Key_name = 'PRIMARY'";
     }
-    
+
     public String getTruncateStatement() {
         return "TRUNCATE TABLE `" + getName() + "`";
     }

@@ -26,6 +26,11 @@ public abstract class FrontPanel extends javax.swing.JPanel {
     protected JTabbedPane parentPane;
     protected java.awt.Component[] toolbarComponents;
     protected javax.swing.JMenuItem[] menuItems;
+    private Integrity integrity = Integrity.HEALTHY;
+
+    protected enum Integrity {
+        HEALTHY, CORRUPT;
+    }
 
     public FrontPanel(JTabbedPane parentPane) {
         this.parentPane = parentPane;
@@ -57,6 +62,27 @@ public abstract class FrontPanel extends javax.swing.JPanel {
      * constructor.
      */
     public void onCreate() {
+    }
+
+    /**
+     * Se chequea si la integridad de este FrontPanel no está corrupta.
+     * Cualquier FrontPanel durante su funcionamiento puede setear esta
+     * propiedad como {@link Integrity#CORRUPT} o {@link Integrity#HEALTHY}. Por
+     * ejemplo, el UIClient, utiliza esta propiedad al momento de insertar el
+     * FrontPanel en el tab correspondiente. Si la integridad es Corrupta en ese
+     * momento, el FrontPanel no será agregado. Por ejemplo, si algo en la
+     * inicialización o constuctor de este FrontPanel hizo que {@code integrity}
+     * sea CORRUPT, UIClient no agregará este FrontPanel.
+     *
+     * @return {@code true} si la integridad es 'Healthy', {@code false} si es
+     * 'Corrupt'.
+     */
+    public boolean checkIntegrity() {
+        return !integrity.equals(Integrity.CORRUPT);
+    }
+
+    public void setIntegrity(Integrity integrity) {
+        this.integrity = integrity;
     }
 
     public abstract String getTabTitle();

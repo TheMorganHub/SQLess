@@ -64,6 +64,8 @@ public class UICreateTableSQLess extends FrontPanel {
     public static final int TABLE_CREATE = 1;
     public static final int TABLE_UPDATE = 2;
     private int task = -1;
+    private boolean fromSuggestion;
+    private GenericWaitingDialog waitDialog;
 
     /**
      * Crea un nuevo editor de tablas.
@@ -79,17 +81,33 @@ public class UICreateTableSQLess extends FrontPanel {
         if (sqlTable == null) {
             task = TABLE_CREATE;
             this.sqlTable = new SQLTable();
-            this.sqlTable.addColumn(new SQLColumn(""));
+            waitDialog = new GenericWaitingDialog("Cargando...");
+            waitDialog.display(() -> {
+                SQLColumn emptyNewColumn = new SQLColumn("");
+                if (emptyNewColumn.getCollation() != null && emptyNewColumn.getCharacterSet() != null) {
+                    this.sqlTable.addColumn(emptyNewColumn);
+                    SwingUtilities.invokeLater(() -> postColumnLoadTasks());
+                } else {
+                    setIntegrity(Integrity.CORRUPT);
+                    waitDialog.dispose();
+                    UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());                    
+                }
+            });
         } else {
             task = TABLE_UPDATE;
             this.sqlTable = new SQLTable(sqlTable);
-            this.sqlTable.loadColumnsForUI();
+            waitDialog = new GenericWaitingDialog("Cargando columnas...");
+            waitDialog.display(() -> {
+                this.sqlTable.loadColumnsForUI();
+                if (!this.sqlTable.getColumns().isEmpty()) {
+                    SwingUtilities.invokeLater(() -> postColumnLoadTasks());
+                } else {
+                    setIntegrity(Integrity.CORRUPT);
+                    waitDialog.dispose();
+                    UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());
+                }                
+            });
         }
-        fkList = this.sqlTable.getForeignKeys();
-        columnList = this.sqlTable.getColumns();
-
-        pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
-        prepararUI();
     }
 
     /**
@@ -111,7 +129,7 @@ public class UICreateTableSQLess extends FrontPanel {
                     + "Use UICreateTableSQLess(JTabbedPane parentPane, SQLTable sqlTable) if the editor isn't created from a suggestion.");
         }
         initComponents();
-
+        this.fromSuggestion = fromSuggestion;
         task = TABLE_CREATE;
         sqlTable = new SQLTable();
         fkList = this.sqlTable.getForeignKeys();
@@ -129,10 +147,14 @@ public class UICreateTableSQLess extends FrontPanel {
         syncRowWithList(0);
         syncRowWithList(1);
         prepararUI();
-        SwingUtilities.invokeLater(() -> {
-            uiTable.setRowSelectionInterval(1, 1);
-            SwingUtilities.invokeLater(() -> uiTable.editCellAt(1, 1));
-        });
+    }
+
+    private void postColumnLoadTasks() {
+        fkList = this.sqlTable.getForeignKeys();
+        columnList = this.sqlTable.getColumns();
+
+        pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
+        prepararUI();
     }
 
     public void prepararUI() {
@@ -159,18 +181,26 @@ public class UICreateTableSQLess extends FrontPanel {
         uiTable.getSelectionModel().addListSelectionListener(tableSelectionListener);
 
         cellChangeListener = new TableCellListener(uiTable, actionEditCell);
-        SwingUtilities.invokeLater(() -> {
-            uiTable.setRowSelectionInterval(0, 0);
-            if (task == TABLE_CREATE) {
-                SwingUtilities.invokeLater(() -> uiTable.editCellAt(0, 1));
-            }
-            if (task == TABLE_UPDATE) {
-                getTableModel().setRowCount(columnList.size());
 
-                for (int i = 0; i < columnList.size(); i++) {
-                    SQLColumn col = columnList.get(i);
-                    syncRowWithList(i);
-                }
+        if (task == TABLE_UPDATE) {
+            getTableModel().setRowCount(columnList.size());
+
+            for (int i = 0; i < columnList.size(); i++) {
+                SQLColumn col = columnList.get(i);
+                syncRowWithList(i);
+            }
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        SwingUtilities.invokeLater(() -> {
+            int row = fromSuggestion ? 1 : 0;
+            uiTable.setRowSelectionInterval(row, row);
+            if (task == TABLE_CREATE) {
+                SwingUtilities.invokeLater(() -> {
+                    uiTable.editCellAt(fromSuggestion ? 1 : 0, 1);
+                });
             }
         });
     }

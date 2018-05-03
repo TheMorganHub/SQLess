@@ -6,12 +6,15 @@ import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIConnectionWizard;
 import com.sqless.sql.objects.SQLDatabase;
+import com.sqless.ui.GenericWaitingDialog;
+import com.sqless.ui.UIClient;
 import java.awt.Frame;
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.SwingUtilities;
 
 /**
  * This class manages everything related to SQLess' connection with the SQLDB
@@ -36,6 +39,7 @@ public class SQLConnectionManager {
     private String hostName;
     private String port;
     private String serverHostName;
+    private GenericWaitingDialog restoreDialog;
 
     public Connection newQueryConnection() {
         Connection newCon = null;
@@ -47,6 +51,16 @@ public class SQLConnectionManager {
             System.err.println("Connection timed out.");
         }
         return newCon;
+    }
+
+    public void restoreLostConnection() {
+        restoreDialog = new GenericWaitingDialog("La conexión con el servidor se perdió. Intentando restablecer...");
+        restoreDialog.display(() -> {
+            SwingUtilities.invokeLater(() -> UIClient.getInstance().setCursor(UIUtils.WAIT_CURSOR));
+            setNewConnectionNoRepair(connectedDB.getName(), UIClient.getInstance());
+            UIClient.getInstance().refreshEntireJTree();
+            SwingUtilities.invokeLater(() -> UIClient.getInstance().setCursor(UIUtils.DEFAULT_CURSOR));
+        });
     }
 
     public Connection newBatchQueryConnection() {
@@ -78,6 +92,9 @@ public class SQLConnectionManager {
                     + " as " + username + " in " + elapsed + "ms");
             return true;
         } catch (SQLException e) {
+            if (restoreDialog != null && restoreDialog.isVisible()) {
+                restoreDialog.dispose();
+            }
             UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
             System.err.println(e.getMessage());
         }
@@ -92,7 +109,7 @@ public class SQLConnectionManager {
      * @param parent The parent {@code Frame} that will display any errors that
      * occur within this operation.
      */
-    private void connectToSavedHost(String dbName, boolean dbIsBrandNew, Frame parent) {
+    private void connectToSavedHost(String dbName, boolean dbIsBrandNew, boolean showRepairConnection, Frame parent) {
         UserPreferencesLoader userPrefs = UserPreferencesLoader.getInstance();
         String hostName = userPrefs.getProperty("Connection.Host");
         String port = userPrefs.getProperty("Connection.Port");
@@ -101,11 +118,19 @@ public class SQLConnectionManager {
         boolean success = connectToDatabase(dbName, username, password, hostName, port, parent);
         if (success) {
             connectedDB = dbIsBrandNew ? new SQLDatabase(dbName, true) : new SQLDatabase(dbName);
+            if (!showRepairConnection) { //este parámetro solo está en falso cuando este método es llamado mediante restoreLostConnection
+                if (restoreDialog.isVisible()) {
+                    restoreDialog.dispose();
+                }
+                UIUtils.showMessage("Aviso", "La conexión fue restablecida.", UIClient.getInstance());
+            }
         } else {
-            UIConnectionWizard fixConnection = new UIConnectionWizard(parent,
-                    UIConnectionWizard.Task.REPAIR);
-            fixConnection.setVisible(true);
-            connectToSavedHost(dbName, dbIsBrandNew, parent);
+            if (showRepairConnection) {
+                UIConnectionWizard fixConnection = new UIConnectionWizard(parent,
+                        UIConnectionWizard.Task.REPAIR);
+                fixConnection.setVisible(true);
+                connectToSavedHost(dbName, dbIsBrandNew, true, parent);
+            }
         }
     }
 
@@ -118,7 +143,11 @@ public class SQLConnectionManager {
      * within this operation.
      */
     public void setNewConnection(String dbName, Frame parent) {
-        connectToSavedHost(dbName, false, parent);
+        connectToSavedHost(dbName, false, true, parent);
+    }
+
+    public void setNewConnectionNoRepair(String dbName, Frame parent) {
+        connectToSavedHost(dbName, false, false, parent);
     }
 
     /**
@@ -136,7 +165,7 @@ public class SQLConnectionManager {
      */
     public void setNewConnection(String dbName, boolean dbIsBrandNew, Frame parent) {
         closeConnection();
-        connectToSavedHost(dbName, dbIsBrandNew, parent);
+        connectToSavedHost(dbName, dbIsBrandNew, true, parent);
     }
 
     /**

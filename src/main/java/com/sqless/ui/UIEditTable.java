@@ -44,14 +44,23 @@ public class UIEditTable extends FrontPanel {
     private TableCellListener cellListener;
     private SQLPrimaryKey tablePK;
     private List<SQLRow> rows;
+    private GenericWaitingDialog waitingDialog;
 
     public UIEditTable(JTabbedPane parentPane, SQLTable table) {
         super(parentPane);
         this.table = new SQLTable(table);
-        this.table.loadColumns();
         initComponents();
-        rows = new ArrayList<>();
-        tablePK = this.table.getPrimaryKey();
+        waitingDialog = new GenericWaitingDialog("Cargando...");
+        waitingDialog.display(() -> {
+            this.table.loadColumns();
+            if (this.table.getColumns().isEmpty()) {
+                setIntegrity(Integrity.CORRUPT);
+            } else {
+                rows = new ArrayList<>();
+                tablePK = this.table.getPrimaryKey();
+                prepareTable();
+            }
+        });
     }
 
     /**
@@ -68,7 +77,6 @@ public class UIEditTable extends FrontPanel {
     @Override
     public void onCreate() {
         splitPane.setDividerLocation((int) (parentPane.getHeight() * 0.75));
-        prepareTable();
     }
 
     public void prepareTable() {
@@ -91,6 +99,9 @@ public class UIEditTable extends FrontPanel {
 
     public void makeTableModel() {
         List<SQLColumn> columns = table.getColumns();
+        if (columns.isEmpty()) {
+            return;
+        }
         String[] columnNames = new String[columns.size()];
         for (int i = 0; i < columns.size(); i++) {
             SQLColumn column = columns.get(i);
@@ -485,6 +496,9 @@ public class UIEditTable extends FrontPanel {
      */
     public void doAddRow() {
         Vector data = createVectorWithDefaults();
+        if (data == null) {
+            return;
+        }
         ((DefaultTableModel) uiTable.getModel()).addRow(data);
         SQLRow newRow = new SQLRow(data);
         newRow.setBrandNew(true);
@@ -498,6 +512,9 @@ public class UIEditTable extends FrontPanel {
     public Vector createVectorWithDefaults() {
         Vector vect = new Vector();
         int autoIncrement = SQLUtils.getTableAutoIncrement(table);
+        if (autoIncrement == -1) {
+            return null;
+        }
         for (SQLColumn column : table.getColumns()) {
             Object defaultVal = column.getDefaultVal();
             Object value = defaultVal;

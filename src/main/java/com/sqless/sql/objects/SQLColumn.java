@@ -80,6 +80,9 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
      * se le asignará una tabla dentro de los métodos
      * {@link SQLTable#addColumn(com.sqless.sql.objects.SQLColumn)} o {@link SQLTable#insertColumn(int, com.sqless.sql.objects.SQLColumn)
      * }
+     * <br><b>Este método hace una llamada a la base de datos para consultar
+     * charset y collation.</b> Es recomendable hacer su llamada de manera
+     * asincrónica.
      *
      * @param nombre El nombre de la columna
      */
@@ -89,8 +92,6 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
         updateDataTypeByName(nombre);
         hasUncommittedChanges = false;
         nullable = true;
-        characterSet = "latin1";
-        collation = "latin1_swedish_ci";
         isBrandNew = true;
     }
 

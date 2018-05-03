@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.sql.objects.*;
+import com.sqless.ui.UIClient;
 import com.sqless.ui.UIEditTable;
 import java.text.ParseException;
 import java.util.Date;
@@ -200,7 +201,7 @@ public class SQLUtils {
     }
 
     public static int getTableAutoIncrement(SQLTable table) {
-        FinalValue<Integer> autoIncrement = new FinalValue<>();
+        FinalValue<Integer> autoIncrement = new FinalValue<>(-1);
 
         SQLQuery getAutoIncrementQuery = new SQLSelectQuery("SELECT `AUTO_INCREMENT`\n"
                 + "FROM  INFORMATION_SCHEMA.TABLES\n"
@@ -210,6 +211,11 @@ public class SQLUtils {
             public void onSuccess(ResultSet rs) throws SQLException {
                 autoIncrement.set(rs.next() ? rs.getInt("AUTO_INCREMENT") : 1);
             }
+
+            @Override
+            public void onFailure(String errMessage) {
+                UIUtils.showErrorMessage("Error", "Hubo un error al traer información del auto increment de la fila.\nEl servidor respondió con mensaje: " + errMessage, UIClient.getInstance());
+            }            
         };
         getAutoIncrementQuery.exec();
         return autoIncrement.get();
@@ -268,8 +274,8 @@ public class SQLUtils {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 if (rs.next()) {
-                    collationAndCharset.put("collation", rs.getString("COLLATION_NAME"));
-                    collationAndCharset.put("charset", rs.getString("character_set_name"));
+                    collationAndCharset.put("collation", rs.getString("DEFAULT_COLLATION_NAME"));
+                    collationAndCharset.put("charset", rs.getString("DEFAULT_CHARACTER_SET_NAME"));
                 }
             }
         };
@@ -326,6 +332,9 @@ public class SQLUtils {
     }
 
     public static void loadKeys(SQLTable table) {
+        if (table.getColumns() == null || table.getColumns().isEmpty()) {
+            return;
+        }
         List<SQLColumn> primaryKeyColumns = new ArrayList<>();
         SQLQuery loadKeysQuery = new SQLSelectQuery(table.getRetrievePKStatement()) {
             @Override

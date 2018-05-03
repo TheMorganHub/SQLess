@@ -1,6 +1,7 @@
 package com.sqless.queries;
 
 import com.sqless.sql.connection.SQLConnectionManager;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -22,9 +23,15 @@ public class SQLSelectQuery extends SQLQuery {
     @Override
     public void exec() {
         try {
-            statement = SQLConnectionManager.getInstance().getConnection().createStatement();
-            ResultSet rs = statement.executeQuery(getSql());
-            onSuccess(rs);
+            Connection con = SQLConnectionManager.getInstance().getConnection();
+            if (!con.isClosed()) {
+                statement = con.createStatement();
+                ResultSet rs = statement.executeQuery(getSql());
+                onSuccess(rs);
+            } else {
+                System.out.println("Intentando restablecer...");
+                SQLConnectionManager.getInstance().restoreLostConnection();
+            }
         } catch (SQLException e) {
             if (defaultErrorHandling) {
                 onFailureStandard(e.getMessage());

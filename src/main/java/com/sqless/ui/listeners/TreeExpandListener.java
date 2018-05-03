@@ -1,5 +1,6 @@
 package com.sqless.ui.listeners;
 
+import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.tree.SQLessTreeNode;
@@ -38,7 +39,7 @@ public class TreeExpandListener implements TreeWillExpandListener {
         TreePath path = event.getPath();
         SQLessTreeNode node = (SQLessTreeNode) event.getPath().getLastPathComponent();
         DefaultTreeModel model = (DefaultTreeModel) ((JTree) event.getSource()).getModel();
-        client.setCursor(UIUtils.WAIT_CURSOR);
+        client.setCursor(UIUtils.WAIT_CURSOR);        
         try {
             if (node.isOfType(CAT_TABLES)) {
                 if (UIUtils.nodeHasDummy(node)) {
@@ -171,6 +172,9 @@ public class TreeExpandListener implements TreeWillExpandListener {
                     model.reload(node);
                 }
             }
+        } catch (NullPointerException ex) {
+            //potencialmente salta cuando la conexión se cerró y se volvió a restablecer
+            //poco ortodoxo catchear un NullPointerException pero en esta ocasión es necesario.
         } finally {
             client.setCursor(UIUtils.DEFAULT_CURSOR);
         }

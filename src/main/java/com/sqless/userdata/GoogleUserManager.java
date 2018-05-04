@@ -31,13 +31,21 @@ public class GoogleUserManager {
         return active;
     }
 
+    public void logIn(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
+        GoogleLogin login = new GoogleLogin(googleUser -> {
+            addNew(googleUser);
+            callback.exec(active);
+        }, waitDialog, GoogleLogin.Type.FIRST_LOGIN);
+        login.start();
+    }
+
     public void authenticateStoredCredentials(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
         if (active == null) {
             if (credentialsExistLocally()) {
                 GoogleLogin login = new GoogleLogin(person -> {
                     addNew(person);
                     callback.exec(active);
-                }, waitDialog);
+                }, waitDialog, GoogleLogin.Type.LOCAL_CREDENTIAL_AUTHENTICATION);
                 login.start();
             }
         }

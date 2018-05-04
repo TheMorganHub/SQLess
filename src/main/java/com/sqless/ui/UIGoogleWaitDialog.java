@@ -31,13 +31,10 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
     public void waitForLogin() {
         lblDialog.setText("Esperando a Google...");
         secondaryThread = new Thread(() -> {
-            GoogleLogin login = new GoogleLogin(googleUser -> {
-                GoogleUserManager.getInstance().addNew(googleUser);
-                UIClient.getInstance().updateMenuBarForGoogleUser(googleUser);
+            GoogleUserManager.getInstance().logIn(user -> {
+                UIClient.getInstance().updateMenuBarForGoogleUser(user);
                 dispose();
-            }, UIGoogleWaitDialog.this);
-            serverReceiver = login.getServerReceiver();
-            login.start();
+            }, this);
         });
         secondaryThread.start();
         setVisible(true);
@@ -133,7 +130,7 @@ public class UIGoogleWaitDialog extends javax.swing.JDialog {
             try {
                 if (serverReceiver != null) {
                     serverReceiver.stop();
-                }                
+                }
             } catch (Exception e) {
             }
             GoogleUserManager.getInstance().logOut();

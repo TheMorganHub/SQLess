@@ -32,6 +32,11 @@ public class GoogleLogin {
 
     private Callback<GoogleUser> callback;
     private UIGoogleWaitDialog waitDialog;
+    private final Type loginType;
+
+    public enum Type {
+        LOCAL_CREDENTIAL_AUTHENTICATION, FIRST_LOGIN;
+    }
 
     /**
      * Construye una nueva instancia de Log in.
@@ -39,10 +44,13 @@ public class GoogleLogin {
      * @param callback el callback que se ejecutará si la operación fue exitosa.
      * @param waitDialog el {@code UIGoogleWaitDialog} que interactuará con esta
      * clase.
+     * @param loginType si la autenticación está autenticando credenciales ya
+     * guardadas localmente, o si el log in es sin credenciales locales.
      */
-    public GoogleLogin(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
+    public GoogleLogin(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog, Type loginType) {
         this.callback = callback;
         this.waitDialog = waitDialog;
+        this.loginType = loginType;
     }
 
     private void initTransportAndStore() {
@@ -131,7 +139,8 @@ public class GoogleLogin {
         //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
-        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()))) {
+        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()), 
+                Resty.data("login_type", loginType.toString()), Resty.data("source", "DESKTOP"))) {
             @Override
             public void onSuccess(JSONObject json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()

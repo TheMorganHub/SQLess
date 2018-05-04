@@ -1,6 +1,5 @@
 package com.sqless.ui.listeners;
 
-import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.tree.SQLessTreeNode;

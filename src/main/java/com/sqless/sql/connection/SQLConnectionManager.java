@@ -77,8 +77,8 @@ public class SQLConnectionManager {
     private boolean connectToDatabase(String dbName, String username, String password,
             String hostName, String port, Frame parent) {
         try {
-            long start = System.currentTimeMillis();
-
+            closeConnection();
+            long start = System.currentTimeMillis();            
             DriverManager.setLoginTimeout(3);
             connection = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + dbName
                     + "?zeroDateTimeBehavior=convertToNull", username, password);
@@ -95,7 +95,25 @@ public class SQLConnectionManager {
             if (restoreDialog != null && restoreDialog.isVisible()) {
                 restoreDialog.dispose();
             }
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                System.err.println("La conexión no pudo cerrarse.");
+            }
             UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean connectionIsClosed() {
+        try {
+            if (connection != null && connection.isClosed()) {
+                return true;
+            }
+        } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
         return false;
@@ -119,10 +137,10 @@ public class SQLConnectionManager {
         if (success) {
             connectedDB = dbIsBrandNew ? new SQLDatabase(dbName, true) : new SQLDatabase(dbName);
             if (!showRepairConnection) { //este parámetro solo está en falso cuando este método es llamado mediante restoreLostConnection
-                if (restoreDialog.isVisible()) {
+                if (restoreDialog != null && restoreDialog.isVisible()) {
                     restoreDialog.dispose();
+                    UIUtils.showMessage("Aviso", "La conexión fue restablecida.", UIClient.getInstance());
                 }
-                UIUtils.showMessage("Aviso", "La conexión fue restablecida.", UIClient.getInstance());
             }
         } else {
             if (showRepairConnection) {
@@ -150,6 +168,10 @@ public class SQLConnectionManager {
         connectToSavedHost(dbName, false, false, parent);
     }
 
+    public void setNewConnectionNoRepair(String dbName, boolean dbIsBrandNew, Frame parent) {
+        connectToSavedHost(dbName, dbIsBrandNew, false, parent);
+    }
+
     /**
      * Closes any active connection and sets a new one. Use this method to start
      * a connection with any database using the saved host. This method makes a
@@ -164,7 +186,6 @@ public class SQLConnectionManager {
      * within this operation.
      */
     public void setNewConnection(String dbName, boolean dbIsBrandNew, Frame parent) {
-        closeConnection();
         connectToSavedHost(dbName, dbIsBrandNew, true, parent);
     }
 
@@ -219,13 +240,13 @@ public class SQLConnectionManager {
     }
 
     public void closeConnection() {
-        if (connection != null) {
-            try {
+        try {
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
                 System.out.println("[ConnectionManager]: Closed connection with database " + connectedDB.getName());
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         }
     }
 

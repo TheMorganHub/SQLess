@@ -27,7 +27,7 @@ public class SQLPrimaryKey implements SQLEditable {
             pkColumnsBackup.add(pkColumn);
         }
     }
-    
+
     public boolean hasAutoIncrementColumn() {
         for (SQLColumn pkColumn : pkColumns) {
             if (pkColumn.isAutoincrement()) {
@@ -53,12 +53,17 @@ public class SQLPrimaryKey implements SQLEditable {
 
     /**
      * Remueve una columna de la definición de esta PK. La columna se mantendrá
-     * como no nullable lo sea o no antes de haber sido asignada como PK.
+     * como no nullable lo sea o no antes de haber sido asignada como PK. Si la
+     * columna fue auto increment al momento de remover la PK, la columna dejará
+     * de serlo.
      *
      * @param column
      */
     public void removeColumn(SQLColumn column) {
         pkColumns.remove(column);
+        if (column.isAutoincrement()) {
+            column.setAutoincrement(false, true);
+        }
     }
 
     public List<SQLColumn> getPkColumns() {

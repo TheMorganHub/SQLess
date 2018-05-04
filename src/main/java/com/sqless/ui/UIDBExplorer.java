@@ -50,7 +50,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     public void prepareUI() {
         lblHost.setText(conManager.getServerHostname());
-        loadTable();        
+        loadTable();
         comboCharset.addItemListener(new CharsetChangeListener());
         showMasterDB((Boolean) sessionSettings.get(SessionSettings.Keys.SHOW_MASTER_DB));
         tabPaneMain.addChangeListener(c -> {
@@ -67,7 +67,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
         pack();
     }
-    
+
     public boolean dbIsNew(String dbName) {
         for (String newDatabase : newDatabases) {
             if (newDatabase.equalsIgnoreCase(dbName)) {
@@ -97,7 +97,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         int rowOnStart = getDefaultDbRow() == -1 ? 0 : getDefaultDbRow();
         tableDb.setRowSelectionInterval(rowOnStart, rowOnStart);
         tableDb.packAll();
-        tableDb.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popTable, tableDb));        
+        tableDb.addMouseListener(UIUtils.mouseListenerWithPopUpMenuForJTable(popTable, tableDb));
     }
 
     @SuppressWarnings("unchecked")
@@ -365,15 +365,21 @@ public class UIDBExplorer extends javax.swing.JDialog {
             }
         }
 
-        if (dbIsNew(dbName)) {
-            conManager.setNewConnection(dbName, true, client);
-        } else {
-            conManager.setNewConnection(dbName, client);
-        }
-        
-        client.createJTree();
-        dispose();
-        client.onNewConnection();
+        GenericWaitingDialog waitDialog = new GenericWaitingDialog("Conectando a " + dbName + "...", true);
+        setCursor(UIUtils.WAIT_CURSOR);
+        waitDialog.display(() -> {
+            if (dbIsNew(dbName)) {
+                conManager.setNewConnectionNoRepair(dbName, true, client);
+            } else {
+                conManager.setNewConnectionNoRepair(dbName, client);
+            }
+            setCursor(UIUtils.DEFAULT_CURSOR);
+            if (!conManager.connectionIsClosed()) { //la conexión fue exitosa
+                client.createJTree();
+                dispose();
+                client.onNewConnection();
+            }
+        });
     }
 
     private void btnDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDropActionPerformed
@@ -475,7 +481,8 @@ public class UIDBExplorer extends javax.swing.JDialog {
     }
 
     public void executeCreateScript() {
-        SQLQuery createDbQuery = new SQLUpdateQuery(scriptCreate(), true) {
+        GenericWaitingDialog waitDialog = new GenericWaitingDialog("Creando base de datos...");
+        SQLQuery createDbQuery = new SQLUpdateQuery(scriptCreate()) {
             @Override
             public void onSuccess(int affectedRows) {
                 String newDbName = txtNewDbName.getText();
@@ -483,7 +490,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 model.addRow(new Object[]{NOT_FAVOURITE_ICON, newDbName});
                 UIUtils.sortTable(tableDb, 1);
                 newDatabases.add(newDbName);
-                
+                waitDialog.dispose();
                 int opt = UIUtils.showConfirmationMessage("Creación de base de datos", "La base de datos " + newDbName
                         + " fue creada exitosamente.\n¿Te gustaría que SQLess se conecte a ella?", getParent());
                 if (opt == 0) {
@@ -493,8 +500,17 @@ public class UIDBExplorer extends javax.swing.JDialog {
                     client.onNewConnection();
                 }
             }
+
+            @Override
+            public void onFailure(String errMessage) {
+                waitDialog.dispose();
+                UIUtils.showErrorMessage("Error", "La base de datos no se pudo crear.\nEl servidor respondió con mensaje: " + errMessage, client);
+            }            
         };
-        createDbQuery.exec();
+        
+        waitDialog.display(() -> {
+            createDbQuery.exec();
+        });
     }
 
     /**
@@ -650,7 +666,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
         }
 
     }
-    
+
     private Action actionDropDatabase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {

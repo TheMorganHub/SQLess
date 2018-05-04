@@ -5,6 +5,7 @@ import com.sqless.utils.AsyncAction;
 public class GenericWaitingDialog extends javax.swing.JDialog {
 
     private Thread secondaryThread;
+    private boolean invisible;
 
     public GenericWaitingDialog(String waitingText) {
         super(UIClient.getInstance(), true);
@@ -12,6 +13,12 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
         lblWaiting.setText(waitingText);
         lblNotice.setVisible(false);
         btnCancelar.setVisible(false);
+        setLocationRelativeTo(getParent());
+    }
+
+    public GenericWaitingDialog(String waitingText, boolean invisible) {
+        this(waitingText);
+        this.invisible = invisible;
     }
 
     public void display(AsyncAction action) {
@@ -20,7 +27,7 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
             dispose();
         });
         secondaryThread.start();
-        setVisible(true);
+        setVisible(!invisible);
     }
 
     public void displayNotice() {

@@ -587,7 +587,11 @@ public class UICreateTableSQLess extends FrontPanel {
         if (newVal) {
             sqlTable.getPrimaryKey().addColumn(colEditada);
         } else {
+            boolean wasAutoIncrement = colEditada.isAutoincrement();
             sqlTable.getPrimaryKey().removeColumn(colEditada);
+            if (wasAutoIncrement) {
+                refreshPnlExtras();
+            }            
         }
         syncRowWithList(row);
     }

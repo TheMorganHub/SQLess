@@ -44,13 +44,12 @@ public class UIEditTable extends FrontPanel {
     private TableCellListener cellListener;
     private SQLPrimaryKey tablePK;
     private List<SQLRow> rows;
-    private GenericWaitingDialog waitingDialog;
 
     public UIEditTable(JTabbedPane parentPane, SQLTable table) {
         super(parentPane);
         this.table = new SQLTable(table);
         initComponents();
-        waitingDialog = new GenericWaitingDialog("Cargando...");
+        GenericWaitingDialog waitingDialog = new GenericWaitingDialog("Cargando...");
         waitingDialog.display(() -> {
             this.table.loadColumns();
             if (this.table.getColumns().isEmpty()) {

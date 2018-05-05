@@ -35,7 +35,7 @@ public class GoogleLogin {
     private final Type loginType;
 
     public enum Type {
-        LOCAL_CREDENTIAL_AUTHENTICATION, FIRST_LOGIN;
+        LOCAL_CREDENTIAL, FIRST_LOGIN;
     }
 
     /**

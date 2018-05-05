@@ -45,7 +45,7 @@ public class GoogleUserManager {
                 GoogleLogin login = new GoogleLogin(person -> {
                     addNew(person);
                     callback.exec(active);
-                }, waitDialog, GoogleLogin.Type.LOCAL_CREDENTIAL_AUTHENTICATION);
+                }, waitDialog, GoogleLogin.Type.LOCAL_CREDENTIAL);
                 login.start();
             }
         }

@@ -1,7 +1,6 @@
 package com.sqless.ui;
 
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.sqless.network.GoogleLogin;
 import com.sqless.userdata.GoogleUserManager;
 
 /**

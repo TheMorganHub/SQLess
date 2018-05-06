@@ -3,6 +3,7 @@ package com.sqless.ui;
 import com.sqless.file.FileManagerAdapter;
 import com.sqless.file.MapleFileManager;
 import com.sqless.queries.MapleQuery;
+import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
@@ -49,22 +50,36 @@ public class UIMapleQueryPanel extends FrontPanel {
         this(parentPane, MapleFileManager.getInstance().newFile(), contents);
     }
 
+    /**
+     * Inicializa un nuevo UIMapleQueryPanel. Si el usuario activo en
+     * {@code GoogleUserManager} es null, este UIMapleQueryPanel será marcado
+     * como corrupto y se invalidará.
+     *
+     * @param parentPane
+     * @param filePath
+     * @param contents
+     */
     public UIMapleQueryPanel(JTabbedPane parentPane, String filePath, String contents) {
         super(parentPane);
         initComponents();
-        this.tabOriginalContents = contents;
-        initEditor();
-        initResultsPanel();
-        initMessagesPanel();
-        tabPane.setSelectedIndex(0);
-        tabPane.addChangeListener(changeEvent -> {
-            int index = tabPane.getSelectedIndex();
-            if (tabPane.getComponentAt(index) instanceof UIPanelResult) {
-                UIPanelResult panelResult = (UIPanelResult) tabPane.getComponentAt(index);
-                updateRowsLabel(panelResult.getRowCount());
-            }
-        });
-        this.filePath = filePath;
+        if (GoogleUserManager.getInstance().getActive() != null) {
+            this.tabOriginalContents = contents;
+            initEditor();
+            initResultsPanel();
+            initMessagesPanel();
+            tabPane.setSelectedIndex(0);
+            tabPane.addChangeListener(changeEvent -> {
+                int index = tabPane.getSelectedIndex();
+                if (tabPane.getComponentAt(index) instanceof UIPanelResult) {
+                    UIPanelResult panelResult = (UIPanelResult) tabPane.getComponentAt(index);
+                    updateRowsLabel(panelResult.getRowCount());
+                }
+            });
+            this.filePath = filePath;
+        } else {
+            UIUtils.showWarning("Aviso", "Debes estar logueado para hacer una consulta con Maple.\nHaz click en 'Iniciar sesión'.", UIClient.getInstance());
+            setIntegrity(Integrity.CORRUPT);
+        }
     }
 
     public void initEditor() {
@@ -454,6 +469,9 @@ public class UIMapleQueryPanel extends FrontPanel {
 
     @Override
     public String getTabTitle() {
+        if (filePath == null) {
+            return null;
+        }
         return MapleFileManager.getInstance().isNewFile(filePath)
                 ? "Maple_File_" + (MapleFileManager.getInstance().getFilesCreatedThisSession()) + ".mpl" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
     }

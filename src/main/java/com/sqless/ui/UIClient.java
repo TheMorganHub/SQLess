@@ -181,8 +181,10 @@ public class UIClient extends javax.swing.JFrame {
 
     public void createNewMapleQueryPanelAndRun(String maple) {
         UIMapleQueryPanel queryPanel = new UIMapleQueryPanel(tabPaneContent, maple);
-        sendToNewTab(queryPanel);
-        queryPanel.runContents();
+        if (queryPanel.checkIntegrity()) {
+            sendToNewTab(queryPanel);
+            queryPanel.runContents();
+        }
     }
 
     public void createJTree() {
@@ -526,8 +528,12 @@ public class UIClient extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSettingsActionPerformed
 
     private void btnNewMapleQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewMapleQueryActionPerformed
-        sendToNewTab(new UIMapleQueryPanel(tabPaneContent, ""));
+        actionNewMapleQuery();
     }//GEN-LAST:event_btnNewMapleQueryActionPerformed
+
+    public void actionNewMapleQuery() {
+        sendToNewTab(new UIMapleQueryPanel(tabPaneContent, ""));
+    }
 
     public void updateMenuBarForGoogleUser(GoogleUser user) {
         barMenu.remove(submenuLogin);

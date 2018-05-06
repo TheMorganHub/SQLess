@@ -4,6 +4,7 @@ import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.ui.UIMapleQueryPanel;
+import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.Callback;
 import com.sqless.utils.TextUtils;
 import java.io.File;
@@ -57,12 +58,15 @@ public class MapleFileManager {
     }
 
     /**
-     * Adds a file to the {@code openedFiles} List.
+     * Adds a file to the {@code openedFiles} List, if and only if the active
+     * user in {@code GoogleUserManager} isn't null.
      *
      * @param file
      */
     private void addFile(File file) {
-        openedFiles.add(file);
+        if (GoogleUserManager.getInstance().getActive() != null) {
+            openedFiles.add(file);
+        }
     }
 
     /**
@@ -126,11 +130,16 @@ public class MapleFileManager {
 
     /**
      * Crea un nuevo archivo con su path siguiendo la nomenclatura
-     * "New_File_[numero de archivos creados en esta sesión]"
+     * "Maple_File_[numero de archivos creados en esta sesión]". El archivo sólo
+     * se va a crear si hay un usuario activo en {@link GoogleUserManager}.
      *
-     * @return El path del archivo creado.
+     * @return El path del archivo creado o {@code null} si el usuario activo en
+     * {@code GoogleUserManager} es null.
      */
     public String newFile() {
+        if (GoogleUserManager.getInstance().getActive() == null) {
+            return null;
+        }
         filesCreatedThisSession++;
         File file = new File("Maple_File_" + filesCreatedThisSession);
         addFile(file);

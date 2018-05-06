@@ -67,7 +67,7 @@ public class OAuth2TokenRefreshService {
      */
     public static OAuth2TokenRefreshService getInstance() {
         if (instance == null) {
-            throw new RuntimeException("El OAuth2TokenRefreshService no está inicializado. Llamar a OAuth2TokenRefreshService.startInstance(GoogleAuthrorizationCodeFlow) primero.");
+            return null; //El OAuth2TokenRefreshService no está inicializado. Llamar a OAuth2TokenRefreshService.startInstance(GoogleAuthrorizationCodeFlow) primero.
         }
         return instance;
     }
@@ -108,6 +108,7 @@ public class OAuth2TokenRefreshService {
     public final void stop() {
         threadPool.shutdown();
         future = null;
+        instance = null;
         System.out.println("OAuth2TokenRefreshService: ejecución finalizada");
     }
 

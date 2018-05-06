@@ -1,6 +1,7 @@
 package com.sqless.queries;
 
 import com.mysql.jdbc.Blob;
+import com.sqless.network.OAuth2TokenRefreshService;
 import com.sqless.network.PostRequest;
 import com.sqless.network.RestRequest;
 import com.sqless.sql.connection.SQLConnectionManager;
@@ -8,6 +9,7 @@ import com.sqless.ui.UIClient;
 import com.sqless.ui.UIMapleQueryPanel;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
+import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.DataTypeUtils;
 import com.sqless.utils.FinalValue;
 import com.sqless.utils.UIUtils;
@@ -65,9 +67,12 @@ public class MapleQuery extends SQLQuery {
             @Override
             public void run() {
                 try {
+                    OAuth2TokenRefreshService service = OAuth2TokenRefreshService.getInstance();
+                    String accessToken = service == null ? "" : service.getCurrentCredential().getAccessToken();
+
                     startTime = System.currentTimeMillis();
                     FinalValue<Boolean> requestSuccess = new FinalValue<>(Boolean.FALSE);
-                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, Resty.form(Resty.data("maple_statement", mapleStatement))) {
+                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, Resty.form(Resty.data("maple_statement", mapleStatement), Resty.data("access_token", accessToken))) {
                         @Override
                         public void onSuccess(JSONObject json) throws Exception {
                             if (json.has("err")) { //hubo un error interno en el server

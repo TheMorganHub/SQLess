@@ -538,7 +538,11 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
 
     @Override
     public String getDropStatement() {
-        return "DROP COLUMN `" + getName() + "`";
+        return getDropStatement(true);
+    }
+    
+    public String getDropStatement(boolean alterTable) {
+        return (alterTable ? "ALTER TABLE `" + getParentTable().getName() + "` " : "") + "DROP COLUMN `" + getName() + "`";
     }
 
     @Override

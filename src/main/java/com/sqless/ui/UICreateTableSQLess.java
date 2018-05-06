@@ -506,7 +506,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 alterTableAdded = true;
                 sb.append("ALTER TABLE ").append("`").append(sqlTable.getName()).append("`\n");
             }
-            sb.append(sqlTable.getDroppedColumns().get(i).getDropStatement()).append(",\n");
+            sb.append(sqlTable.getDroppedColumns().get(i).getDropStatement(false)).append(",\n");
         }
 
         for (int i = 0; i < columnList.size(); i++) {

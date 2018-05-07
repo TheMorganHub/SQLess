@@ -139,7 +139,7 @@ public class GoogleLogin {
         //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
-        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()), 
+        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()),
                 Resty.data("login_type", loginType.toString()), Resty.data("source", "DESKTOP"))) {
             @Override
             public void onSuccess(JSONObject json) throws Exception {

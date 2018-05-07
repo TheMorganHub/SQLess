@@ -9,7 +9,6 @@ import com.sqless.ui.UIClient;
 import com.sqless.ui.UIMapleQueryPanel;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
-import com.sqless.userdata.GoogleUserManager;
 import com.sqless.utils.DataTypeUtils;
 import com.sqless.utils.FinalValue;
 import com.sqless.utils.UIUtils;

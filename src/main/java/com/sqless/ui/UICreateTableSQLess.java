@@ -90,7 +90,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 } else {
                     setIntegrity(Integrity.CORRUPT);
                     waitDialog.dispose();
-                    UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());                    
+                    UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());
                 }
             });
         } else {
@@ -105,7 +105,7 @@ public class UICreateTableSQLess extends FrontPanel {
                     setIntegrity(Integrity.CORRUPT);
                     waitDialog.dispose();
                     UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());
-                }                
+                }
             });
         }
     }
@@ -164,6 +164,16 @@ public class UICreateTableSQLess extends FrontPanel {
         prepararToolbar();
         prepararMainTable();
         prepararFKTable();
+        loadKeybindings();
+        SwingUtilities.invokeLater(() -> uiTable.requestFocus());
+    }
+
+    public void loadKeybindings() {
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_ROW");
+        uiTable.getActionMap().put("DELETE_ROW", actionDeleteCampo);
+
+        uiTableFKs.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_FK");
+        uiTableFKs.getActionMap().put("DELETE_FK", actionRemoveFK);
     }
 
     public void prepararMainTable() {
@@ -591,7 +601,7 @@ public class UICreateTableSQLess extends FrontPanel {
             sqlTable.getPrimaryKey().removeColumn(colEditada);
             if (wasAutoIncrement) {
                 refreshPnlExtras();
-            }            
+            }
         }
         syncRowWithList(row);
     }
@@ -814,7 +824,7 @@ public class UICreateTableSQLess extends FrontPanel {
     @Override
     public Component[] getToolbarComponents() {
         if (camposToolbarComponents == null) {
-            btnSave = UIUtils.newToolbarBtn(actionSave, "Commit all changes", UIUtils.icon("ui_general", "SAVE"));
+            btnSave = UIUtils.newToolbarBtn(actionSave, "Guardar todos los cambios", UIUtils.icon("ui_general", "SAVE"));
             btnAddCampo = UIUtils.newToolbarBtn(actionAddCampo, "Agregar una columna a la tabla", UIUtils.icon(this, "AGREGAR_CAMPO"));
             btnInsertCampo = UIUtils.newToolbarBtn(actionInsertCampo, "Insertar un campo en la posición actual", UIUtils.icon(this, "INSERTAR_CAMPO"));
             btnRemoveCampo = UIUtils.newToolbarBtn(actionDeleteCampo, "Remover el campo en la posición actual", UIUtils.icon(this, "BORRAR_CAMPO"));
@@ -1044,25 +1054,28 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private ActionListener actionRemoveFK = e -> {
-        if (uiTableFKs.getCellEditor() != null) {
-            uiTableFKs.getCellEditor().stopCellEditing();
-        }
-        int[] selectedRows = uiTableFKs.getSelectedRows();
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            if (!fkList.get(selectedRows[i]).isBrandNew()) { //si la FK era nueva no hace falta droppearla ya que todavía no está agregada a la tabla
-                sqlTable.getDroppedFKs().add(fkList.get(selectedRows[i]));
+    private Action actionRemoveFK = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (uiTableFKs.getCellEditor() != null) {
+                uiTableFKs.getCellEditor().stopCellEditing();
             }
-            sqlTable.removeFK(selectedRows[i]);
-            getFKTableModel().removeRow(selectedRows[i]);
-            boldTitleLabel();
-        }
-        if (uiTableFKs.getRowCount() > 0) {
-            //si la fila a remover fue la última en la tabla, seleccionamos la que ahora es última
-            if (selectedRows[0] == uiTableFKs.getRowCount()) {
-                uiTableFKs.setRowSelectionInterval(selectedRows[0] - 1, selectedRows[0] - 1);
-            } else { //de lo contrario, seleccionamos la que nos cae de arriba, que ahora va a ocupar el lugar de la removida
-                uiTableFKs.setRowSelectionInterval(selectedRows[0], selectedRows[0]);
+            int[] selectedRows = uiTableFKs.getSelectedRows();
+            for (int i = selectedRows.length - 1; i >= 0; i--) {
+                if (!fkList.get(selectedRows[i]).isBrandNew()) { //si la FK era nueva no hace falta droppearla ya que todavía no está agregada a la tabla
+                    sqlTable.getDroppedFKs().add(fkList.get(selectedRows[i]));
+                }
+                sqlTable.removeFK(selectedRows[i]);
+                getFKTableModel().removeRow(selectedRows[i]);
+                boldTitleLabel();
+            }
+            if (uiTableFKs.getRowCount() > 0) {
+                //si la fila a remover fue la última en la tabla, seleccionamos la que ahora es última
+                if (selectedRows[0] == uiTableFKs.getRowCount()) {
+                    uiTableFKs.setRowSelectionInterval(selectedRows[0] - 1, selectedRows[0] - 1);
+                } else { //de lo contrario, seleccionamos la que nos cae de arriba, que ahora va a ocupar el lugar de la removida
+                    uiTableFKs.setRowSelectionInterval(selectedRows[0], selectedRows[0]);
+                }
             }
         }
     };

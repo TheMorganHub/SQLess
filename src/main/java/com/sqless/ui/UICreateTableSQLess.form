@@ -19,7 +19,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="menuItemDelete">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="actionDeleteCampo" type="code"/>
+              <Connection code="actionDeleteColumn" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Eliminar fila(s)"/>
           </Properties>

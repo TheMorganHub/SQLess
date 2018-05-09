@@ -49,7 +49,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
     }
 
     public void prepareUI() {
-        lblHost.setText(conManager.getServerHostname());
+        lblHost.setText(conManager.getHostName() + ":" + conManager.getPort());
         loadTable();
         comboCharset.addItemListener(new CharsetChangeListener());
         showMasterDB((Boolean) sessionSettings.get(SessionSettings.Keys.SHOW_MASTER_DB));
@@ -199,6 +199,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
         iLblHost.setText("Host:");
 
+        lblHost.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lblHost.setText("###");
 
         chkShowMaster.setText("Mostrar base de datos 'mysql'");
@@ -376,7 +377,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
             setCursor(UIUtils.DEFAULT_CURSOR);
             if (!conManager.connectionIsClosed()) { //la conexión fue exitosa
                 client.createJTree();
-                dispose();
+                dispose();                
                 client.onNewConnection();
             }
         });

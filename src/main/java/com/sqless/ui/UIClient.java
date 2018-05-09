@@ -211,6 +211,16 @@ public class UIClient extends javax.swing.JFrame {
     public void clearJTree() {
         treeDiagram.setModel(new DefaultTreeModel(new SQLessTreeNode()));
     }
+    
+    public void removeNonQueryFrontPanels() {
+        if (tabPaneContent.getTabCount() > 0) {
+            for (int i = tabPaneContent.getTabCount() - 1; i >= 0; i--) {
+                if (tabPaneContent.getComponentAt(i) instanceof UICreateTableSQLess || tabPaneContent.getComponentAt(i) instanceof UIEditTable) {
+                    tabPaneContent.remove(i);
+                }
+            }
+        }
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -548,7 +558,8 @@ public class UIClient extends javax.swing.JFrame {
     }
 
     public void onNewConnection() {
-        if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {
+        removeNonQueryFrontPanels();
+        if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {            
             HintsManager hintsManager = new HintsManager();
             hintsManager.activate(HintsManager.CREATE_TABLE_IN_EMPTY_DB);
         }

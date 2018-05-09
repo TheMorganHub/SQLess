@@ -131,22 +131,32 @@ public class UICreateTableSQLess extends FrontPanel {
         initComponents();
         this.fromSuggestion = fromSuggestion;
         task = TABLE_CREATE;
-        sqlTable = new SQLTable();
-        fkList = this.sqlTable.getForeignKeys();
-        columnList = this.sqlTable.getColumns();
+        waitDialog = new GenericWaitingDialog("Cargando...");
+        waitDialog.display(() -> {
+            sqlTable = new SQLTable();
+            fkList = this.sqlTable.getForeignKeys();
+            columnList = this.sqlTable.getColumns();
 
-        SQLColumn pkCol = new SQLColumn("id");
-        pkCol.setAutoincrement(true, false);
-        SQLColumn newExtraCol = new SQLColumn("");
-        sqlTable.getPrimaryKey().addColumn(pkCol);
-        sqlTable.addColumn(pkCol);
-        sqlTable.addColumn(newExtraCol);
-        getTableModel().addRow(new Object[5]);
+            SQLColumn pkCol = new SQLColumn("id");
+            pkCol.setAutoincrement(true, false);
+            SQLColumn newExtraCol = new SQLColumn("");
+            if (newExtraCol.getCharacterSet() != null && newExtraCol.getCollation() != null) {
+                sqlTable.getPrimaryKey().addColumn(pkCol);
+                sqlTable.addColumn(pkCol);
+                sqlTable.addColumn(newExtraCol);
+                getTableModel().addRow(new Object[5]);
 
-        pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
-        syncRowWithList(0);
-        syncRowWithList(1);
-        prepararUI();
+                pnlExtraSettings.add(new UIColumnExtrasPanel(this, uiTable, columnList));
+                syncRowWithList(0);
+                syncRowWithList(1);
+                prepararUI();
+            } else {
+                setIntegrity(Integrity.CORRUPT);
+                waitDialog.dispose();
+                UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());
+            }
+        });
+
     }
 
     private void postColumnLoadTasks() {
@@ -169,11 +179,15 @@ public class UICreateTableSQLess extends FrontPanel {
     }
 
     public void loadKeybindings() {
-        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_ROW");
-        uiTable.getActionMap().put("DELETE_ROW", actionDeleteCampo);
+        uiTable.getActionMap().put("ADD_COLUMN", actionAddColumn);
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ADD"), "ADD_COLUMN");
+        uiTable.getActionMap().put("DELETE_COLUMN", actionDeleteColumn);
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_COLUMN");
 
-        uiTableFKs.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_FK");
+        uiTableFKs.getActionMap().put("ADD_FK", actionAddFK);
+        uiTableFKs.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ADD"), "ADD_FK");
         uiTableFKs.getActionMap().put("DELETE_FK", actionRemoveFK);
+        uiTableFKs.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_FK");
     }
 
     public void prepararMainTable() {
@@ -358,7 +372,7 @@ public class UICreateTableSQLess extends FrontPanel {
         menuItemInsert.setText("Insertar fila aquí");
         popMenu.add(menuItemInsert);
 
-        menuItemDelete.setAction(actionDeleteCampo);
+        menuItemDelete.setAction(actionDeleteColumn);
         menuItemDelete.setText("Eliminar fila(s)");
         popMenu.add(menuItemDelete);
 
@@ -825,9 +839,9 @@ public class UICreateTableSQLess extends FrontPanel {
     public Component[] getToolbarComponents() {
         if (camposToolbarComponents == null) {
             btnSave = UIUtils.newToolbarBtn(actionSave, "Guardar todos los cambios", UIUtils.icon("ui_general", "SAVE"));
-            btnAddCampo = UIUtils.newToolbarBtn(actionAddCampo, "Agregar una columna a la tabla", UIUtils.icon(this, "AGREGAR_CAMPO"));
+            btnAddCampo = UIUtils.newToolbarBtn(actionAddColumn, "Agregar una columna a la tabla", UIUtils.icon(this, "AGREGAR_CAMPO"));
             btnInsertCampo = UIUtils.newToolbarBtn(actionInsertCampo, "Insertar un campo en la posición actual", UIUtils.icon(this, "INSERTAR_CAMPO"));
-            btnRemoveCampo = UIUtils.newToolbarBtn(actionDeleteCampo, "Remover el campo en la posición actual", UIUtils.icon(this, "BORRAR_CAMPO"));
+            btnRemoveCampo = UIUtils.newToolbarBtn(actionDeleteColumn, "Remover el campo en la posición actual", UIUtils.icon(this, "BORRAR_CAMPO"));
             btnAddPK = UIUtils.newToolbarBtn(actionAddPK, "Alternar PK en esta columna", UIUtils.icon(this, "ADD_PK"));
             btnMoveUp = UIUtils.newToolbarBtn(actionMoveUp, "Mover la columna seleccionada hacia arriba", UIUtils.icon(this, "MOVER_ARRIBA"));
             btnMoveDown = UIUtils.newToolbarBtn(actionMoveDown, "Mover la columna seleccionada hacia abajo", UIUtils.icon(this, "MOVER_ABAJO"));
@@ -926,18 +940,22 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private ActionListener actionAddCampo = e -> {
-        if (columnList.isEmpty() || !columnList.get(uiTable.getSelectedRow()).getUncommittedName().isEmpty()) {
-            if (uiTable.getCellEditor() != null) {
-                uiTable.getCellEditor().stopCellEditing();
+    private Action actionAddColumn = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (columnList.isEmpty() || !columnList.get(uiTable.getSelectedRow()).getUncommittedName().isEmpty()) {
+                if (uiTable.getCellEditor() != null) {
+                    uiTable.getCellEditor().stopCellEditing();
+                }
+
+                sqlTable.addColumn(new SQLColumn(""));
+                getTableModel().addRow(new Object[5]);
+                uiTable.setRowSelectionInterval(getTableModel().getRowCount() - 1, getTableModel().getRowCount() - 1);
+
+                syncRowWithList(columnList.size() - 1);
+                boldTitleLabel();
+                SwingUtilities.invokeLater(() -> uiTable.editCellAt(getTableModel().getRowCount() - 1, 1));
             }
-
-            sqlTable.addColumn(new SQLColumn(""));
-            getTableModel().addRow(new Object[5]);
-            uiTable.setRowSelectionInterval(getTableModel().getRowCount() - 1, getTableModel().getRowCount() - 1);
-
-            syncRowWithList(columnList.size() - 1);
-            boldTitleLabel();
         }
     };
 
@@ -966,7 +984,7 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private Action actionDeleteCampo = new AbstractAction() {
+    private Action actionDeleteColumn = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (columnList.isEmpty()) {
@@ -1038,19 +1056,22 @@ public class UICreateTableSQLess extends FrontPanel {
         }
     };
 
-    private ActionListener actionAddFK = e -> {
-        Object lastColName = null;
-        if (uiTableFKs.getRowCount() > 0) {
-            lastColName = uiTableFKs.getValueAt(uiTableFKs.getRowCount() - 1, 0);
-        }
+    private Action actionAddFK = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Object lastColName = null;
+            if (uiTableFKs.getRowCount() > 0) {
+                lastColName = uiTableFKs.getValueAt(uiTableFKs.getRowCount() - 1, 0);
+            }
 
-        if (uiTableFKs.getRowCount() == 0 || (lastColName != null && !lastColName.toString().isEmpty())) {
-            getFKTableModel().addRow(new Object[4]);
-            sqlTable.addFK(new SQLForeignKey(sqlTable.getName()));
-            SwingUtilities.invokeLater(() -> {
-                uiTableFKs.setRowSelectionInterval(getFKTableModel().getRowCount() - 1, getFKTableModel().getRowCount() - 1);
-            });
-            boldTitleLabel();
+            if (uiTableFKs.getRowCount() == 0 || (lastColName != null && !lastColName.toString().isEmpty())) {
+                getFKTableModel().addRow(new Object[4]);
+                sqlTable.addFK(new SQLForeignKey(sqlTable.getName()));
+                SwingUtilities.invokeLater(() -> {
+                    uiTableFKs.setRowSelectionInterval(getFKTableModel().getRowCount() - 1, getFKTableModel().getRowCount() - 1);
+                });
+                boldTitleLabel();
+            }
         }
     };
 

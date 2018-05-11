@@ -7,11 +7,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import us.monoid.json.JSONObject;
 
 /**
  * Un servicio que se activa al momento de hacer log in con Google. Su tarea
  * principal es la de refrescar el access token de la credencial guardada cada
- * 50 minutos. <br>
+ * 55 minutos. <br>
  * A tener en cuenta: los tokens generados por este servicio no son persistidos
  * en el dispositivo local, sino que son almacenados de manera temporaria en
  * memoria mientras la aplicación corre por si el usuario desea hacer una
@@ -87,22 +88,34 @@ public class OAuth2TokenRefreshService {
 
     /**
      * Inicia la tarea programada de refrescar el token de acceso. Esta tarea se
-     * ejecutará después de 50 minutos de haber hecho log in y a partir de ahí
-     * cada 50 minutos. Los tokens de accesso de Google duran aproximadamente 60
-     * minutos.
+     * ejecutará con una demora inicial de cual sea el valor de expiración del
+     * token y a partir de ahí cada 55 minutos. Los tokens de accesso de Google
+     * duran aproximadamente 60 minutos.
      */
     public final void start() {
-        System.out.println("OAuth2TokenRefreshService: ejecución iniciada");
         threadPool = Executors.newScheduledThreadPool(1);
-        future = threadPool.scheduleWithFixedDelay(() -> {
-            try {
-                credential.refreshToken();
-                System.out.println("OAuth2TokenRefreshService: Access token refrescado - " + credential.getAccessToken());
-            } catch (Exception e) {
-                System.err.println("OAuth2TokenRefreshService: " + e.getMessage() + " - El token no se pudo refrescar.");
-                stop();
+        RestRequest expTimeReq = new GetRequest("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credential.getAccessToken()) {
+            @Override
+            public void onSuccess(JSONObject json) throws Exception {
+                int expires_in = Integer.parseInt(json.get("expires_in").toString());
+                System.out.println("OAuth2TokenRefreshService: ejecución iniciada con demora inicial de " + expires_in + " segundos.");
+                future = threadPool.scheduleWithFixedDelay(() -> {
+                    try {
+                        credential.refreshToken();
+                        System.out.println("OAuth2TokenRefreshService: Access token refrescado - " + credential.getAccessToken());
+                    } catch (Exception e) {
+                        System.err.println("OAuth2TokenRefreshService: " + e.getMessage() + " - El token no se pudo refrescar.");
+                        stop();
+                    }
+                }, expires_in, 3300, TimeUnit.SECONDS);
             }
-        }, 50, 50, TimeUnit.MINUTES);
+
+            @Override
+            public void onFailure(String message) {
+                System.err.println("OAuth2TokenRefreshService: " + message);
+            }
+        };
+        expTimeReq.exec();
     }
 
     public final void stop() {

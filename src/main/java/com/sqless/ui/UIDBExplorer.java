@@ -377,7 +377,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
             setCursor(UIUtils.DEFAULT_CURSOR);
             if (!conManager.connectionIsClosed()) { //la conexión fue exitosa
                 client.createJTree();
-                dispose();                
+                dispose();
                 client.onNewConnection();
             }
         });
@@ -506,9 +506,9 @@ public class UIDBExplorer extends javax.swing.JDialog {
             public void onFailure(String errMessage) {
                 waitDialog.dispose();
                 UIUtils.showErrorMessage("Error", "La base de datos no se pudo crear.\nEl servidor respondió con mensaje: " + errMessage, client);
-            }            
+            }
         };
-        
+
         waitDialog.display(() -> {
             createDbQuery.exec();
         });

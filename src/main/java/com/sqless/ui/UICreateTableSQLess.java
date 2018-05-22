@@ -86,7 +86,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 SQLColumn emptyNewColumn = new SQLColumn("");
                 if (emptyNewColumn.getCollation() != null && emptyNewColumn.getCharacterSet() != null) {
                     this.sqlTable.addColumn(emptyNewColumn);
-                    SwingUtilities.invokeLater(() -> postColumnLoadTasks());
+                    postColumnLoadTasks();
                 } else {
                     setIntegrity(Integrity.CORRUPT);
                     waitDialog.dispose();
@@ -100,7 +100,7 @@ public class UICreateTableSQLess extends FrontPanel {
             waitDialog.display(() -> {
                 this.sqlTable.loadColumnsForUI();
                 if (!this.sqlTable.getColumns().isEmpty()) {
-                    SwingUtilities.invokeLater(() -> postColumnLoadTasks());
+                    postColumnLoadTasks();
                 } else {
                     setIntegrity(Integrity.CORRUPT);
                     waitDialog.dispose();
@@ -156,7 +156,19 @@ public class UICreateTableSQLess extends FrontPanel {
                 UIUtils.showErrorMessage("Error", "Hubo un error al cargar las columnas. Por favor, revisa que la conexión con la base de datos está activa.", UIClient.getInstance());
             }
         });
+    }
 
+    @Override
+    public void tabClosing(int tabNum) {
+        if (task == TABLE_CREATE || sqlTable.hasUncommittedColumns() || sqlTable.hasUncommittedFKs()) {
+            int opt = UIUtils.showConfirmationMessage("Cerrar", "Los cambios aún no fueron guardados.\n"
+                    + "¿Estás seguro que deseas cerrar?", UIClient.getInstance());
+            if (opt == 0) {
+                super.tabClosing(tabNum);
+            }
+        } else {
+            super.tabClosing(tabNum);
+        }
     }
 
     private void postColumnLoadTasks() {

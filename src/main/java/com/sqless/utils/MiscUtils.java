@@ -1,5 +1,6 @@
 package com.sqless.utils;
 
+import com.sqless.ui.UIClient;
 import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Robot;
@@ -41,6 +42,14 @@ public class MiscUtils {
 
     public static Properties getSystemInfo() {
         return System.getProperties();
+    }
+
+    public static void openDirectory(String directory) {
+        try {
+            Runtime.getRuntime().exec("explorer.exe /select," + directory);
+        } catch (IOException ex) {
+            UIUtils.showErrorMessage("Error", "No se pudo abrir el directorio.", UIClient.getInstance());
+        }
     }
 
     /**

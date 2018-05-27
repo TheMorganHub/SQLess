@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SQLExecutable extends SQLObject implements SQLCallable, SQLDroppable {
-    
+
     protected List<SQLParameter> parameters;
 
     public SQLExecutable(String name) {
         super(name);
     }
-    
+
     public void addParameter(SQLParameter parameter) {
         if (parameters == null) {
             parameters = new ArrayList<>();
@@ -27,12 +27,12 @@ public abstract class SQLExecutable extends SQLObject implements SQLCallable, SQ
         StringBuilder paramsStmt = new StringBuilder();
         if (parameters != null) {
             for (SQLParameter parameter : parameters) {
-                paramsStmt.append(parameter.getValue()).append(", ");
+                paramsStmt.append("'").append(parameter.getValue()).append("'").append(", ");
             }
         }
         return (parameters != null && !parameters.isEmpty() ? paramsStmt.substring(0, paramsStmt.length() - 2) : paramsStmt.toString());
     }
-    
+
     @Override
     public String toString() {
         StringBuilder paramatersToString = new StringBuilder("(");
@@ -43,5 +43,5 @@ public abstract class SQLExecutable extends SQLObject implements SQLCallable, SQ
         }
         return getName() + (parameters != null && !parameters.isEmpty() ? paramatersToString.substring(0, paramatersToString.length() - 2) + ")" : "()");
     }
-    
+
 }

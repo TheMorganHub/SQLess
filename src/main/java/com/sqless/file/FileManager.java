@@ -3,8 +3,10 @@ package com.sqless.file;
 import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.settings.UserPreferencesLoader;
+import com.sqless.ui.GenericWaitingDialog;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.Callback;
+import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +22,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -157,7 +160,7 @@ public class FileManager {
     public boolean isNewFile(String filePath) {
         return !filePath.contains("\\");
     }
-    
+
     public void doOpenFile(JTabbedPane tabPane, File selectedFile) {
         if (fileIsAlreadyOpen(selectedFile)) { //el archivo ya existe
             String filePath = selectedFile.getPath();
@@ -371,11 +374,14 @@ public class FileManager {
 
     public void saveTableAs(JTable table) {
         JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filterJSON = new FileNameExtensionFilter(
+                "Archivo JSON (.json)", "json");
         FileNameExtensionFilter filterCsv = new FileNameExtensionFilter(
                 "Archivo delimitado por comas (.csv)", "csv");
         FileNameExtensionFilter filterTxt = new FileNameExtensionFilter(
                 "Texto plano (.txt)", "txt");
         chooser.setDialogTitle("Guardar...");
+        chooser.addChoosableFileFilter(filterJSON);
         chooser.addChoosableFileFilter(filterCsv);
         chooser.addChoosableFileFilter(filterTxt);
         chooser.setAcceptAllFileFilterUsed(false);
@@ -386,11 +392,28 @@ public class FileManager {
             String extension = fileFilter.getExtensions()[0];
             File file = chooser.getSelectedFile();
             boolean commaDelimited = extension.equals("csv");
-            try (FileWriter fw = new FileWriter(appendExtension(file.getPath(), extension))) {
-                fw.write(TextUtils.tableToString(table, true, commaDelimited, true));
-            } catch (IOException ex) {
-                UIUtils.showErrorMessage("Error", "No se pudo guardar el archivo " + file.getName(), UIClient.getInstance());
-            }
+
+            GenericWaitingDialog exportDialog = new GenericWaitingDialog("Exportando...");
+
+            exportDialog.display(() -> {
+                String fullFilePath = appendExtension(file.getPath(), extension);
+                if (extension.equals("json")) {
+                    TextUtils.writeTableToFileAsJSON(table, fullFilePath);
+                } else {
+                    String toExport = TextUtils.tableToString(table, true, commaDelimited, true);
+                    try (FileWriter fw = new FileWriter(fullFilePath)) {
+                        fw.write(toExport);
+                        SwingUtilities.invokeLater(() -> {
+                            UIUtils.showMessage("Exportar tabla", "Los datos fueron exportados con éxito.", client);
+                            MiscUtils.openDirectory(fullFilePath);
+                        });
+                    } catch (IOException ex) {
+                        SwingUtilities.invokeLater(() -> {
+                            UIUtils.showErrorMessage("Error", "No se pudo guardar el archivo " + file.getName(), client);
+                        });
+                    }
+                }
+            });
         }
     }
 

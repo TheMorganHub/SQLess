@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import com.sqless.settings.UserPreferencesLoader;
+import com.sqless.utils.MiscUtils;
 
 public class UISettings extends javax.swing.JDialog {
 
@@ -337,11 +338,7 @@ public class UISettings extends javax.swing.JDialog {
     }//GEN-LAST:event_btnApplyActionPerformed
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
-        try {
-            Runtime.getRuntime().exec("explorer.exe /select," + txtDefaultSaveDir.getText());
-        } catch (IOException ex) {
-            UIUtils.showErrorMessage("Error", "No se pudo abrir el directorio.", getParent());
-        }
+        MiscUtils.openDirectory(txtDefaultSaveDir.getText());
     }//GEN-LAST:event_btnOpenActionPerformed
 
     private void btnRestoreDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreDefaultsActionPerformed

@@ -1,11 +1,19 @@
 package com.sqless.utils;
 
+import com.sqless.ui.UIClient;
 import java.awt.Color;
+import java.io.FileWriter;
+import java.io.IOException;
 import javax.swing.JEditorPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
+import us.monoid.json.JSONArray;
+import us.monoid.json.JSONException;
+import us.monoid.json.JSONObject;
 
 /**
  * A class that provides tools suited for text manipulation and document
@@ -109,6 +117,171 @@ public class TextUtils {
             builder.append("\r\n");
         }
         return builder.toString();
+    }
+
+    public static void writeTableToFileAsJSON(JTable table, String filePath) {
+        table.setColumnSelectionInterval(1, table.getColumnCount() - 1);
+        table.setRowSelectionInterval(0, table.getRowCount() - 1);
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        int rowCount = model.getRowCount();
+        int columnCount = model.getColumnCount();
+        boolean firstRow = true;
+        try (FileWriter fw = new FileWriter(filePath)) {
+            fw.write("[");
+            StringBuilder json = new StringBuilder();
+            for (int i = 0; i < rowCount; i++) {
+                json.setLength(0);
+                json.append("{");
+                for (int j = 1; j < columnCount; j++) {
+                    Object value = model.getValueAt(i, j);
+
+                    String valueStr = value != null ? value.toString() : null;
+                    String columnName = model.getColumnName(j);
+                    json.append(j > 1 ? "," : "").append("\"").append(columnName).append("\":");
+                    if (valueStr != null && TextUtils.isNumeric(valueStr)) {
+                        if (valueStr.contains(".")) {
+                            json.append(Double.parseDouble(valueStr));
+                        } else if (valueStr.contains("x")) {
+                            json.append(Integer.parseInt(valueStr, 16));
+                        } else {
+                            json.append(Integer.parseInt(valueStr));
+                        }
+                    } else {
+                        json.append("\"").append(valueStr).append("\"");
+                    }
+                }
+                json.append("}");
+                fw.write(firstRow ? json.toString() : ("," + json.toString()));
+                firstRow = false;
+            }
+            fw.write("]");
+            SwingUtilities.invokeLater(() -> {
+                UIUtils.showMessage("Exportar tabla", "Los datos fueron exportados con éxito.", UIClient.getInstance());
+                MiscUtils.openDirectory(filePath);
+            });
+        } catch (IOException e) {
+            UIUtils.showErrorMessage("Exportar tabla", "Hubo un error al convertir la tabla a formato JSON", UIClient.getInstance());
+        }
+    }
+
+    /**
+     * Checks whether a string is a valid Java number. Taken from Apache
+     * NumberUtils.
+     *
+     * @param str
+     * @return {@code true} if the string is a number.
+     */
+    public static boolean isNumeric(final String str) {
+        if (str.isEmpty()) {
+            return false;
+        }
+        final char[] chars = str.toCharArray();
+        int sz = chars.length;
+        boolean hasExp = false;
+        boolean hasDecPoint = false;
+        boolean allowSigns = false;
+        boolean foundDigit = false;
+        // deal with any possible sign up front
+        final int start = chars[0] == '-' || chars[0] == '+' ? 1 : 0;
+        if (sz > start + 1 && chars[start] == '0' && !str.contains(".")) { // leading 0, skip if is a decimal number
+            if (chars[start + 1] == 'x' || chars[start + 1] == 'X') { // leading 0x/0X
+                int i = start + 2;
+                if (i == sz) {
+                    return false; // str == "0x"
+                }
+                // checking hex (it can't be anything else)
+                for (; i < chars.length; i++) {
+                    if ((chars[i] < '0' || chars[i] > '9')
+                            && (chars[i] < 'a' || chars[i] > 'f')
+                            && (chars[i] < 'A' || chars[i] > 'F')) {
+                        return false;
+                    }
+                }
+                return true;
+            } else if (Character.isDigit(chars[start + 1])) {
+                // leading 0, but not hex, must be octal
+                int i = start + 1;
+                for (; i < chars.length; i++) {
+                    if (chars[i] < '0' || chars[i] > '7') {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        sz--; // don't want to loop to the last char, check it afterwords
+        // for type qualifiers
+        int i = start;
+        // loop to the next to last char or to the last char if we need another digit to
+        // make a valid number (e.g. chars[0..5] = "1234E")
+        while (i < sz || i < sz + 1 && allowSigns && !foundDigit) {
+            if (chars[i] >= '0' && chars[i] <= '9') {
+                foundDigit = true;
+                allowSigns = false;
+
+            } else if (chars[i] == '.') {
+                if (hasDecPoint || hasExp) {
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                hasDecPoint = true;
+            } else if (chars[i] == 'e' || chars[i] == 'E') {
+                // we've already taken care of hex.
+                if (hasExp) {
+                    // two E's
+                    return false;
+                }
+                if (!foundDigit) {
+                    return false;
+                }
+                hasExp = true;
+                allowSigns = true;
+            } else if (chars[i] == '+' || chars[i] == '-') {
+                if (!allowSigns) {
+                    return false;
+                }
+                allowSigns = false;
+                foundDigit = false; // we need a digit after the E
+            } else {
+                return false;
+            }
+            i++;
+        }
+        if (i < chars.length) {
+            if (chars[i] >= '0' && chars[i] <= '9') {
+                // no type qualifier, OK
+                return true;
+            }
+            if (chars[i] == 'e' || chars[i] == 'E') {
+                // can't have an E at the last byte
+                return false;
+            }
+            if (chars[i] == '.') {
+                if (hasDecPoint || hasExp) {
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                // single trailing decimal point after non-exponent is ok
+                return foundDigit;
+            }
+            if (!allowSigns
+                    && (chars[i] == 'd'
+                    || chars[i] == 'D'
+                    || chars[i] == 'f'
+                    || chars[i] == 'F')) {
+                return foundDigit;
+            }
+            if (chars[i] == 'l'
+                    || chars[i] == 'L') {
+                // not allowing L with an exponent or decimal point
+                return foundDigit && !hasExp && !hasDecPoint;
+            }
+            // last character is illegal
+            return false;
+        }
+        // allowSigns is true iff the val ends in 'E'
+        // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
+        return !allowSigns && foundDigit;
     }
 
     /**

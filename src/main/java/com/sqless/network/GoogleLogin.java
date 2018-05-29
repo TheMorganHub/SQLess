@@ -1,6 +1,10 @@
 package com.sqless.network;
 
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.CredentialRefreshListener;
+import com.google.api.client.auth.oauth2.TokenErrorResponse;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -123,7 +127,19 @@ public class GoogleLogin {
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(DATA_STORE_FACTORY)
                 .setAccessType("offline")
+                .setCredentialCreatedListener((credential, tokenResponse) -> DATA_STORE_FACTORY.getDataStore("user").set("id_token", tokenResponse.get("id_token").toString()))
+                .addRefreshListener(new CredentialRefreshListener() {
+                    @Override
+                    public void onTokenResponse(Credential credential, TokenResponse tokenResponse) throws IOException {
+                        DATA_STORE_FACTORY.getDataStore("user").set("id_token", tokenResponse.get("id_token").toString());
+                    }
+
+                    @Override
+                    public void onTokenErrorResponse(Credential credential, TokenErrorResponse tokenErrorResponse) throws IOException {
+                    }
+                })
                 .build();
+
         Credential credential = new AuthorizationCodeInstalledApp(flow, serverReceiver).authorize("user");
         System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
@@ -136,11 +152,11 @@ public class GoogleLogin {
                 .build();
         Userinfoplus userinfo = oauth2.userinfo().get().execute(); //esto actualiza el access token usando el refresh token si es necesario automáticamente
 
-        //llamamos al backend con el access token. El backend autentica este token y crea (o no) la cuenta si es necesario.
+        //llamamos al backend con el id token. El backend autentica este token y crea (o no) la cuenta si es necesario.
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
-        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.form(Resty.data("access_token", credential.getAccessToken()),
-                Resty.data("login_type", loginType.toString()), Resty.data("source", "DESKTOP"))) {
+        String idToken = DATA_STORE_FACTORY.getDataStore("user").get("id_token").toString();
+        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.data("id_token", idToken), Resty.data("login_type", loginType.toString())) {
             @Override
             public void onSuccess(JSONObject json) throws Exception {
                 //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()

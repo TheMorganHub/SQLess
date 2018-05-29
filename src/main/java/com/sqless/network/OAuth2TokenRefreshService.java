@@ -2,6 +2,7 @@ package com.sqless.network;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.util.store.DataStoreFactory;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,9 +29,13 @@ public class OAuth2TokenRefreshService {
     private static OAuth2TokenRefreshService instance;
     private ScheduledExecutorService threadPool;
     private ScheduledFuture future; //la tarea que se va a llevar a cabo
+    private DataStoreFactory dataStoreFactory;
+    private String idToken;
 
     private OAuth2TokenRefreshService(GoogleAuthorizationCodeFlow flow) throws IOException {
         credential = flow.loadCredential("user");
+        this.dataStoreFactory = flow.getCredentialDataStore().getDataStoreFactory();
+        this.idToken = dataStoreFactory.getDataStore("user").get("id_token").toString();
         if (future == null) {
             start();
         }
@@ -102,7 +107,10 @@ public class OAuth2TokenRefreshService {
                 future = threadPool.scheduleWithFixedDelay(() -> {
                     try {
                         credential.refreshToken();
-                        System.out.println("OAuth2TokenRefreshService: Access token refrescado - " + credential.getAccessToken());
+                        idToken = dataStoreFactory.getDataStore("user").get("id_token").toString();
+
+                        System.out.println("OAuth2TokenRefreshService: Access token refrescado.");
+                        System.out.println("OAuth2TokenRefreshService: Id token refrescado.");
                     } catch (Exception e) {
                         System.err.println("OAuth2TokenRefreshService: " + e.getMessage() + " - El token no se pudo refrescar.");
                         stop();
@@ -123,6 +131,10 @@ public class OAuth2TokenRefreshService {
         future = null;
         instance = null;
         System.out.println("OAuth2TokenRefreshService: ejecución finalizada");
+    }
+
+    public String getIdToken() {
+        return idToken;
     }
 
 }

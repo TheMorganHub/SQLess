@@ -67,11 +67,12 @@ public class MapleQuery extends SQLQuery {
             public void run() {
                 try {
                     OAuth2TokenRefreshService service = OAuth2TokenRefreshService.getInstance();
-                    String accessToken = service == null ? "" : service.getCurrentCredential().getAccessToken();
+                    String idToken = service == null ? "" : service.getIdToken();
 
                     startTime = System.currentTimeMillis();
                     FinalValue<Boolean> requestSuccess = new FinalValue<>(Boolean.FALSE);
-                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, Resty.form(Resty.data("maple_statement", mapleStatement), Resty.data("access_token", accessToken))) {
+                    RestRequest rest = new PostRequest(RestRequest.MAPLE_URL, false, Resty.data("maple_statement", mapleStatement),
+                            Resty.data("id_token", idToken)) {
                         @Override
                         public void onSuccess(JSONObject json) throws Exception {
                             if (json.has("err")) { //hubo un error interno en el server

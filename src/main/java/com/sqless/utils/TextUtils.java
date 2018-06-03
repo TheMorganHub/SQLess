@@ -4,6 +4,7 @@ import com.sqless.ui.UIClient;
 import java.awt.Color;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import javax.swing.JEditorPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -11,9 +12,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import jsyntaxpane.SyntaxDocument;
-import us.monoid.json.JSONArray;
-import us.monoid.json.JSONException;
-import us.monoid.json.JSONObject;
 
 /**
  * A class that provides tools suited for text manipulation and document
@@ -144,7 +142,12 @@ public class TextUtils {
                         } else if (valueStr.contains("x")) {
                             json.append(Integer.parseInt(valueStr, 16));
                         } else {
-                            json.append(Integer.parseInt(valueStr));
+                            BigInteger bigInt = new BigInteger(valueStr);
+                            if (bigInt.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
+                                json.append("\"").append(bigInt.toString()).append("\"");
+                            } else {
+                                json.append(bigInt.toString());
+                            }
                         }
                     } else {
                         json.append("\"").append(valueStr).append("\"");

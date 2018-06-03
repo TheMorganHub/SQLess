@@ -81,7 +81,7 @@
           <Color blue="0" green="0" red="cc" type="rgb"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="La tarea est&#xe1; tardando demasiado. Haz click en Cancelar para cancelarla."/>
+        <Property name="text" type="java.lang.String" value="La tarea est&#xe1; tardando demasiado. Haz click en Cancelar si deseas cancelarla."/>
       </Properties>
     </Component>
   </SubComponents>

@@ -1,6 +1,10 @@
 package com.sqless.ui;
 
 import com.sqless.utils.AsyncAction;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class GenericWaitingDialog extends javax.swing.JDialog {
 
@@ -21,16 +25,22 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
         this.invisible = invisible;
     }
 
+    public void countTime() {
+        ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(1);
+        threadPool.schedule(() -> displayLongTaskNotice(), 10, TimeUnit.SECONDS);
+    }
+
     public void display(AsyncAction action) {
         secondaryThread = new Thread(() -> {
             action.exec();
             dispose();
         });
+        countTime();
         secondaryThread.start();
         setVisible(!invisible);
     }
 
-    public void displayNotice() {
+    public void displayLongTaskNotice() {
         lblNotice.setVisible(true);
         btnCancelar.setVisible(true);
         btnCancelar.requestFocus();
@@ -62,7 +72,7 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
 
         lblNotice.setForeground(new java.awt.Color(204, 0, 0));
         lblNotice.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblNotice.setText("La tarea está tardando demasiado. Haz click en Cancelar para cancelarla.");
+        lblNotice.setText("La tarea está tardando demasiado. Haz click en Cancelar si deseas cancelarla.");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -98,6 +108,10 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        if (secondaryThread != null && secondaryThread.isAlive()) {
+            secondaryThread.interrupt();
+        }
+        
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 

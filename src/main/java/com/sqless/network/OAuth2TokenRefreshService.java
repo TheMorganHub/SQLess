@@ -12,14 +12,8 @@ import us.monoid.json.JSONObject;
 
 /**
  * Un servicio que se activa al momento de hacer log in con Google. Su tarea
- * principal es la de refrescar el access token de la credencial guardada cada
- * 55 minutos. <br>
- * A tener en cuenta: los tokens generados por este servicio no son persistidos
- * en el dispositivo local, sino que son almacenados de manera temporaria en
- * memoria mientras la aplicación corre por si el usuario desea hacer una
- * llamada al backend. Una vez que el usuario cierre y vuelva abrir la
- * aplicación, es en ese momento en que un nuevo token actualizado será
- * persistido localmente
+ * principal es la de refrescar el access token y id token de la credencial
+ * guardada cada 55 minutos. <br>
  *
  * @author Morgan
  */
@@ -92,10 +86,10 @@ public class OAuth2TokenRefreshService {
     }
 
     /**
-     * Inicia la tarea programada de refrescar el token de acceso. Esta tarea se
-     * ejecutará con una demora inicial de cual sea el valor de expiración del
-     * token y a partir de ahí cada 55 minutos. Los tokens de accesso de Google
-     * duran aproximadamente 60 minutos.
+     * Inicia la tarea programada de refrescar los access token y id token. Esta
+     * tarea se ejecutará con una demora inicial de cual sea el valor de
+     * expiración del token y a partir de ahí cada 55 minutos. Los tokens de
+     * Google duran aproximadamente 60 minutos.
      */
     public final void start() {
         threadPool = Executors.newScheduledThreadPool(1);

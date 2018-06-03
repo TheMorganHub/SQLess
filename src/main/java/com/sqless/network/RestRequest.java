@@ -1,6 +1,5 @@
 package com.sqless.network;
 
-import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import us.monoid.json.JSONObject;
 import us.monoid.web.Resty;
@@ -33,29 +32,19 @@ public abstract class RestRequest {
      * de este método serán atrapadas por {@link #onFailure(java.lang.String)}
      */
     public void onSuccess(JSONObject json) throws Exception {
+        System.out.println("RestRequest - Unactioned request success: " + (json != null ? json.toString() : ""));
     }
 
     /**
-     * Es llamado por {@link #executePostExec(us.monoid.json.JSONObject)} al
-     * completarse el request contra el servidor <b>exitosamente</b> y si la
-     * autenticación del token de usuario fue exitosa.
-     *
-     * @param json
-     * @throws Exception si hubo algún error dentro de este método. Por ejemplo,
-     * si el usuario manipula el JSON de manera erronea. Todas las excepciones
-     * de este método serán atrapadas por {@link #onFailure(java.lang.String)}
-     */
-    public void onTokenSuccess(JSONObject json) throws Exception {
-    }
-
-    /**
-     * Si hubo alguna excepción al mandar el request contra el servidor o si el
-     * usuario manipuló de forma erronea el JSON del request.
+     * Si hubo algún error al mandar el request contra el servidor o si el
+     * usuario manipuló de forma erronea el JSON del request. Es recomendable
+     * sobrescribir este método, de lo contrario, se mostrará un error estándar
+     * en la consola que el usuario no podrá ver.
      *
      * @param message El mensaje de error.
      */
     public void onFailure(String message) {
-        UIUtils.showErrorMessage("Request error", message, null);
+        System.err.println("RestRequest - Unactioned request error: " + message);
     }
 
     /**
@@ -78,10 +67,6 @@ public abstract class RestRequest {
         Runnable runnable = () -> {
             try {
                 onSuccess(json);
-//                int tokenStatus = Integer.parseInt(json.get("user_id").toString());
-//                if (tokenStatus != -1) {
-//                    onTokenSuccess(json);
-//                }
             } catch (Exception e) {
                 onFailure(e.getMessage());
             }

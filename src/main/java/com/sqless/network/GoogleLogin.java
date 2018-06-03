@@ -1,6 +1,5 @@
 package com.sqless.network;
 
-import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.CredentialRefreshListener;
 import com.google.api.client.auth.oauth2.TokenErrorResponse;
@@ -114,10 +113,11 @@ public class GoogleLogin {
     private LocalServerReceiver serverReceiver;
 
     /**
-     * Creates an authorized Credential object.
+     * Crea una {@code Credential} y persiste el id_token de Google en el
+     * {@code DataStoreFactory} local.
      *
-     * @return an authorized Credential object.
-     * @throws java.io.IOException
+     * @return
+     * @throws IOException
      */
     public Credential authorize() throws IOException {
         InputStream in = GoogleLogin.class.getResourceAsStream("/google/client_secret.json");
@@ -156,26 +156,34 @@ public class GoogleLogin {
         //NOTA: si el token no pudo ser actualizado en el paso anterior o hubo algún error con el refresh token, la exception va a saltar antes de que se
         //ejecute esta sección
         String idToken = DATA_STORE_FACTORY.getDataStore("user").get("id_token").toString();
-        RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.data("id_token", idToken), Resty.data("login_type", loginType.toString())) {
-            @Override
-            public void onSuccess(JSONObject json) throws Exception {
-                //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
-                json.get("token_info");
-                if (callback != null) {
-                    callback.exec(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
+        if (loginType.equals(Type.FIRST_LOGIN)) { //solo hacemos la llamada al backend si el usuario se está logueando por primera vez, es decir, si no hay credenciales locales
+            RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.data("id_token", idToken)) {
+                @Override
+                public void onSuccess(JSONObject json) throws Exception {
+                    //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
+                    json.get("token_info");
+                    execPostLoginCallbackAndStartService(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
                 }
-                OAuth2TokenRefreshService.startInstance(flow);
-            }
 
-            @Override
-            public void onFailure(String message) {
-                UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", UIClient.getInstance());
-                if (waitDialog != null) {
-                    waitDialog.cancel();
+                @Override
+                public void onFailure(String message) {
+                    UIUtils.showErrorMessage("Autenticación con Google", "Hubo un error al procesar la autenticación con Google.", UIClient.getInstance());
+                    if (waitDialog != null) {
+                        waitDialog.cancel();
+                    }
                 }
-            }
-        };
-        rest.exec();
+            };
+            rest.exec();
+        } else {
+            execPostLoginCallbackAndStartService(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail()));
+        }
+    }
+
+    public void execPostLoginCallbackAndStartService(GoogleUser user) throws IOException {
+        if (callback != null) {
+            callback.exec(user);
+        }
+        OAuth2TokenRefreshService.startInstance(flow);
     }
 
     public void start() {

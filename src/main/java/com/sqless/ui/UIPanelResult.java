@@ -145,6 +145,10 @@ public class UIPanelResult extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     public void actionCopyRows(boolean includeHeaders) {
+        if (tableResult.getRowCount() == 0) {
+            UIUtils.showWarning("Copiar resultados", "La tabla debe tener al menos una fila para poder ser copiada.", UIClient.getInstance());
+            return;
+        }
         int[] selectedRows = tableResult.getSelectedRows();
         int[] selectedColumns = tableResult.getSelectedColumns();
         if (selectedColumns == null || selectedRows == null) {
@@ -194,6 +198,10 @@ public class UIPanelResult extends javax.swing.JPanel {
     private Action actionSelectAll = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (tableResult.getRowCount() == 0) {
+                UIUtils.showWarning("Selección de filas", "El número de filas debe ser al menos uno para hacer uso de esta funcionalidad.", UIClient.getInstance());
+                return;
+            }
             tableResult.setColumnSelectionInterval(1, tableResult.getColumnCount() - 1);
             tableResult.setRowSelectionInterval(0, tableResult.getRowCount() - 1);
         }
@@ -203,7 +211,7 @@ public class UIPanelResult extends javax.swing.JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (tableResult.getRowCount() == 0) {
-                UIUtils.showErrorMessage("No hay suficientes filas", "El número de filas debe ser al menos uno para hacer uso de esta funcionalidad.", null);
+                UIUtils.showWarning("Seleccionar rango", "El número de filas debe ser al menos uno para hacer uso de esta funcionalidad.", UIClient.getInstance());
                 return;
             }
             UISelectRange uISelectRange = new UISelectRange(tableResult.getRowCount());

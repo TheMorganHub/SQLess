@@ -373,6 +373,10 @@ public class FileManager {
     }
 
     public void saveTableAs(JTable table) {
+        if (table.getRowCount() == 0) {
+            UIUtils.showWarning("Guardar tabla", "La tabla debe tener al menos una fila para poder ser exportada.", UIClient.getInstance());
+            return;
+        }
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filterJSON = new FileNameExtensionFilter(
                 "Archivo JSON (.json)", "json");

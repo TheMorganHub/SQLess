@@ -75,7 +75,7 @@ public class MapleQuery extends SQLQuery {
                             Resty.data("id_token", idToken)) {
                         @Override
                         public void onSuccess(JSONObject json) throws Exception {
-                            if (json.has("err")) { //hubo un error interno en el server
+                            if (json.has("err")) { //la petición fue exitosa, pero hubo un error interno en el server
                                 onFailure(json.getString("err"));
                                 return;
                             }

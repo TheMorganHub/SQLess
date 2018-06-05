@@ -394,7 +394,7 @@ public class UIMapleQueryPanel extends FrontPanel {
                     btnRun.doClick();
                     break;
                 case KeyEvent.VK_F6:
-//                    btnStop.doClick();
+                    btnStop.doClick();
                     break;
             }
         }
@@ -426,9 +426,16 @@ public class UIMapleQueryPanel extends FrontPanel {
     private javax.swing.JEditorPane txtMapleQuery;
     private javax.swing.JEditorPane txtSQLQuery;
     // End of variables declaration//GEN-END:variables
+    private JButton btnSave;
     private JButton btnRun;
     private JButton btnStop;
-    private JButton btnSave;
+    private JButton btnUndo;
+    private JButton btnRedo;
+    private JButton btnDelete;
+    private JButton btnComment;
+    private JButton btnUncomment;
+    private JButton btnIndent;
+    private JButton btnUnindent;
     private JMenuItem menuSave;
     private JMenuItem menuSaveAs;
 
@@ -439,7 +446,14 @@ public class UIMapleQueryPanel extends FrontPanel {
             btnRun = UIUtils.newToolbarBtn(actionRunQuery, "Ejecutar", "", UIUtils.icon(this, "EXECUTE"));
             btnStop = UIUtils.newToolbarBtn(actionStopQuery, "Parar la ejecución de esta consulta", UIUtils.icon(this, "STOP_EXECUTION"));
             btnStop.setEnabled(false);
-            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop};
+            btnUndo = UIUtils.newToolbarBtn(actionUndoQuery, "Deshacer", UIUtils.icon(this, "UNDO"));
+            btnRedo = UIUtils.newToolbarBtn(actionRedoQuery, "Rehacer", UIUtils.icon(this, "REDO"));
+            btnDelete = UIUtils.newToolbarBtn(actionDeleteQuery, "Borrar la consulta actual", UIUtils.icon(this, "BORRAR"));
+            btnComment = UIUtils.newToolbarBtn(actionCommentQuery, "Comentar", UIUtils.icon(this, "COMMENT"));
+            btnUncomment = UIUtils.newToolbarBtn(actionUncommentQuery, "Descomentar", UIUtils.icon(this, "UNCOMMENT"));
+            btnIndent = UIUtils.newToolbarBtn(actionIndent, "Indentar", UIUtils.icon(this, "INDENT"));
+            btnUnindent = UIUtils.newToolbarBtn(actionUnindent, "Desindentar", UIUtils.icon(this, "UNINDENT"));
+            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop, UIUtils.newSeparator(), btnUndo, btnRedo, btnDelete, btnComment, btnUncomment, btnIndent, btnUnindent};
         }
         return toolbarComponents;
     }
@@ -503,6 +517,29 @@ public class UIMapleQueryPanel extends FrontPanel {
     private ActionListener actionSaveQueryAs = e -> {
         MapleFileManager.getInstance().saveFileAs(this);
         setTabToolTipText(filePath);
+    };
+    private ActionListener actionUndoQuery = (e) -> {
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_Z);
+    };
+    private ActionListener actionRedoQuery = (e) -> {
+        MiscUtils.simulateCtrlKeyEvent(txtMapleQuery, KeyEvent.VK_Y);
+    };
+    private ActionListener actionDeleteQuery = (e) -> {
+        if (!txtMapleQuery.getText().isEmpty()) {
+            TextUtils.emptyDoc(txtMapleQuery);
+        }
+    };
+    private ActionListener actionCommentQuery = (e) -> {
+        TextUtils.prependToText("-- ", txtMapleQuery);
+    };
+    private ActionListener actionUncommentQuery = (e) -> {
+        TextUtils.removePrependedText("-- ", txtMapleQuery);
+    };
+    private ActionListener actionIndent = (e) -> {
+        TextUtils.prependToText("\t", txtMapleQuery);
+    };
+    private ActionListener actionUnindent = (e) -> {
+        TextUtils.removePrependedText("\t", txtMapleQuery);
     };
 
 }

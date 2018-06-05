@@ -3,7 +3,6 @@ package com.sqless.ui;
 import com.sqless.utils.AsyncAction;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class GenericWaitingDialog extends javax.swing.JDialog {

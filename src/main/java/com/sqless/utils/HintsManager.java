@@ -31,13 +31,13 @@ public class HintsManager {
     public HintsManager() {
     }
 
-    public void activate(int hint) {
+    public void activate(int hint, Object... args) {
         switch (hint) {
             case COULD_BE_PK:
                 processCanBePK();
                 break;
             case COULD_BE_FK:
-                processCanBeFK();
+                processCanBeFK((int) args[0]);
                 break;
             case GUESS_DATATYPE_BY_NAME:
                 processGuessDataTypeByName();
@@ -46,6 +46,10 @@ public class HintsManager {
                 processCreateTableInEmptyDb();
                 break;
         }
+    }
+
+    public void activate(int hint) {
+        activate(hint, (Object[]) null);
     }
 
     private void processCanBePK() {
@@ -66,7 +70,7 @@ public class HintsManager {
         }
     }
 
-    private void processCanBeFK() {
+    private void processCanBeFK(int task) {
         if (col.isFK() || !col.getDataType().equals("int")) {
             return;
         }
@@ -90,19 +94,22 @@ public class HintsManager {
                             int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría servir para unir esta tabla con la tabla '"
                                     + potentialRefTableName + "'.\n¿Deseas que SQLess cree esta unión mediante una Foreign Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
                             if (opt == 0) {
-                                Object requiredValForColumn = SQLUtils.fetchFirstValueForColumn(potentialRefTableCol);
-                                if (requiredValForColumn == null) {
-                                    UIUtils.showErrorMessage("Error", "Ha habido un error al convertir esta columna en foreign key.\n"
-                                            + "Revisa que la tabla referenciada pueda ser identificada por una primary key en una columna 'id' "
-                                            + "y que ese valor no sea null.", UIClient.getInstance());
-                                    return;
+                                if (task == UICreateTableSQLess.TABLE_UPDATE) {
+                                    Object requiredValForColumn = SQLUtils.fetchFirstValueForColumn(potentialRefTableCol);
+                                    if (requiredValForColumn == null) {
+                                        UIUtils.showErrorMessage("Error", "Ha habido un error al convertir esta columna en foreign key.\n"
+                                                + "Revisa que la tabla referenciada pueda ser identificada por una primary key en una columna 'id' "
+                                                + "y que ese valor no sea null.", UIClient.getInstance());
+                                        return;
+                                    }
+                                    col.setDefaultVal(requiredValForColumn.toString(), true);
                                 }
                                 String newFkName = "fk_" + (parentTable.getName().isEmpty() ? MiscUtils.random(100000, 900000) + "" : parentTable.getName()) + "_" + potentialRefTableName;
                                 SQLForeignKey newFk = new SQLForeignKey(newFkName, parentTable.getName(),
                                         newName, potentialRefTableName, potentialRefTableCol.getName(), SQLForeignKey.RULE_CASCADE, SQLForeignKey.RULE_CASCADE);
                                 newFk.isBrandNew(true);
                                 parentTable.addFK(newFk);
-                                col.setDefaultVal(requiredValForColumn.toString(), true);
+
                                 col.setNullable(false);
                                 col.evaluateUncommittedChanges();
 

@@ -11,11 +11,9 @@ public class DataTypeUtils {
     public static final SimpleDateFormat MYSQL_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static final SimpleDateFormat MYSQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final String[] DEFAULT_DATA_TYPES = {"int", "decimal", "datetime", "varchar", "enum", "set"};
-
+    
     public static boolean dataTypeIsNumeric(String dataType) {
-        return dataType.equals("bit") || dataType.equals("tinyint") || dataType.equals("smallint")
-                || dataType.equals("mediumint") || dataType.equals("int")
-                || dataType.equals("bigint") || dataType.equals("decimal");
+        return dataTypeIsInteger(dataType) || dataTypeIsDecimal(dataType);
     }
 
     public static boolean dataTypeIsInteger(String dataType) {

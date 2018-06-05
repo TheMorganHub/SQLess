@@ -211,12 +211,26 @@ public class UIClient extends javax.swing.JFrame {
     public void clearJTree() {
         treeDiagram.setModel(new DefaultTreeModel(new SQLessTreeNode()));
     }
-    
-    public void removeNonQueryFrontPanels() {
+
+    /**
+     * Remueve todos los FrontPanel activos que sean del tipo especificado.
+     *
+     * @param triggerTabClosing Si {@code true}, el método
+     * {@link FrontPanel#tabClosing(int)} será llamado al removerse el Panel.
+     * @param types los tipos de FrontPanel a remover.
+     */
+    public void removeAllFrontPanels(boolean triggerTabClosing, Class<? extends FrontPanel>... types) {
         if (tabPaneContent.getTabCount() > 0) {
             for (int i = tabPaneContent.getTabCount() - 1; i >= 0; i--) {
-                if (tabPaneContent.getComponentAt(i) instanceof UICreateTableSQLess || tabPaneContent.getComponentAt(i) instanceof UIEditTable) {
-                    tabPaneContent.remove(i);
+                Component frontPanel = tabPaneContent.getComponentAt(i);
+                for (Class<? extends FrontPanel> fpClass : types) {
+                    if (fpClass.isInstance(frontPanel)) {
+                        if (triggerTabClosing) {
+                            ((FrontPanel) frontPanel).tabClosing(i);
+                        } else {
+                            tabPaneContent.remove(i);
+                        }                        
+                    }
                 }
             }
         }
@@ -558,8 +572,8 @@ public class UIClient extends javax.swing.JFrame {
     }
 
     public void onNewConnection() {
-        removeNonQueryFrontPanels();
-        if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {            
+        removeAllFrontPanels(false, UICreateTableSQLess.class, UIEditTable.class);
+        if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {
             HintsManager hintsManager = new HintsManager();
             hintsManager.activate(HintsManager.CREATE_TABLE_IN_EMPTY_DB);
         }
@@ -705,6 +719,7 @@ public class UIClient extends javax.swing.JFrame {
             barMenu.add(submenuLogin);
             barMenu.revalidate();
             barMenu.repaint();
+            removeAllFrontPanels(true, UIMapleQueryPanel.class);
         }
     };
 

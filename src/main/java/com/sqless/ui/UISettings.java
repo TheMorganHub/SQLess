@@ -1,12 +1,10 @@
 package com.sqless.ui;
 
-import com.sqless.utils.UIUtils;
 import com.sqless.utils.SQLUtils;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JCheckBox;
@@ -364,7 +362,7 @@ public class UISettings extends javax.swing.JDialog {
         if (outcome == UIConnectionWizard.CONNECTION_CHANGED) {
             populateDefaultDbCombobox(comboDatabases);
             client.clearJTree();
-            client.removeNonQueryFrontPanels();
+            client.removeAllFrontPanels(false, UICreateTableSQLess.class, UIEditTable.class);
         }
     }//GEN-LAST:event_btnModifySettingsActionPerformed
 

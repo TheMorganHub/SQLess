@@ -211,14 +211,14 @@ public class TreeContextMenuItemListener extends MouseAdapter {
                 } else {
                     System.out.println("El archivo ya existe");
                 }
-                UIDatabaseDumper dbDumper = new UIDatabaseDumper(tempFile, true);
-                dbDumper.start();
             } else {
                 if (tempDirectory.mkdir()) {
                     Files.copy(link, tempFile.getAbsoluteFile().toPath());
                 }
             }
             tempFile.deleteOnExit();
+            UIDatabaseDumper dbDumper = new UIDatabaseDumper(tempFile, true);
+            dbDumper.start();
         } catch (IOException ex) {
             UIUtils.showErrorMessage("Error", ex.getMessage(), null);
         }

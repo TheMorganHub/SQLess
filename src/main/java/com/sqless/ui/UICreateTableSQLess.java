@@ -647,7 +647,7 @@ public class UICreateTableSQLess extends FrontPanel {
         colEditada.setUncommittedName(cellChangeListener.getNewValue().toString());
 
         hints.activate(HintsManager.COULD_BE_PK);
-        hints.activate(HintsManager.COULD_BE_FK);
+        hints.activate(HintsManager.COULD_BE_FK, task);
         syncRowWithList(row);
     }
 
@@ -670,7 +670,7 @@ public class UICreateTableSQLess extends FrontPanel {
 
     public void processDecimalColumnChange(SQLColumn colEditada, int row) {
         //decimales - si el tipo de dato del row no es decimal, el campo decimal no se va a poder setear
-        if (!colEditada.getDataType().equals("decimal")) {
+        if (!DataTypeUtils.dataTypeIsDecimal(colEditada.getDataType())) {
             uiTable.setValueAt(null, row, 4);
         } else {
             colEditada.setNumericScale(cellChangeListener.getNewValue().toString());

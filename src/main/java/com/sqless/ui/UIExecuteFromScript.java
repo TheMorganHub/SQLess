@@ -5,7 +5,6 @@ import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
@@ -13,11 +12,26 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
 
     private String filePath;
     private ScriptExecutor scriptExecutor;
+    private String[] executeBeforeScript;
+    private Runnable callbackSuccess;
 
     public UIExecuteFromScript(String filePath) {
+        this(filePath, (String[]) null);
+    }
+
+    /**
+     * Inicializa un dialogo de ejecución de script. Se ejecutará primero lo
+     * dado en {@code executeBeforeScript} y luego el script. Las sentencias
+     * dadas en el array no deberán tener delimitadores como ";".
+     *
+     * @param filePath
+     * @param executeBeforeScript
+     */
+    public UIExecuteFromScript(String filePath, String... executeBeforeScript) {
         super(UIClient.getInstance(), true);
         initComponents();
         this.filePath = filePath + (!filePath.endsWith(".sql") ? ".sql" : "");
+        this.executeBeforeScript = executeBeforeScript;
         setLocationRelativeTo(getParent());
     }
 
@@ -75,9 +89,14 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void start() {
+    public void start(Runnable callbackSuccess) {
+        this.callbackSuccess = callbackSuccess;
         scriptExecutor = new ScriptExecutor();
         scriptExecutor.execute();
+    }
+
+    public void start() {
+        start(null);
     }
 
     private class ScriptExecutor extends SwingWorker<Void, Void> {
@@ -95,16 +114,24 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
                 scriptQuery = new SQLBatchQuery() {
                     @Override
                     public void onSuccess(int[] updateCounts) {
-                        System.out.println(Arrays.toString(updateCounts));
-                        //TODO success report
+                        dispose();
+                        UIUtils.showMessage("Ejecución de script", "El script dado se ejecutó con éxito.", UIClient.getInstance());
+                        if (callbackSuccess != null) {
+                            callbackSuccess.run();
+                        }
                     }
 
                     @Override
                     public void onFailure(int[] updateCounts, String errMessage) {
-                        System.err.println(errMessage);
-                        //TODO error report
+                        dispose();
+                        UIUtils.showErrorMessage("Ejecución de script", "Hubo un error al ejecutar el script dado.\nEl servidor respondió con mensaje: \n" + errMessage, UIClient.getInstance());
                     }
                 };
+                if (executeBeforeScript != null && executeBeforeScript.length > 0) {
+                    for (String stmt : executeBeforeScript) {
+                        scriptQuery.addBatch(stmt);
+                    }
+                }
                 while ((line = reader.readLine()) != null) {
                     if (buffer.length() == 0 && line.startsWith("DELIMITER")) {
                         delimiter = line.split(" ")[1];
@@ -141,7 +168,9 @@ public class UIExecuteFromScript extends javax.swing.JDialog {
                 UIUtils.showErrorMessage("Error", "Hubo un error al ejecutar el archivo dado."
                         + "\nAsegúrate que la ruta es la correcta y que el archivo SQL es válido y no está corrupto.", UIClient.getInstance());
             } finally {
-                dispose();
+                if (isShowing()) {
+                    dispose();
+                }
             }
         }
 

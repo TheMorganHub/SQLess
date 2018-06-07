@@ -892,7 +892,7 @@ public class UICreateTableSQLess extends FrontPanel {
     @Override
     public JMenuItem[] getMenuItems() {
         if (menuItems == null) {
-            menuSave = new JMenuItem("Save");
+            menuSave = new JMenuItem("Guardar");
             menuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
             menuSave.addActionListener(actionSave);
             menuItems = new JMenuItem[]{menuSave};
@@ -955,11 +955,8 @@ public class UICreateTableSQLess extends FrontPanel {
     private Action actionAddColumn = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
             if (columnList.isEmpty() || !columnList.get(uiTable.getSelectedRow()).getUncommittedName().isEmpty()) {
-                if (uiTable.getCellEditor() != null) {
-                    uiTable.getCellEditor().stopCellEditing();
-                }
-
                 sqlTable.addColumn(new SQLColumn(""));
                 getTableModel().addRow(new Object[5]);
                 uiTable.setRowSelectionInterval(getTableModel().getRowCount() - 1, getTableModel().getRowCount() - 1);

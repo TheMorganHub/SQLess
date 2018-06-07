@@ -392,7 +392,7 @@ public class UIEditTable extends FrontPanel {
             btnAddRow = UIUtils.newToolbarBtn(actionAddRow, "Agregar una fila nueva", UIUtils.icon(this, "ADD_ROW"));
             btnDeleteRows = UIUtils.newToolbarBtn(actionDeleteRow, "Eliminar la(s) fila(s) seleccionada(s)", UIUtils.icon(this, "DELETE_ROWS"));
             btnSave = UIUtils.newToolbarBtn(actionSaveChanges, "Confirmar todos los cambios", UIUtils.icon(this, "SAVE"));
-            btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Cargar la tabla nuevamenete para reflejar cambios externos (F5)", UIUtils.icon(this, "REFRESH"));
+            btnRefresh = UIUtils.newToolbarBtn(actionRefreshTable, "Cargar la tabla nuevamente para reflejar cambios externos (F5)", UIUtils.icon(this, "REFRESH"));
             btnTruncate = UIUtils.newToolbarBtn(actionTruncateTable, "Eliminar todas las filas en esta tabla (TRUNCATE)", UIUtils.icon(this, "TRUNCATE"));
             toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddRow, btnDeleteRows, UIUtils.newSeparator(), btnRefresh, UIUtils.newSeparator(), btnTruncate};
         }

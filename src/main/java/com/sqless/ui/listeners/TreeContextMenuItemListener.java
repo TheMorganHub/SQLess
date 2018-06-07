@@ -225,8 +225,8 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     };
 
     private ActionListener actionExecuteFromScript = e -> {
-        FileManager.getInstance().loadFile(fileContents -> {
-            UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(fileContents);
+        FileManager.getInstance().loadFile(filePath -> {
+            UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(filePath);
             uiExecuteFromScript.start();
         });
     };

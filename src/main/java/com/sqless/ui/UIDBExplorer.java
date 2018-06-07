@@ -1,5 +1,7 @@
 package com.sqless.ui;
 
+import com.sqless.file.FileManager;
+import com.sqless.file.FileManagerAdapter;
 import com.sqless.utils.UIUtils;
 import com.sqless.utils.SQLUtils;
 import java.awt.event.ActionEvent;
@@ -64,6 +66,12 @@ public class UIDBExplorer extends javax.swing.JDialog {
                     break;
             }
         });
+        chkIncludeCreate.addItemListener(e -> {
+            boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+            lblNombreCreate.setEnabled(selected);
+            txtNombreCreate.setEnabled(selected);
+            lblNoticeCreate.setVisible(!selected);
+        });
 
         pack();
     }
@@ -119,7 +127,9 @@ public class UIDBExplorer extends javax.swing.JDialog {
         iLblHost = new javax.swing.JLabel();
         lblHost = new javax.swing.JLabel();
         chkShowMaster = new javax.swing.JCheckBox();
+        btnRefresh = new javax.swing.JButton();
         pnlCreation = new javax.swing.JPanel();
+        pnlManualCreation = new javax.swing.JPanel();
         iLblName = new javax.swing.JLabel();
         txtNewDbName = new javax.swing.JTextField();
         btnRestoreDefaults = new javax.swing.JButton();
@@ -128,13 +138,22 @@ public class UIDBExplorer extends javax.swing.JDialog {
         iLblCollation = new javax.swing.JLabel();
         comboCharset = new javax.swing.JComboBox<>();
         comboCollation = new javax.swing.JComboBox<>();
+        pnlScriptCreate = new javax.swing.JPanel();
+        iLblUbicacion = new javax.swing.JLabel();
+        txtRutaScript = new javax.swing.JTextField();
+        btnExplorar = new javax.swing.JButton();
+        chkIncludeCreate = new javax.swing.JCheckBox();
+        btnEjecutarScript = new javax.swing.JButton();
+        txtNombreCreate = new javax.swing.JTextField();
+        lblNombreCreate = new javax.swing.JLabel();
+        lblNoticeCreate = new javax.swing.JLabel();
 
         menuItemDropDb.setAction(actionDropDatabase);
         menuItemDropDb.setText("Eliminar base de datos");
         popTable.add(menuItemDropDb);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Administrador de base de datos");
+        setTitle("Administrador de bases de datos");
 
         tabPaneMain.setFocusable(false);
 
@@ -188,14 +207,6 @@ public class UIDBExplorer extends javax.swing.JDialog {
         tableDb.getTableHeader().setReorderingAllowed(false);
         tableDb.getTableHeader().setResizingAllowed(false);
         tableDb.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        /*HighlightPredicate myPredicate = new HighlightPredicate() {
-            @Override
-            public boolean isHighlighted(Component component, org.jdesktop.swingx.decorator.ComponentAdapter adapter) {
-                return dbIsDefault(adapter.getValue().toString()) || adapter.row == getDefaultDbRow();
-            }
-        };
-        ColorHighlighter highlighter = new ColorHighlighter(myPredicate, UIUtils.COOL_GREEN, Color.BLACK);
-        tableDb.addHighlighter(highlighter);*/
 
         iLblHost.setText("Host:");
 
@@ -209,6 +220,16 @@ public class UIDBExplorer extends javax.swing.JDialog {
             }
         });
 
+        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_dbexplorer/REFRESH_ICON.png"))); // NOI18N
+        btnRefresh.setToolTipText("Refrescar lista de bases de datos");
+        btnRefresh.setFocusable(false);
+        btnRefresh.setPreferredSize(new java.awt.Dimension(49, 23));
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlManagerLayout = new javax.swing.GroupLayout(pnlManager);
         pnlManager.setLayout(pnlManagerLayout);
         pnlManagerLayout.setHorizontalGroup(
@@ -218,38 +239,44 @@ public class UIDBExplorer extends javax.swing.JDialog {
                 .addGroup(pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scrMain, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(pnlManagerLayout.createSequentialGroup()
-                        .addComponent(iLblHost)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblHost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnlManagerLayout.createSequentialGroup()
                         .addComponent(chkShowMaster)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
+                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDrop)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnConnect)))
+                        .addComponent(btnConnect))
+                    .addGroup(pnlManagerLayout.createSequentialGroup()
+                        .addComponent(iLblHost)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblHost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlManagerLayout.setVerticalGroup(
             pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlManagerLayout.createSequentialGroup()
-                .addGap(7, 7, 7)
+                .addContainerGap()
                 .addGroup(pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(iLblHost)
                     .addComponent(lblHost))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                .addGap(9, 9, 9)
+                .addComponent(scrMain, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkShowMaster, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnDrop)
-                        .addComponent(btnConnect)))
+                    .addGroup(pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(chkShowMaster, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManagerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnDrop)
+                            .addComponent(btnConnect)))
+                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         tabPaneMain.addTab("Administrar", pnlManager);
 
-        pnlCreation.setBorder(javax.swing.BorderFactory.createTitledBorder("Crear base de datos"));
+        pnlCreation.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        pnlManualCreation.setBorder(javax.swing.BorderFactory.createTitledBorder("Crear base de datos vacía"));
 
         iLblName.setText("Nombre:");
 
@@ -278,50 +305,148 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
         comboCollation.setFocusable(false);
 
+        javax.swing.GroupLayout pnlManualCreationLayout = new javax.swing.GroupLayout(pnlManualCreation);
+        pnlManualCreation.setLayout(pnlManualCreationLayout);
+        pnlManualCreationLayout.setHorizontalGroup(
+            pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlManualCreationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManualCreationLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRestoreDefaults)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCreateDb, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlManualCreationLayout.createSequentialGroup()
+                        .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(pnlManualCreationLayout.createSequentialGroup()
+                                .addComponent(iLblCollation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(pnlManualCreationLayout.createSequentialGroup()
+                                .addComponent(iLblCharset, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                                .addGap(4, 4, 4)))
+                        .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboCharset, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(comboCollation, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(pnlManualCreationLayout.createSequentialGroup()
+                        .addComponent(iLblName, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNewDbName)))
+                .addContainerGap())
+        );
+        pnlManualCreationLayout.setVerticalGroup(
+            pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManualCreationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNewDbName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(iLblName))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(iLblCharset)
+                    .addComponent(comboCharset, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(comboCollation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(iLblCollation))
+                .addGap(18, 18, 18)
+                .addGroup(pnlManualCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRestoreDefaults)
+                    .addComponent(btnCreateDb))
+                .addContainerGap())
+        );
+
+        pnlScriptCreate.setBorder(javax.swing.BorderFactory.createTitledBorder("Crear base de datos desde script"));
+
+        iLblUbicacion.setText("Ubicación:");
+
+        btnExplorar.setText("Explorar...");
+        btnExplorar.setFocusable(false);
+        btnExplorar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExplorarActionPerformed(evt);
+            }
+        });
+
+        chkIncludeCreate.setSelected(true);
+        chkIncludeCreate.setText("Incluir CREATE DATABASE [nombre] al principio del script");
+        chkIncludeCreate.setFocusable(false);
+
+        btnEjecutarScript.setText("Ejecutar");
+        btnEjecutarScript.setFocusable(false);
+        btnEjecutarScript.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEjecutarScriptActionPerformed(evt);
+            }
+        });
+
+        lblNombreCreate.setText("Nombre:");
+
+        lblNoticeCreate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_general/ATTENTION_ICON.png"))); // NOI18N
+        lblNoticeCreate.setText("Se asumirá que el script dado ya incluye la sentencia CREATE DATABASE");
+
+        javax.swing.GroupLayout pnlScriptCreateLayout = new javax.swing.GroupLayout(pnlScriptCreate);
+        pnlScriptCreate.setLayout(pnlScriptCreateLayout);
+        pnlScriptCreateLayout.setHorizontalGroup(
+            pnlScriptCreateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlScriptCreateLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlScriptCreateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlScriptCreateLayout.createSequentialGroup()
+                        .addComponent(lblNombreCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNombreCreate))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlScriptCreateLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnEjecutarScript, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlScriptCreateLayout.createSequentialGroup()
+                        .addComponent(iLblUbicacion, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtRutaScript)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnExplorar))
+                    .addGroup(pnlScriptCreateLayout.createSequentialGroup()
+                        .addComponent(chkIncludeCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 501, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 9, Short.MAX_VALUE))
+                    .addComponent(lblNoticeCreate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        pnlScriptCreateLayout.setVerticalGroup(
+            pnlScriptCreateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlScriptCreateLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlScriptCreateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(iLblUbicacion)
+                    .addComponent(txtRutaScript, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExplorar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkIncludeCreate)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlScriptCreateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNombreCreate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNombreCreate))
+                .addGap(18, 18, 18)
+                .addComponent(btnEjecutarScript)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                .addComponent(lblNoticeCreate)
+                .addContainerGap())
+        );
+
+        lblNoticeCreate.setVisible(false);
+
         javax.swing.GroupLayout pnlCreationLayout = new javax.swing.GroupLayout(pnlCreation);
         pnlCreation.setLayout(pnlCreationLayout);
         pnlCreationLayout.setHorizontalGroup(
             pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCreationLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCreationLayout.createSequentialGroup()
-                        .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(iLblName, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(iLblCharset)
-                            .addComponent(iLblCollation))
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNewDbName)
-                            .addComponent(comboCharset, 0, 346, Short.MAX_VALUE)
-                            .addComponent(comboCollation, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(pnlCreationLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnCreateDb, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnRestoreDefaults))))
-                .addContainerGap())
+            .addComponent(pnlScriptCreate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlManualCreation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlCreationLayout.setVerticalGroup(
             pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCreationLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(iLblName)
-                    .addComponent(txtNewDbName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(pnlManualCreation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboCharset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(iLblCharset))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlCreationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboCollation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(iLblCollation))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRestoreDefaults)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
-                .addComponent(btnCreateDb, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(pnlScriptCreate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabPaneMain.addTab("Crear", pnlCreation);
@@ -460,6 +585,47 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private void btnRestoreDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreDefaultsActionPerformed
         restoreDefaults();
     }//GEN-LAST:event_btnRestoreDefaultsActionPerformed
+
+    private void btnExplorarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExplorarActionPerformed
+        FileManager.getInstance().loadFile(filepath -> {
+            txtRutaScript.setText(filepath);
+        });
+    }//GEN-LAST:event_btnExplorarActionPerformed
+
+    private void btnEjecutarScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEjecutarScriptActionPerformed
+        actionExecuteScript();
+    }//GEN-LAST:event_btnEjecutarScriptActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        actionRefreshTableDBs();
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    public void actionExecuteScript() {
+        String ruta = txtRutaScript.getText();
+        if (ruta == null || ruta.isEmpty()) {
+            UIUtils.showErrorMessage("Crear base de datos", "La ruta no puede estar vacía.", client);
+            return;
+        }
+
+        String[] executeBeforeSql = null;
+        String nombreCreate = txtNombreCreate.getText();
+        if (chkIncludeCreate.isSelected()) {
+            if (nombreCreate == null || nombreCreate.isEmpty()) {
+                UIUtils.showErrorMessage("Crear base de datos", "El nombre de la base de datos no puede estar vacío si se desea incluir la sentencia CREATE DATABASE.", client);
+                return;
+            }
+            executeBeforeSql = new String[]{"CREATE DATABASE `" + nombreCreate + "`", "USE `" + nombreCreate + "`"};
+        }
+        UIExecuteFromScript uiExecuteFromScript = new UIExecuteFromScript(ruta, executeBeforeSql);
+        uiExecuteFromScript.start(() -> {
+            tabPaneMain.setSelectedIndex(0);
+            actionRefreshTableDBs();
+        });
+    }
+
+    public void actionRefreshTableDBs() {
+        loadTable();
+    }
 
     public void showMasterDB(boolean flag) {
         if (flag) {
@@ -710,7 +876,11 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnCreateDb;
     private javax.swing.JButton btnDrop;
+    private javax.swing.JButton btnEjecutarScript;
+    private javax.swing.JButton btnExplorar;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRestoreDefaults;
+    private javax.swing.JCheckBox chkIncludeCreate;
     private javax.swing.JCheckBox chkShowMaster;
     private javax.swing.JComboBox<String> comboCharset;
     private javax.swing.JComboBox<String> comboCollation;
@@ -718,14 +888,21 @@ public class UIDBExplorer extends javax.swing.JDialog {
     private javax.swing.JLabel iLblCollation;
     private javax.swing.JLabel iLblHost;
     private javax.swing.JLabel iLblName;
+    private javax.swing.JLabel iLblUbicacion;
     private javax.swing.JLabel lblHost;
+    private javax.swing.JLabel lblNombreCreate;
+    private javax.swing.JLabel lblNoticeCreate;
     private javax.swing.JMenuItem menuItemDropDb;
     private javax.swing.JPanel pnlCreation;
     private javax.swing.JPanel pnlManager;
+    private javax.swing.JPanel pnlManualCreation;
+    private javax.swing.JPanel pnlScriptCreate;
     private javax.swing.JPopupMenu popTable;
     private javax.swing.JScrollPane scrMain;
     private javax.swing.JTabbedPane tabPaneMain;
     private org.jdesktop.swingx.JXTable tableDb;
     private javax.swing.JTextField txtNewDbName;
+    private javax.swing.JTextField txtNombreCreate;
+    private javax.swing.JTextField txtRutaScript;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,13 +1,13 @@
 package com.sqless.ui.seteditor;
 
+import com.sqless.ui.UIClient;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JCheckBox;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
-public class UISQLSetPanelInner extends javax.swing.JPanel {
+public class UISQLSetEditorDialog extends javax.swing.JDialog {
 
     /**
      * The values of the set that the column has selected before this UI is
@@ -26,35 +26,16 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
      * All the values available in the set.
      */
     private String[] defaultVals;
-    private JPopupMenu parent;
+    private JTextField txtFieldOnConfirm;
 
-    /**
-     * Crea un nuevo panel. Usar este constructor para ocasiones en las que se
-     * utilice este panel en conjunto con un componente que no sea una JTable.
-     *
-     * @param parent El JPopupMenu padre de este panel.
-     * @param defaultVals Los valores que esta columna puede aceptar en su set.
-     * @param originalColumnValues Los valores que la columna tiene asignado en
-     * su set actualmente al abrirse esta ventana.
-     */
-    public UISQLSetPanelInner(JPopupMenu parent, String[] defaultVals, String originalColumnValues) {
+    public UISQLSetEditorDialog(String[] defaultVals, String originalColumnValues, JTextField textField) {
+        super(UIClient.getInstance(), true);
         initComponents();
         this.originalColumnValues = originalColumnValues.split(",");
         this.defaultVals = defaultVals;
-        this.parent = parent;
+        this.txtFieldOnConfirm = textField;
         fillPanel();
-    }
-
-    private void fillPanel() {
-        for (String defaultVal : defaultVals) {
-            JCheckBox checkBox = new JCheckBox(defaultVal);
-            checkBox.setBackground(Color.WHITE);
-            checkBox.setFocusable(false);
-            checkBox.setSelected(valIsSelected(defaultVal));
-            panelCheckBoxes.add(checkBox);
-        }
-        panelCheckBoxes.revalidate();
-        panelCheckBoxes.repaint();
+        setLocationRelativeTo(getParent());
     }
 
     public String[] getSelectedValues() {
@@ -70,6 +51,18 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
         return false;
     }
 
+    private void fillPanel() {
+        for (String defaultVal : defaultVals) {
+            JCheckBox checkBox = new JCheckBox(defaultVal);
+            checkBox.setBackground(Color.WHITE);
+            checkBox.setFocusable(false);
+            checkBox.setSelected(valIsSelected(defaultVal));
+            panelCheckBoxes.add(checkBox);
+        }
+        panelCheckBoxes.revalidate();
+        panelCheckBoxes.repaint();
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -79,6 +72,8 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
         btnCancel = new javax.swing.JButton();
         scrPane = new javax.swing.JScrollPane();
         panelCheckBoxes = new javax.swing.JPanel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         btnOK.setText("OK");
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -102,7 +97,7 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
                 .addGap(41, 41, 41)
                 .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnOK, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+                .addComponent(btnOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(6, 6, 6))
         );
         panelBackLayout.setVerticalGroup(
@@ -119,8 +114,8 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
         panelCheckBoxes.setLayout(new javax.swing.BoxLayout(panelCheckBoxes, javax.swing.BoxLayout.Y_AXIS));
         scrPane.setViewportView(panelCheckBoxes);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(panelBack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -133,6 +128,8 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(panelBack, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
@@ -144,15 +141,19 @@ public class UISQLSetPanelInner extends javax.swing.JPanel {
             }
         }
 
-        String[] toArray = selected.toArray(new String[selected.size()]);
-        userSelectedValues = toArray;
-        parent.setVisible(false);
+        if (txtFieldOnConfirm == null) {
+            String[] toArray = selected.toArray(new String[selected.size()]);
+            userSelectedValues = toArray;
+        } else {
+            txtFieldOnConfirm.setText(String.join(",", selected));
+        }
+
+        setVisible(false);
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        parent.setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;

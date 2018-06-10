@@ -2,7 +2,8 @@ package com.sqless.ui;
 
 import com.sqless.sql.objects.SQLColumn;
 import com.sqless.ui.dateeditor.UISQLDatePanelInner;
-import com.sqless.ui.enumeditor.UISQLEnumPanelInner;
+import com.sqless.ui.enumeditor.UISQLEnumEditorDialog;
+import com.sqless.ui.seteditor.UISQLSetEditorDialog;
 import com.sqless.ui.seteditor.UISQLSetPanelInner;
 import com.sqless.utils.SQLUtils;
 import java.awt.Component;
@@ -23,7 +24,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.jdesktop.swingx.JXDatePicker;
 
 /**
  * Un {@code JPanel} que sirve para representar, visualizar, y cambiar
@@ -242,16 +242,12 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow() == -1 ? 0 : uiTable.getSelectedRow());
         switch (selectedColumn.getDataType()) {
             case "enum":
-                JPopupMenu enumPop = new JPopupMenu();
-                UISQLEnumPanelInner enumPanelInnerPopUp = new UISQLEnumPanelInner(enumPop, SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
-                enumPop.add(enumPanelInnerPopUp);
-                enumPop.show(this, btnEditDefaultVals.getLocation().x - 95, btnEditDefaultVals.getLocation().y + 20);
+                UISQLEnumEditorDialog enumEditorDialog = new UISQLEnumEditorDialog(SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
+                enumEditorDialog.setVisible(true);
                 break;
             case "set":
-                JPopupMenu setPop = new JPopupMenu();
-                UISQLSetPanelInner setPanelInnerPopUp = new UISQLSetPanelInner(setPop, SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
-                setPop.add(setPanelInnerPopUp);
-                setPop.show(this, btnEditDefaultVals.getLocation().x - 95, btnEditDefaultVals.getLocation().y + 20);
+                UISQLSetEditorDialog setEditorDialog = new UISQLSetEditorDialog(SQLUtils.getEnumLikeValuesAsArray(selectedColumn.getEnumLikeValues(false)), txtDefault.getText(), txtDefault);
+                setEditorDialog.setVisible(true);
                 break;
             case "datetime":
                 UISQLDatePanelInner datePanelInnerPopUp = new UISQLDatePanelInner(selectedColumn, txtDefault.getText(), txtDefault);

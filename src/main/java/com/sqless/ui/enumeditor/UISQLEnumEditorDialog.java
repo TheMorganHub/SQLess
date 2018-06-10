@@ -1,23 +1,24 @@
 package com.sqless.ui.enumeditor;
 
+import com.sqless.ui.UIClient;
 import javax.swing.DefaultListModel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
-public class UISQLEnumPanelInner extends javax.swing.JPanel {
+public class UISQLEnumEditorDialog extends javax.swing.JDialog {
 
-    private JPopupMenu parent;
     private String[] availableValues;
     private String actualValue;
     private JTextField txtFieldOnConfirm;
 
-    public UISQLEnumPanelInner(JPopupMenu parent, String[] availableValues, String actualValue, JTextField txtFieldOnConfirm) {
+    public UISQLEnumEditorDialog(String[] availableValues, String actualValue, JTextField txtFieldOnConfirm) {
+        super(UIClient.getInstance(), true);
         initComponents();
-        this.parent = parent;
         this.availableValues = availableValues;
         this.actualValue = actualValue;
         this.txtFieldOnConfirm = txtFieldOnConfirm;
         initList();
+        setLocationRelativeTo(getParent());
+        pack();
     }
 
     public void initList() {
@@ -58,8 +59,8 @@ public class UISQLEnumPanelInner extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(scrList, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -86,11 +87,11 @@ public class UISQLEnumPanelInner extends javax.swing.JPanel {
         if (!actualValue.equalsIgnoreCase(listEnum.getSelectedValue())) {
             txtFieldOnConfirm.setText(listEnum.getSelectedValue());
         }
-        parent.setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        parent.setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
 

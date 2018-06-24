@@ -52,7 +52,9 @@ public class TreeContextMenuHandler {
         TreeMenuItemSet databaseContext = new TreeMenuItemSet(DATABASE);
         databaseContext.add(new TreeContextMenuItem("Exportar estructura y datos...", "EXPORT_DB"));
         databaseContext.add(new TreeContextMenuItem("Exportar sólo estructura...", "EXPORT_DB_NO_DATA"));
-        databaseContext.add(new TreeContextMenuItem("Ejecutar desde archivo SQL...", "EXECUTE_FROM_SCRIPT"));
+        
+        TreeMenuItemSet databaseContext2 = new TreeMenuItemSet(DATABASE);        
+        databaseContext2.add(new TreeContextMenuItem("Ejecutar desde archivo SQL...", "EXECUTE_FROM_SCRIPT"));
 
         TreeMenuItemSet genericMenu = new TreeMenuItemSet(DATABASE, TABLE_COLUMN, TABLE, VIEW, VIEW_COLUMN, INDEX,
                 FUNCTION, PROCEDURE, TRIGGER);
@@ -65,6 +67,7 @@ public class TreeContextMenuHandler {
         itemSets.add(executableContext);
         itemSets.add(columnTableObjectContext);
         itemSets.add(databaseContext);
+        itemSets.add(databaseContext2);
         itemSets.add(genericMenu);
     }
 

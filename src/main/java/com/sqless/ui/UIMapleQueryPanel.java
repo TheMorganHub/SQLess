@@ -191,6 +191,10 @@ public class UIMapleQueryPanel extends FrontPanel {
     public void clearMessages() {
         panelMessages.clear();
     }
+    
+    public void clearConvertedSQL() {
+        txtSQLQuery.setText("");
+    }
 
     public void stopQuery() {
         if (mapleQuery != null) {

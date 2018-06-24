@@ -526,6 +526,7 @@ public class SQLColumn extends SQLObject implements SQLSelectable, SQLEditable,
     public String getCreateStatement() {
         return "`" + getUncommittedName() + "` "
                 + (getDataType().equals("enum") || getDataType().equals("set") ? getEnumLikeValues(true) : getDataType() + getDataPrecision())
+                + (unsigned ? " UNSIGNED" : "")
                 + " " + (nullable ? "NULL" : "NOT NULL") + " "
                 + (autoincrement ? "AUTO_INCREMENT " : "")
                 + (defaultVal == null || defaultVal.isEmpty() ? "" : "DEFAULT "

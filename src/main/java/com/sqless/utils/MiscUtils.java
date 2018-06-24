@@ -3,12 +3,15 @@ package com.sqless.utils;
 import com.sqless.ui.UIClient;
 import java.awt.AWTException;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -49,6 +52,16 @@ public class MiscUtils {
             Runtime.getRuntime().exec("explorer.exe /select," + directory);
         } catch (IOException ex) {
             UIUtils.showErrorMessage("Error", "No se pudo abrir el directorio.", UIClient.getInstance());
+        }
+    }
+    
+    public static void openInBrowser(String url) {
+        try {
+            if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(url));
+            }
+        } catch (IOException | URISyntaxException e) {
+            UIUtils.showErrorMessage("Error", "Esta funcionalidad no es soportada. Asegúrate que tu computadora pueda navegar por internet.", UIClient.getInstance());
         }
     }
 

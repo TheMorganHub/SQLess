@@ -30,6 +30,10 @@ public class GoogleUserManager {
     public GoogleUser getActive() {
         return active;
     }
+    
+    public boolean userIsLoggedIn() {
+        return active != null;
+    }
 
     public void logIn(Callback<GoogleUser> callback, UIGoogleWaitDialog waitDialog) {
         GoogleLogin login = new GoogleLogin(googleUser -> {

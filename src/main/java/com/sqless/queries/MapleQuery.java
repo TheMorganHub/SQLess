@@ -51,6 +51,7 @@ public class MapleQuery extends SQLQuery {
     public void exec() {
         if (queryPanel != null) {
             queryPanel.clearMessages();
+            queryPanel.clearConvertedSQL();
             queryStatus = Status.LOADING;
             queryPanel.updateStatusLabel(Status.LOADING);
             queryPanel.updateRowsLabel(0);

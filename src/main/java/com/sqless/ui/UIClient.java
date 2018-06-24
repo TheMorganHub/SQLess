@@ -229,7 +229,7 @@ public class UIClient extends javax.swing.JFrame {
                             ((FrontPanel) frontPanel).tabClosing(i);
                         } else {
                             tabPaneContent.remove(i);
-                        }                        
+                        }
                     }
                 }
             }
@@ -240,8 +240,6 @@ public class UIClient extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        submenuLoggedInGoogle = new javax.swing.JMenu();
-        menuLogOutGoogle = new javax.swing.JMenuItem();
         toolbarTop = new javax.swing.JToolBar();
         btnNewQuery = new javax.swing.JButton();
         btnNewMapleQuery = new javax.swing.JButton();
@@ -256,6 +254,8 @@ public class UIClient extends javax.swing.JFrame {
         toolbarDiagrama = new javax.swing.JToolBar();
         btnDbManager = new javax.swing.JButton();
         btnRefreshJTree = new javax.swing.JButton();
+        toolbarTopUser = new javax.swing.JToolBar();
+        btnLogin = new javax.swing.JButton();
         barMenu = new javax.swing.JMenuBar();
         submenuArchivo = new javax.swing.JMenu();
         menuNewFile = new javax.swing.JMenuItem();
@@ -264,16 +264,6 @@ public class UIClient extends javax.swing.JFrame {
         menuSettings = new javax.swing.JMenuItem();
         submenuHelp = new javax.swing.JMenu();
         menuAbout = new javax.swing.JMenuItem();
-        submenuLogin = new javax.swing.JMenu();
-        menuLoginGoogle = new javax.swing.JMenuItem();
-
-        submenuLoggedInGoogle.setText("jMenu1");
-        submenuLoggedInGoogle.setName("submenuLoggedInGoogle"); // NOI18N
-
-        menuLogOutGoogle.setAction(actionLogOutGoogle);
-        menuLogOutGoogle.setText("Cerrar sesión");
-        menuLogOutGoogle.setName("menuLogOutGoogle"); // NOI18N
-        submenuLoggedInGoogle.add(menuLogOutGoogle);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SQLess - David Orquin, Tomás Casir, Valeria Fornieles");
@@ -285,10 +275,7 @@ public class UIClient extends javax.swing.JFrame {
             }
         });
 
-        org.jdesktop.swingx.border.DropShadowBorder dropShadowBorder1 = new org.jdesktop.swingx.border.DropShadowBorder();
-        dropShadowBorder1.setShadowSize(3);
-        dropShadowBorder1.setShowRightShadow(false);
-        toolbarTop.setBorder(dropShadowBorder1);
+        toolbarTop.setBorder(null);
         toolbarTop.setFloatable(false);
         toolbarTop.setRollover(true);
         toolbarTop.setName("toolbarTop"); // NOI18N
@@ -346,12 +333,12 @@ public class UIClient extends javax.swing.JFrame {
         tabPaneContent.setName("tabPaneContent"); // NOI18N
         splitMain.setRightComponent(tabPaneContent);
 
-        org.jdesktop.swingx.border.DropShadowBorder dropShadowBorder2 = new org.jdesktop.swingx.border.DropShadowBorder();
-        dropShadowBorder2.setCornerSize(5);
-        dropShadowBorder2.setShadowSize(3);
-        dropShadowBorder2.setShowLeftShadow(true);
-        dropShadowBorder2.setShowTopShadow(true);
-        pnlDiagram.setBorder(dropShadowBorder2);
+        org.jdesktop.swingx.border.DropShadowBorder dropShadowBorder1 = new org.jdesktop.swingx.border.DropShadowBorder();
+        dropShadowBorder1.setCornerSize(5);
+        dropShadowBorder1.setShadowSize(3);
+        dropShadowBorder1.setShowLeftShadow(true);
+        dropShadowBorder1.setShowTopShadow(true);
+        pnlDiagram.setBorder(dropShadowBorder1);
         pnlDiagram.setName("pnlDiagram"); // NOI18N
 
         scrlDiagram.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -404,10 +391,27 @@ public class UIClient extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDiagramLayout.createSequentialGroup()
                 .addComponent(toolbarDiagrama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
-                .addComponent(scrlDiagram, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE))
+                .addComponent(scrlDiagram, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
         );
 
         splitMain.setLeftComponent(pnlDiagram);
+
+        toolbarTopUser.setFloatable(false);
+        toolbarTopUser.setRollover(true);
+        toolbarTopUser.setName("toolbarTopUser"); // NOI18N
+
+        btnLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/ui_client/USER_PICTURE_ICON.png"))); // NOI18N
+        btnLogin.setToolTipText("Inicia sesión con Google");
+        btnLogin.setFocusable(false);
+        btnLogin.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnLogin.setName("btnLogin"); // NOI18N
+        btnLogin.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
+        toolbarTopUser.add(btnLogin);
 
         barMenu.setName("barMenu"); // NOI18N
 
@@ -465,35 +469,29 @@ public class UIClient extends javax.swing.JFrame {
         barMenu.add(submenuHelp);
         barMenu.add(Box.createHorizontalGlue());
 
-        submenuLogin.setText("Iniciar sesión");
-        submenuLogin.setName("submenuLogin"); // NOI18N
-
-        menuLoginGoogle.setAction(actionLogInGoogle);
-        menuLoginGoogle.setText("Iniciar sesión (Google)");
-        menuLoginGoogle.setName("menuLoginGoogle"); // NOI18N
-        submenuLogin.add(menuLoginGoogle);
-
-        barMenu.add(Box.createHorizontalGlue());
-
-        barMenu.add(submenuLogin);
-
         setJMenuBar(barMenu);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(toolbarTop, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1288, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(splitMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(toolbarTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, 0)
+                        .addComponent(toolbarTopUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(splitMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1282, Short.MAX_VALUE)))
                 .addGap(3, 3, 3))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(toolbarTop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(toolbarTop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(toolbarTopUser, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addComponent(splitMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(4, 4, 4))
         );
@@ -555,15 +553,27 @@ public class UIClient extends javax.swing.JFrame {
         actionNewMapleQuery();
     }//GEN-LAST:event_btnNewMapleQueryActionPerformed
 
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        actionLogInButton();
+    }//GEN-LAST:event_btnLoginActionPerformed
+
+    public void actionLogInButton() {
+        JPopupMenu popMenuLogin = new JPopupMenu();
+        if (GoogleUserManager.getInstance().userIsLoggedIn()) {
+            popMenuLogin.add(new UIPanelLoggedIn(popMenuLogin));
+        } else {
+            popMenuLogin.add(new UIPanelLoginGoogle());
+        }
+        popMenuLogin.show(btnLogin, btnLogin.getX(), btnLogin.getY() + btnLogin.getHeight());
+    }
+
     public void actionNewMapleQuery() {
         sendToNewTab(new UIMapleQueryPanel(tabPaneContent, ""));
     }
 
     public void updateMenuBarForGoogleUser(GoogleUser user) {
-        barMenu.remove(submenuLogin);
-        submenuLoggedInGoogle.setText(user.getNombre());
-        barMenu.add(submenuLoggedInGoogle);
-        barMenu.revalidate();
+        btnLogin.setIcon(user.getProfilePicture());
+        btnLogin.setToolTipText(user.getNombre() + " (" + user.getEmail() + ")");
     }
 
     public void actionSettings() {
@@ -694,6 +704,13 @@ public class UIClient extends javax.swing.JFrame {
         return treeDiagram;
     }
 
+    public void onUserLogOut() {
+        GoogleUserManager.getInstance().logOut();
+        removeAllFrontPanels(true, UIMapleQueryPanel.class);
+        btnLogin.setIcon(UIUtils.icon("ui_client", "USER_PICTURE"));
+        btnLogin.setToolTipText("Inicia sesión con Google");
+    }
+
     /**
      * Returns the only instance of {@code UIClient}.
      *
@@ -702,27 +719,7 @@ public class UIClient extends javax.swing.JFrame {
     public static UIClient getInstance() {
         return instance;
     }
-
-    private Action actionLogInGoogle = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            UIGoogleWaitDialog waitDialog = new UIGoogleWaitDialog();
-            waitDialog.waitForLogin();
-        }
-    };
-
-    private Action actionLogOutGoogle = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            GoogleUserManager.getInstance().logOut();
-            barMenu.remove(submenuLoggedInGoogle);
-            barMenu.add(submenuLogin);
-            barMenu.revalidate();
-            barMenu.repaint();
-            removeAllFrontPanels(true, UIMapleQueryPanel.class);
-        }
-    };
-
+    
     private Action actionRefreshJTree = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -757,13 +754,12 @@ public class UIClient extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barMenu;
     private javax.swing.JButton btnDbManager;
+    private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnNewMapleQuery;
     private javax.swing.JButton btnNewQuery;
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnRefreshJTree;
     private javax.swing.JMenuItem menuAbout;
-    private javax.swing.JMenuItem menuLogOutGoogle;
-    private javax.swing.JMenuItem menuLoginGoogle;
     private javax.swing.JMenuItem menuNewFile;
     private javax.swing.JMenuItem menuOpen;
     private javax.swing.JMenuItem menuSettings;
@@ -772,12 +768,11 @@ public class UIClient extends javax.swing.JFrame {
     private javax.swing.JSplitPane splitMain;
     private javax.swing.JMenu submenuArchivo;
     private javax.swing.JMenu submenuHelp;
-    private javax.swing.JMenu submenuLoggedInGoogle;
-    private javax.swing.JMenu submenuLogin;
     private javax.swing.JMenu submenuTools;
     private javax.swing.JTabbedPane tabPaneContent;
     private javax.swing.JToolBar toolbarDiagrama;
     private javax.swing.JToolBar toolbarTop;
+    private javax.swing.JToolBar toolbarTopUser;
     private javax.swing.JToolBar.Separator topSeparator;
     private javax.swing.JTree treeDiagram;
     // End of variables declaration//GEN-END:variables

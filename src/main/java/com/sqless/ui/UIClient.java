@@ -573,7 +573,7 @@ public class UIClient extends javax.swing.JFrame {
 
     public void updateMenuBarForGoogleUser(GoogleUser user) {
         btnLogin.setIcon(user.getProfilePicture());
-        btnLogin.setToolTipText(user.getNombre() + " (" + user.getEmail() + ")");
+        btnLogin.setToolTipText(user.toString());
     }
 
     public void actionSettings() {

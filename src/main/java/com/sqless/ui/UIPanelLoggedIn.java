@@ -31,7 +31,7 @@ public class UIPanelLoggedIn extends javax.swing.JPanel {
         lblMapleIcon = new javax.swing.JLabel();
         lblAprende = new javax.swing.JLabel();
 
-        lblTitle.setFont(new java.awt.Font("Roboto Light", 0, 18)); // NOI18N
+        lblTitle.setFont(UIUtils.ROBOTO_LIGHT);
         lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ui_general/SQLess_logo_mini.png"))); // NOI18N
         lblTitle.setText("Bienvenido a SQLess!");

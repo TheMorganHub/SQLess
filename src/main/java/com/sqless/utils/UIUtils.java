@@ -7,11 +7,16 @@ import com.sqless.ui.tree.SQLessTreeNode;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -58,9 +63,23 @@ public class UIUtils {
     public static final Color DARK_GREEN = new Color(62, 137, 39);
     public static final Color COOL_GREEN = new Color(0x84DB66);
     public static final String ICONS_PATH = "/icons/";
+    public static final String FONTS_PATH = "/fonts/";
+    public static final Font ROBOTO_LIGHT = loadFont("RobotoLight", 18f);
 
     public enum CellEdit {
         STOP, CANCEL
+    }
+    
+    private static Font loadFont(String name, float size) {
+        Font font = null;
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT, UIUtils.class.getResourceAsStream(FONTS_PATH + name + ".ttf")).deriveFont(size);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(font);
+        } catch (IOException | FontFormatException e) {
+            System.err.println("Font could not be loaded: " + e.getMessage());            
+        }
+        return font;
     }
 
     /**

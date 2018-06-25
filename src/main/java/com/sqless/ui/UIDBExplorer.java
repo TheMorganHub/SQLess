@@ -1,7 +1,6 @@
 package com.sqless.ui;
 
 import com.sqless.file.FileManager;
-import com.sqless.file.FileManagerAdapter;
 import com.sqless.utils.UIUtils;
 import com.sqless.utils.SQLUtils;
 import java.awt.event.ActionEvent;
@@ -21,6 +20,8 @@ import com.sqless.utils.TextUtils;
 import com.sqless.settings.UserPreferencesLoader;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
@@ -48,6 +49,15 @@ public class UIDBExplorer extends javax.swing.JDialog {
         prepareUI();
         setLocationRelativeTo(client);
         getRootPane().setDefaultButton(btnConnect);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                String currentDb = SQLConnectionManager.getInstance().getConnectedDB().getName();
+                if (currentDb.equals("mysql")) {
+                    UIClient.getInstance().createJTree();
+                }
+            }
+        });
     }
 
     public void prepareUI() {
@@ -625,6 +635,7 @@ public class UIDBExplorer extends javax.swing.JDialog {
 
     public void actionRefreshTableDBs() {
         loadTable();
+        showMasterDB(chkShowMaster.isSelected());
     }
 
     public void showMasterDB(boolean flag) {

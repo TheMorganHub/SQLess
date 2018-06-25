@@ -51,6 +51,6 @@ public class GoogleUser {
 
     @Override
     public String toString() {
-        return "USUARIO DE GOOGLE: " + id + " - " + nombre + " - " + email;
+        return nombre + " (" + email + ")";
     }
 }

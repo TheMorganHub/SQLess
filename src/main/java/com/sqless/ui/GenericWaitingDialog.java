@@ -110,7 +110,7 @@ public class GenericWaitingDialog extends javax.swing.JDialog {
         if (secondaryThread != null && secondaryThread.isAlive()) {
             secondaryThread.interrupt();
         }
-        
+
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 

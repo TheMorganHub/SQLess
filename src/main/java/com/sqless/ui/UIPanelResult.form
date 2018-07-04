@@ -59,6 +59,20 @@
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="popMenuTable.addSeparator();"/>
           </AuxValues>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="menuItemFind">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="actionFindInTable" type="code"/>
+            </Property>
+            <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+              <KeyStroke key="Ctrl+F"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Buscar..."/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="popMenuTable.addSeparator();"/>
+          </AuxValues>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="menuItemSaveTableAs">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">

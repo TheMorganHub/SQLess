@@ -1,21 +1,27 @@
 package com.sqless.ui;
 
 import com.sqless.file.FileManager;
+import com.sqless.utils.MiscUtils;
 import com.sqless.utils.TextUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.JXTable;
@@ -27,6 +33,24 @@ public class UIPanelResult extends javax.swing.JPanel {
 
     public UIPanelResult() {
         initComponents();
+        translateSwingXComponents();
+    }
+
+    private void translateSwingXComponents() {
+        tableResult.setLocale(new Locale("es", "ES"));
+        Action findAction = tableResult.getActionMap().get("find");
+        tableResult.getActionMap().put("find", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                findAction.actionPerformed(e);
+                SwingUtilities.invokeLater(() -> {
+                    Window activeWindow = javax.swing.FocusManager.getCurrentManager().getActiveWindow();
+                    if (activeWindow instanceof JDialog) {
+                        activeWindow.pack();
+                    }
+                });
+            }
+        });        
     }
 
     @SuppressWarnings("unchecked")
@@ -39,6 +63,7 @@ public class UIPanelResult extends javax.swing.JPanel {
         menuItemCopyRows = new javax.swing.JMenuItem();
         menuItemSelectRange = new javax.swing.JMenuItem();
         menuItemSelectAllTable = new javax.swing.JMenuItem();
+        menuItemFind = new javax.swing.JMenuItem();
         menuItemSaveTableAs = new javax.swing.JMenuItem();
         scrTableResult = new javax.swing.JScrollPane();
         tableResult = new JXTable() {
@@ -73,6 +98,12 @@ public class UIPanelResult extends javax.swing.JPanel {
         menuItemSelectAllTable.setAction(actionSelectAll);
         menuItemSelectAllTable.setText("Seleccionar todo");
         popMenuTable.add(menuItemSelectAllTable);
+        popMenuTable.addSeparator();
+
+        menuItemFind.setAction(actionFindInTable);
+        menuItemFind.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
+        menuItemFind.setText("Buscar...");
+        popMenuTable.add(menuItemFind);
         popMenuTable.addSeparator();
 
         menuItemSaveTableAs.setAction(actionSaveTableAs);
@@ -187,6 +218,7 @@ public class UIPanelResult extends javax.swing.JPanel {
     private javax.swing.JMenu menuItemCopyCategory;
     private javax.swing.JMenuItem menuItemCopyRows;
     private javax.swing.JMenuItem menuItemCopyRowsWithHeaders;
+    private javax.swing.JMenuItem menuItemFind;
     private javax.swing.JMenuItem menuItemSaveTableAs;
     private javax.swing.JMenuItem menuItemSelectAllTable;
     private javax.swing.JMenuItem menuItemSelectRange;
@@ -195,6 +227,13 @@ public class UIPanelResult extends javax.swing.JPanel {
     private org.jdesktop.swingx.JXTable tableResult;
     // End of variables declaration//GEN-END:variables
 
+    private Action actionFindInTable = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            MiscUtils.simulateCtrlKeyEvent(tableResult, KeyEvent.VK_F);
+        }
+    };
+    
     private Action actionSelectAll = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {

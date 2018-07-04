@@ -276,7 +276,7 @@ public class UIMapleQueryPanel extends FrontPanel {
         popMenuEditor.addSeparator();
 
         menuItemFind.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemFind.setText("Encontrar...");
+        menuItemFind.setText("Buscar...");
         menuItemFind.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemFindActionPerformed(evt);

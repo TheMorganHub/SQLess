@@ -617,7 +617,7 @@ public class UIEditTable extends FrontPanel {
 
             if (!rows.get(selectedRows[0]).isBrandNew()) {
                 int opt = UIUtils.showConfirmationMessage("Eliminar filas", "¿Estás seguro que deseas eliminar " + selectedRows.length + " fila(s) permanentemente?", null);
-                if (opt == 1) {
+                if (opt != 0) {
                     return;
                 }
             }

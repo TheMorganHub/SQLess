@@ -2,7 +2,6 @@ package com.sqless.file;
 
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.ui.UIClient;
-import com.sqless.utils.Callback;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JTabbedPane;

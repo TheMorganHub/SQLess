@@ -6,7 +6,7 @@ import com.sqless.sql.objects.SQLForeignKey;
 import com.sqless.sql.objects.SQLPrimaryKey;
 import com.sqless.sql.objects.SQLTable;
 import com.sqless.ui.UIClient;
-import com.sqless.ui.UICreateTableSQLess;
+import com.sqless.ui.UICreateAndModifyTable;
 import com.sqless.ui.UIExecuteFromScript;
 import com.sqless.ui.listeners.TableCellListener;
 import java.util.List;
@@ -18,11 +18,11 @@ public class HintsManager {
     public static final int COULD_BE_FK = 13;
     public static final int GUESS_DATATYPE_BY_NAME = 14;
     public static final int CREATE_TABLE_IN_EMPTY_DB = 15;
-    private UICreateTableSQLess ui;
+    private UICreateAndModifyTable ui;
     private TableCellListener tableChangeListener;
     private SQLColumn col;
 
-    public HintsManager(UICreateTableSQLess ui, SQLColumn col, TableCellListener tableChangeListener) {
+    public HintsManager(UICreateAndModifyTable ui, SQLColumn col, TableCellListener tableChangeListener) {
         this.ui = ui;
         this.col = col;
         this.tableChangeListener = tableChangeListener;
@@ -94,7 +94,7 @@ public class HintsManager {
                             int opt = UIUtils.showYesNoOptionDialog("Sugerencia", "SQLess ha detectado que la columna que acabas de editar podría servir para unir esta tabla con la tabla '"
                                     + potentialRefTableName + "'.\n¿Deseas que SQLess cree esta unión mediante una Foreign Key?", JOptionPane.QUESTION_MESSAGE, false, UIClient.getInstance());
                             if (opt == 0) {
-                                if (task == UICreateTableSQLess.TABLE_UPDATE) {
+                                if (task == UICreateAndModifyTable.TABLE_UPDATE) {
                                     Object requiredValForColumn = SQLUtils.fetchFirstValueForColumn(potentialRefTableCol);
                                     if (requiredValForColumn == null) {
                                         UIUtils.showErrorMessage("Error", "Ha habido un error al convertir esta columna en foreign key.\n"
@@ -133,7 +133,7 @@ public class HintsManager {
         int opt = UIUtils.showOptionDialog("Sugerencia", "SQLess detectó que la base de datos está vacía.\n¿Deseas crear una tabla?", client, "Sí", "Llenar desde archivo SQL...", "No");
         switch (opt) {
             case 0:
-                UICreateTableSQLess createTableUI = new UICreateTableSQLess(client.getTabPaneContent(), true);
+                UICreateAndModifyTable createTableUI = new UICreateAndModifyTable(client.getTabPaneContent(), true);
                 client.sendToNewTab(createTableUI);
                 break;
             case 1:

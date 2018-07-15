@@ -11,7 +11,7 @@ public class DataTypeUtils {
     public static final SimpleDateFormat MYSQL_DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static final SimpleDateFormat MYSQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final String[] DEFAULT_DATA_TYPES = {"int", "decimal", "datetime", "varchar", "enum", "set"};
-    
+
     public static boolean dataTypeIsNumeric(String dataType) {
         return dataTypeIsInteger(dataType) || dataTypeIsDecimal(dataType);
     }
@@ -37,6 +37,12 @@ public class DataTypeUtils {
 
     public static boolean dataTypeCanBeUnsigned(String dataType) {
         return dataType.equals("tinyint") || dataType.equals("smallint") || dataType.equals("mediumint");
+    }
+
+    public static boolean dataTypeSupportsLength(String dataType) {
+        return !dataType.equals("enum") && !dataType.equals("set")
+                && !dataType.equals("text") && !dataType.equals("year")
+                && !dataTypeIsTimeBased(dataType);
     }
 
     /**
@@ -90,21 +96,5 @@ public class DataTypeUtils {
             }
         }
         return false;
-    }
-
-    /**
-     * @param column
-     * @return
-     * @deprecated
-     */
-    public static String convertDefaultToValidSQLDate(SQLColumn column) {
-        if (!column.isTimeBased()) {
-            throw new IllegalArgumentException("The column must be of a data type that displays time or date.");
-        }
-        if (column.getDefaultVal() == null) {
-            return null;
-        }
-        String defaultVal = column.getDefaultVal();
-        return DataTypeUtils.convertDateToValidSQLDate(!defaultVal.startsWith("CURRENT") ? new Date() : defaultVal, column);
     }
 }

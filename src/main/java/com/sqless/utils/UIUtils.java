@@ -41,6 +41,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import java.net.URL;
+import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
@@ -67,7 +68,7 @@ public class UIUtils {
     public enum CellEdit {
         STOP, CANCEL
     }
-    
+
     private static Font loadFont(String name, float size) {
         Font font = null;
         try {
@@ -75,9 +76,18 @@ public class UIUtils {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(font);
         } catch (IOException | FontFormatException e) {
-            System.err.println("Font could not be loaded: " + e.getMessage());            
+            System.err.println("Font could not be loaded: " + e.getMessage());
         }
         return font;
+    }
+
+    /**
+     * Transfers focus to {@code JComponent to}.
+     *
+     * @param to The component which we want to have the focus.
+     */
+    public static void swapFocus(JComponent to) {
+        SwingUtilities.invokeLater(() -> to.requestFocus());
     }
 
     /**

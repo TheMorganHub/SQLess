@@ -582,7 +582,7 @@ public class UIClient extends javax.swing.JFrame {
     }
 
     public void onNewConnection() {
-        removeAllFrontPanels(false, UICreateTableSQLess.class, UIEditTable.class);
+        removeAllFrontPanels(false, UICreateAndModifyTable.class, UIEditTable.class);
         if (SQLUtils.getConnectedDB().isBrandNew() || SQLUtils.currentDbIsEmpty()) {
             HintsManager hintsManager = new HintsManager();
             hintsManager.activate(HintsManager.CREATE_TABLE_IN_EMPTY_DB);
@@ -719,7 +719,7 @@ public class UIClient extends javax.swing.JFrame {
     public static UIClient getInstance() {
         return instance;
     }
-    
+
     private Action actionRefreshJTree = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {

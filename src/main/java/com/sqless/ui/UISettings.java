@@ -362,7 +362,7 @@ public class UISettings extends javax.swing.JDialog {
         if (outcome == UIConnectionWizard.CONNECTION_CHANGED) {
             populateDefaultDbCombobox(comboDatabases);
             client.clearJTree();
-            client.removeAllFrontPanels(false, UICreateTableSQLess.class, UIEditTable.class);
+            client.removeAllFrontPanels(false, UICreateAndModifyTable.class, UIEditTable.class);
         }
     }//GEN-LAST:event_btnModifySettingsActionPerformed
 

@@ -13,7 +13,10 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -64,6 +67,10 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
         for (String value : valuesArray) {
             getModel().addRow(new String[]{value});
         }
+        uiTable.getActionMap().put("ADD_FIELD", actionAdd);
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ADD"), "ADD_FIELD");
+        uiTable.getActionMap().put("DELETE_FIELD", actionRemove);
+        uiTable.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("DELETE"), "DELETE_FIELD");
     }
 
     public boolean valuesChanged() {
@@ -98,6 +105,7 @@ public class UISetEnumValuesEditor extends javax.swing.JDialog {
             UIUtils.interruptCellEdit(uiTable, UIUtils.CellEdit.STOP);
             UIUtils.scrollToBottom(scrTable);
             uiTable.setRowSelectionInterval(uiTable.getRowCount() - 1, uiTable.getRowCount() - 1);
+            SwingUtilities.invokeLater(() -> uiTable.editCellAt(uiTable.getRowCount() - 1, 0));
         }
     };
 

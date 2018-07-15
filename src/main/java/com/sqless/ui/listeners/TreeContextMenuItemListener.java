@@ -12,7 +12,7 @@ import com.sqless.utils.UIUtils;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.tree.SQLessTreeNode;
 import com.sqless.sql.objects.SQLTable;
-import com.sqless.ui.UICreateTableSQLess;
+import com.sqless.ui.UICreateAndModifyTable;
 import com.sqless.ui.UIDatabaseDumper;
 import com.sqless.ui.UIEditTable;
 import com.sqless.ui.UIExecuteCallable;
@@ -128,7 +128,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
         switch (node.getType()) {
             case TABLE:
                 SQLTable table = (SQLTable) node.getUserObject();
-                UICreateTableSQLess uiModifyTable = new UICreateTableSQLess(client.getTabPaneContent(), table);
+                UICreateAndModifyTable uiModifyTable = new UICreateAndModifyTable(client.getTabPaneContent(), table);
                 client.sendToNewTab(uiModifyTable);
                 break;
         }
@@ -155,7 +155,7 @@ public class TreeContextMenuItemListener extends MouseAdapter {
     public void doCreate(SQLessTreeNode node) {
         switch (node.getType()) {
             case CAT_TABLES:
-                UICreateTableSQLess uiCreateTable = new UICreateTableSQLess(client.getTabPaneContent(), null);
+                UICreateAndModifyTable uiCreateTable = new UICreateAndModifyTable(client.getTabPaneContent(), null);
                 client.sendToNewTab(uiCreateTable);
                 break;
         }

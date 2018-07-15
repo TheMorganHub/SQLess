@@ -4,8 +4,8 @@ import com.sqless.sql.objects.SQLColumn;
 import com.sqless.ui.dateeditor.UISQLDatePanelInner;
 import com.sqless.ui.enumeditor.UISQLEnumEditorDialog;
 import com.sqless.ui.seteditor.UISQLSetEditorDialog;
-import com.sqless.ui.seteditor.UISQLSetPanelInner;
 import com.sqless.utils.SQLUtils;
+import com.sqless.utils.UIUtils;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -19,7 +19,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -202,8 +201,16 @@ public class UIColumnExtrasPanel extends javax.swing.JPanel {
         @Override
         public void itemStateChanged(ItemEvent e) {
             SQLColumn selectedColumn = columnList.get(uiTable.getSelectedRow());
-            selectedColumn.setAutoincrement(chkAutoIncrement.isSelected(), true);
-            frontPanel.boldTitleLabel();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (selectedColumn.isPK()) {
+                    selectedColumn.setAutoincrement(true, true);
+                    frontPanel.boldTitleLabel();
+                } else {
+                    UIUtils.showMessage("Auto increment", "Sólo puede haber una columna AUTO INCREMENT en la tabla y debe ser PK.", UIClient.getInstance());
+                }
+            } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                selectedColumn.setAutoincrement(false, true);
+            }
         }
     };
     private ItemListener unsignedChangeListener = new ItemListener() {

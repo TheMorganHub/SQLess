@@ -1,6 +1,8 @@
 package com.sqless.ui.enumeditor;
 
 import com.sqless.ui.UIClient;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.JTextField;
 
@@ -17,8 +19,9 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
         this.actualValue = actualValue;
         this.txtFieldOnConfirm = txtFieldOnConfirm;
         initList();
-        setLocationRelativeTo(getParent());
         pack();
+        setLocationRelativeTo(UIClient.getInstance());
+        getRootPane().setDefaultButton(btnOK);
     }
 
     public void initList() {
@@ -28,6 +31,14 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
         }
         listEnum.setModel(model);
         listEnum.setSelectedValue(actualValue, true);
+        listEnum.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    actionOK();
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -38,6 +49,9 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
         listEnum = new javax.swing.JList<>();
         btnOK = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Selección de valor default");
 
         listEnum.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         listEnum.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -63,7 +77,7 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrList, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(scrList, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -84,11 +98,15 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
+        actionOK();
+    }//GEN-LAST:event_btnOKActionPerformed
+
+    public void actionOK() {
         if (!actualValue.equalsIgnoreCase(listEnum.getSelectedValue())) {
             txtFieldOnConfirm.setText(listEnum.getSelectedValue());
         }
         setVisible(false);
-    }//GEN-LAST:event_btnOKActionPerformed
+    }
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         setVisible(false);

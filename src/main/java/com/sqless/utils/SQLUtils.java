@@ -84,9 +84,9 @@ public class SQLUtils {
         return dbNames;
     }
 
-    public static List<String> getTablesFromDBAsString() {
+    public static List<String> getTableNamesFromDB() {
         List<String> tableNames = new ArrayList<>();
-        SQLQuery showTablesQuery = new SQLSelectQuery("SHOW TABLES FROM `" + getConnectedDBName() + "`") {
+        SQLQuery showTablesQuery = new SQLSelectQuery("show full tables where Table_Type = 'BASE TABLE' OR Table_Type = 'SYSTEM VIEW'") {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {
                 while (rs.next()) {

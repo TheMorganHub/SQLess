@@ -46,7 +46,7 @@ import jsyntaxpane.DefaultSyntaxKit;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
-public class UICreateTableSQLess extends FrontPanel {
+public class UICreateAndModifyTable extends FrontPanel {
 
     private TableCellListener cellChangeListener;
     private TableCellListener cellFkChangeListener;
@@ -74,10 +74,9 @@ public class UICreateTableSQLess extends FrontPanel {
      * @param sqlTable La {@code SQLTable} a editar. Si es {@code null}, se
      * asume que el editor va a estar en modo creación de tabla.
      */
-    public UICreateTableSQLess(JTabbedPane parentPane, SQLTable sqlTable) {
+    public UICreateAndModifyTable(JTabbedPane parentPane, SQLTable sqlTable) {
         super(parentPane);
         initComponents();
-
         if (sqlTable == null) {
             task = TABLE_CREATE;
             this.sqlTable = new SQLTable();
@@ -115,18 +114,18 @@ public class UICreateTableSQLess extends FrontPanel {
      * sólo si se está creando una tabla mediante una sugerencia de SQLess. Por
      * ejemplo, si creamos una base de datos y nos conectamos a ella y está
      * vacía. Para crear un editor normalmente, usar
-     * {@link #UICreateTableSQLess(javax.swing.JTabbedPane, com.sqless.sql.objects.SQLTable)}
+     * {@link #UICreateAndModifyTable(javax.swing.JTabbedPane, com.sqless.sql.objects.SQLTable)}
      *
      * @param parentPane El {@code JTabbedPane} que contendrá a este editor.
      * @param fromSuggestion Si {@code true}, el editor automáticamente agregará
      * una columna de nombre id que será PK. Si {@code false}, se tirará una
      * excepción.
      */
-    public UICreateTableSQLess(JTabbedPane parentPane, boolean fromSuggestion) {
+    public UICreateAndModifyTable(JTabbedPane parentPane, boolean fromSuggestion) {
         super(parentPane);
         if (!fromSuggestion) {
-            throw new IllegalArgumentException("Wrong constructor for UICreateTableSQLess. "
-                    + "Use UICreateTableSQLess(JTabbedPane parentPane, SQLTable sqlTable) if the editor isn't created from a suggestion.");
+            throw new IllegalArgumentException("Wrong constructor for UICreateAndModifyTable. "
+                    + "Use UICreateAndModifyTable(JTabbedPane parentPane, SQLTable sqlTable) if the editor isn't created from a suggestion.");
         }
         initComponents();
         this.fromSuggestion = fromSuggestion;
@@ -187,7 +186,7 @@ public class UICreateTableSQLess extends FrontPanel {
         prepararMainTable();
         prepararFKTable();
         loadKeybindings();
-        SwingUtilities.invokeLater(() -> uiTable.requestFocus());
+        SwingUtilities.invokeLater(() -> UIUtils.swapFocus(uiTable));
     }
 
     public void loadKeybindings() {
@@ -212,7 +211,7 @@ public class UICreateTableSQLess extends FrontPanel {
         for (int i = 0; i < uiTable.getColumnModel().getColumnCount(); i++) {
             ((DefaultCellEditor) uiTable.getDefaultEditor(uiTable.getColumnClass(i))).setClickCountToStart(1);
         }
-        uiTable.getColumn(0).setPreferredWidth(20);
+        uiTable.getColumn(0).setPreferredWidth(30);
         uiTable.getColumn(1).setPreferredWidth(125);
         uiTable.getSelectionModel().addListSelectionListener(tableSelectionListener);
 
@@ -250,7 +249,7 @@ public class UICreateTableSQLess extends FrontPanel {
         uiTableFKs.getColumn(2).setPreferredWidth(125);
         uiTableFKs.getColumn(3).setPreferredWidth(125);
         uiTableFKs.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(comboFieldsFK));
-        uiTableFKs.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(UIUtils.createEditableComboBox(SQLUtils.getTablesFromDBAsString().toArray(new String[0]))));
+        uiTableFKs.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(UIUtils.createEditableComboBox(SQLUtils.getTableNamesFromDB().toArray(new String[0]))));
         uiTableFKs.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(comboReferencedField));
 
         for (int i = 0; i < uiTableFKs.getColumnModel().getColumnCount(); i++) {
@@ -398,7 +397,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 {null, null, null, null, null,  new Boolean(true)}
             },
             new String [] {
-                "", "Nombre", "Tipo", "Longitud", "Decimales", "Acepta null"
+                "PK?", "Nombre", "Tipo", "Longitud", "Decimales", "Acepta null"
             }
         ) {
             Class[] types = new Class [] {
@@ -658,23 +657,21 @@ public class UICreateTableSQLess extends FrontPanel {
     }
 
     public void processLengthColumnChange(SQLColumn colEditada, int row) {
-        if (!colEditada.getDataType().startsWith("enum") && !colEditada.getDataType().startsWith("set")
-                && !colEditada.getDataType().equals("text") && !colEditada.getDataType().equals("year")
-                && !colEditada.isTimeBased()) {
+        if (DataTypeUtils.dataTypeSupportsLength(colEditada.getDataType())) {
             colEditada.setLength(cellChangeListener.getNewValue().toString());
             syncRowWithList(row);
         } else {
-            uiTable.setValueAt(cellChangeListener.getOldValue(), row, 3);
+            uiTable.setValueAt(null, row, 3);
         }
     }
 
     public void processDecimalColumnChange(SQLColumn colEditada, int row) {
-        //decimales - si el tipo de dato del row no es decimal, el campo decimal no se va a poder setear
-        if (!DataTypeUtils.dataTypeIsDecimal(colEditada.getDataType())) {
-            uiTable.setValueAt(null, row, 4);
-        } else {
+        if (DataTypeUtils.dataTypeIsDecimal(colEditada.getDataType())) {
             colEditada.setNumericScale(cellChangeListener.getNewValue().toString());
             syncRowWithList(row);
+        } else {
+            //decimales - si el tipo de dato de la columna no es decimal, el campo decimal no se va a poder setear
+            uiTable.setValueAt(null, row, 4);
         }
     }
 
@@ -779,6 +776,7 @@ public class UICreateTableSQLess extends FrontPanel {
             Boolean valor = (Boolean) value;
             lbl.setIcon(value != null && valor ? PK_ICON : null);
             lbl.setText("");
+            lbl.setHorizontalAlignment(JLabel.CENTER);
             return lbl;
         }
     };
@@ -826,7 +824,6 @@ public class UICreateTableSQLess extends FrontPanel {
     private JButton btnAddCampo;
     private JButton btnInsertCampo;
     private JButton btnRemoveCampo;
-    private JButton btnAddPK;
     private JButton btnAddFK;
     private JButton btnRemoveFK;
     private JButton btnSave;
@@ -843,7 +840,6 @@ public class UICreateTableSQLess extends FrontPanel {
         if (e.getValueIsAdjusting()) {
             return;
         }
-
         refreshPnlExtras();
     };
 
@@ -854,13 +850,11 @@ public class UICreateTableSQLess extends FrontPanel {
             btnAddCampo = UIUtils.newToolbarBtn(actionAddColumn, "Agregar una columna a la tabla", UIUtils.icon(this, "AGREGAR_CAMPO"));
             btnInsertCampo = UIUtils.newToolbarBtn(actionInsertCampo, "Insertar un campo en la posición actual", UIUtils.icon(this, "INSERTAR_CAMPO"));
             btnRemoveCampo = UIUtils.newToolbarBtn(actionDeleteColumn, "Remover el campo en la posición actual", UIUtils.icon(this, "BORRAR_CAMPO"));
-            btnAddPK = UIUtils.newToolbarBtn(actionAddPK, "Alternar PK en esta columna", UIUtils.icon(this, "ADD_PK"));
             btnMoveUp = UIUtils.newToolbarBtn(actionMoveUp, "Mover la columna seleccionada hacia arriba", UIUtils.icon(this, "MOVER_ARRIBA"));
             btnMoveDown = UIUtils.newToolbarBtn(actionMoveDown, "Mover la columna seleccionada hacia abajo", UIUtils.icon(this, "MOVER_ABAJO"));
             btnMoveColumns = UIUtils.newToolbarBtn(actionMoveColumns, "Opciones avanzadas de orden de columnas", UIUtils.icon(this, "MOVER_COLUMNAS"));
-            camposToolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddCampo, btnInsertCampo, btnRemoveCampo, UIUtils.newSeparator(), btnAddPK, UIUtils.newSeparator(),
+            camposToolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnAddCampo, btnInsertCampo, btnRemoveCampo, UIUtils.newSeparator(),
                 btnMoveUp, btnMoveDown, btnMoveColumns};
-
         }
 
         if (fkToolbarComponents == null) {
@@ -1057,10 +1051,10 @@ public class UICreateTableSQLess extends FrontPanel {
             }
         } else {
             int opt = UIUtils.showOptionDialog("Mover columnas", "Se han detectado columnas con cambios pendientes. "
-                    + "Para poder acceder a opciones avanzadas de orden de columnas es necesario hacer el commit en la base de datos.", null,
+                    + "Para poder acceder a opciones avanzadas de orden de columnas, es necesario guardar los cambios en la base de datos.", UIClient.getInstance(),
                     "Guardar cambios", "Cancelar");
             if (opt == 0) {
-                commitUpdateTable();
+                commitUpdateTable(() -> btnMoveColumns.doClick());
             }
         }
     };
@@ -1078,6 +1072,7 @@ public class UICreateTableSQLess extends FrontPanel {
                 sqlTable.addFK(new SQLForeignKey(sqlTable.getName()));
                 SwingUtilities.invokeLater(() -> {
                     uiTableFKs.setRowSelectionInterval(getFKTableModel().getRowCount() - 1, getFKTableModel().getRowCount() - 1);
+                    uiTableFKs.editCellAt(uiTableFKs.getRowCount() - 1, 0);
                 });
                 boldTitleLabel();
             }
@@ -1141,7 +1136,7 @@ public class UICreateTableSQLess extends FrontPanel {
         if (uiTable.getCellEditor() != null) {
             uiTable.getCellEditor().stopCellEditing();
         }
-        String tableName = UIUtils.showInputDialog("Create new table", "Table name:", UIClient.getInstance());
+        String tableName = UIUtils.showInputDialog("Crear tabla nueva", "Nombre de tabla:", UIClient.getInstance());
         if (tableName == null) {
             return;
         }
@@ -1167,6 +1162,10 @@ public class UICreateTableSQLess extends FrontPanel {
     }
 
     public void commitUpdateTable() {
+        commitUpdateTable(null);
+    }
+
+    public void commitUpdateTable(Runnable andExecute) {
         if (uiTable.getCellEditor() != null) {
             uiTable.getCellEditor().stopCellEditing();
         }
@@ -1182,6 +1181,9 @@ public class UICreateTableSQLess extends FrontPanel {
                 sqlTable.commit();
                 sqlPane.setText("");
                 unboldTitleLabel();
+                if (andExecute != null) {
+                    andExecute.run();
+                }
             }
 
             @Override

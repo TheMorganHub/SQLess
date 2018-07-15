@@ -16,6 +16,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 public class UIMoveColumns extends javax.swing.JDialog {
 
     private SQLTable table;
+    private List<SQLColumn> backupColumns;
     private int result;
     public static final int ORDER_CHANGED = 1;
     private int task;
@@ -24,6 +25,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
         super(UIClient.getInstance(), true);
         initComponents();
         this.table = table;
+        this.backupColumns = new ArrayList<>(table.getColumns());
         setTitle("Mover columnas: " + table.getName());
         setToolbar();
         fillTable();
@@ -66,6 +68,11 @@ public class UIMoveColumns extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(411, 357));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         org.jdesktop.swingx.border.DropShadowBorder dropShadowBorder1 = new org.jdesktop.swingx.border.DropShadowBorder();
         dropShadowBorder1.setShadowSize(3);
@@ -131,6 +138,10 @@ public class UIMoveColumns extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        table.replaceColumns(backupColumns);
+    }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblNotice;
@@ -205,7 +216,7 @@ public class UIMoveColumns extends javax.swing.JDialog {
     };
 
     public void commit() {
-        if (task == UICreateTableSQLess.TABLE_UPDATE) {
+        if (task == UICreateAndModifyTable.TABLE_UPDATE) {
             StringBuilder alterTableBuilder = new StringBuilder("ALTER TABLE `").append(table.getName()).append("`\n");
             boolean anyPosChanged = false;
             for (SQLColumn column : table.getColumns()) {

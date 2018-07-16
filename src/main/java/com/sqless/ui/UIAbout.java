@@ -45,6 +45,18 @@ public class UIAbout extends javax.swing.JDialog {
         }
     }
 
+    public void appendItem(String text) {
+        HTMLDocument doc = (HTMLDocument) txtInfo.getDocument();
+        HTMLEditorKit kit = (HTMLEditorKit) txtInfo.getEditorKit();
+        try {
+            kit.insertHTML(doc, doc.getLength(), "<div style=\"font-family: Segoe UI\">"
+                    + "<span style=\"font-size: 10px\"> " + text + "</span>"
+                    + "</div>", 0, 0, null);
+        } catch (BadLocationException | IOException ex) {
+            System.err.println(ex.getMessage());
+        }
+    }
+
     public void appendSeparator() {
         HTMLDocument doc = (HTMLDocument) txtInfo.getDocument();
         HTMLEditorKit kit = (HTMLEditorKit) txtInfo.getEditorKit();
@@ -56,24 +68,30 @@ public class UIAbout extends javax.swing.JDialog {
     }
 
     public void loadInfo() {
-        Map<String, String> sqlInfo = SQLUtils.getMySQLInfo();
-        Properties systemInfo = MiscUtils.getSystemInfo();
-        appendCategory("SQLess");
-        appendItem("Diseñado por", "David Orquin, Tomás Casir, Valeria Fornieles");
-        appendSeparator();
-        appendCategory("Sistema");
-        appendItem("Sistema operativo", systemInfo.getProperty("os.name") + " x" + systemInfo.getProperty("sun.arch.data.model"));
-        appendItem("Usuario", systemInfo.getProperty("user.name"));
-        appendSeparator();
-        appendCategory("MySQL");
-        appendItem("Version MySQL", sqlInfo.get("version"));
-        appendItem("Directorio MySQL", sqlInfo.get("basedir"));
-        appendSeparator();
-        appendCategory("Java (TM)");
-        appendItem("Home", systemInfo.getProperty("java.home"));
-        appendItem("Version", systemInfo.getProperty("java.version"));
-        appendItem("Vendor", systemInfo.getProperty("java.vendor"));
-        UIUtils.scrollToTop(scrMain);
+        MiscUtils.getSystemInfo(() -> {
+            appendItem("Cargando información de sistema...");
+        }, info -> {
+            txtInfo.setText("");
+            appendCategory("SQLess");
+            appendItem("Diseñado por", "David Orquin, Tomás Casir, Valeria Fornieles");
+            appendSeparator();
+            appendCategory("Sistema");
+            appendItem("Sistema operativo", info.get("OS Name") + " (" + info.get("OS Version") + ")");
+            appendItem("Arquitectura", info.get("System Type"));
+            appendItem("Usuario", info.get("user"));
+            appendSeparator();
+            appendCategory("MySQL");
+            appendItem("Version MySQL", info.get("sql-version"));
+            appendItem("Directorio MySQL", info.get("sql-basedir"));
+            appendSeparator();
+            appendCategory("Java™");
+            appendItem("Home", info.get("Java-Home"));
+            appendItem("Version", info.get("Java-Version"));
+            appendItem("Vendor", info.get("Java-Vendor"));
+            UIUtils.scrollToTop(scrMain);
+        }, () -> {
+            UIUtils.showErrorMessage("Error", "Hubo un error al traer la información del sistema. Intenta de nuevo más adelante.", UIClient.getInstance());
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +114,7 @@ public class UIAbout extends javax.swing.JDialog {
         txtInfo.setContentType("text/html"); // NOI18N
         scrMain.setViewportView(txtInfo);
 
-        btnClose.setText("Close");
+        btnClose.setText("OK");
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -114,7 +132,7 @@ public class UIAbout extends javax.swing.JDialog {
                     .addComponent(scrMain)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContainerLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnClose)))
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         pnlContainerLayout.setVerticalGroup(

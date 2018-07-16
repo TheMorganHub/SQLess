@@ -33,6 +33,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import org.jdesktop.swingx.JXTable;
@@ -83,6 +84,7 @@ public class UIEditTable extends FrontPanel {
         makeTableModel();
         cellListener = new TableCellListener(uiTable, actionEditTable);
         uiTable.getSelectionModel().addListSelectionListener(tableSelectionListener);
+        SwingUtilities.invokeLater(() -> UIUtils.swapFocus(uiTable));
     }
 
     public void loadKeyBindings() {

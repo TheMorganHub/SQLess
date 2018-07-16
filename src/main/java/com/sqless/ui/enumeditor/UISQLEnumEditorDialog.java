@@ -1,6 +1,7 @@
 package com.sqless.ui.enumeditor;
 
 import com.sqless.ui.UIClient;
+import com.sqless.utils.UIUtils;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.DefaultListModel;
@@ -35,7 +36,10 @@ public class UISQLEnumEditorDialog extends javax.swing.JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    actionOK();
+                    int clickedIndex = UIUtils.indexAtPoint(listEnum, e.getPoint());
+                    if (clickedIndex > -1) {
+                        actionOK();
+                    }
                 }
             }
         });

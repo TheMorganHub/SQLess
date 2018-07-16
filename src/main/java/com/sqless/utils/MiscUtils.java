@@ -1,20 +1,31 @@
 package com.sqless.utils;
 
+import com.sqless.queries.SQLQuery;
+import com.sqless.queries.SQLSelectQuery;
 import com.sqless.ui.UIClient;
 import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 public class MiscUtils {
 
@@ -47,6 +58,63 @@ public class MiscUtils {
         return System.getProperties();
     }
 
+    public static void getSystemInfo(Runnable before, Callback<Map<String, String>> after, Runnable onError) {
+        before.run();
+        SwingWorker<Map<String, String>, Void> systemWorker = new SwingWorker<Map<String, String>, Void>() {
+            @Override
+            protected Map<String, String> doInBackground() throws Exception {
+                Map<String, String> infoMap = new HashMap<>();
+                Runtime rt = Runtime.getRuntime();
+                String[] commands = {"systeminfo"};
+                Process proc = rt.exec(commands);
+
+                BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                String s = null;
+                while ((s = stdInput.readLine()) != null) {
+                    if (s.startsWith("OS Name")) {
+                        infoMap.put("OS Name", s.split(":")[1].trim());
+                    } else if (s.startsWith("OS Version")) {
+                        infoMap.put("OS Version", s.split(":")[1].trim());
+                    } else if (s.startsWith("System Type")) {
+                        infoMap.put("System Type", s.split(":")[1].trim());
+                    }
+                }
+                SQLQuery mysqlInfoQuery = new SQLSelectQuery("SHOW VARIABLES;") {
+                    @Override
+                    public void onSuccess(ResultSet rs) throws SQLException {
+                        while (rs.next()) {
+                            String key = rs.getString(1);
+                            String value = rs.getString(2);
+                            if (key.equals("version")) {                                
+                                infoMap.put("sql-version", value);
+                            } else if (key.equals("basedir")) {
+                                infoMap.put("sql-basedir", value);
+                            }
+                        }
+                    }                 
+                };
+                mysqlInfoQuery.exec();
+                infoMap.put("user", getSystemInfo().getProperty("user.name"));
+                infoMap.put("Java-Home", getSystemInfo().getProperty("java.home"));
+                infoMap.put("Java-Version", getSystemInfo().getProperty("java.version"));
+                infoMap.put("Java-Vendor", getSystemInfo().getProperty("java.vendor"));
+                return infoMap;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    Map<String, String> info = get();
+                    after.exec(info);
+                } catch (InterruptedException e) {
+                } catch (ExecutionException e) {
+                    onError.run();
+                }
+            }
+        };
+        systemWorker.execute();
+    }
+
     public static void openDirectory(String directory) {
         try {
             Runtime.getRuntime().exec("explorer.exe /select," + directory);
@@ -54,7 +122,7 @@ public class MiscUtils {
             UIUtils.showErrorMessage("Error", "No se pudo abrir el directorio.", UIClient.getInstance());
         }
     }
-    
+
     public static void openInBrowser(String url) {
         try {
             if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {

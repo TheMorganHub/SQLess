@@ -6,6 +6,7 @@ import java.awt.Frame;
 import javax.swing.SwingWorker;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.settings.UserPreferencesLoader;
+import com.sqless.utils.TextUtils;
 import java.util.concurrent.ExecutionException;
 
 public class UIConnectionWizard extends javax.swing.JDialog {
@@ -214,6 +215,17 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         String port = txtPort.getText();
         String username = txtUserName.getText();
         String password = UIUtils.getStringFromPasswordField(txtPassword);
+        if (hostName.isEmpty() || port.isEmpty() || username.isEmpty()) {
+            UIUtils.showErrorMessage("Error", "El único campo que puede estar vacío es la contraseña.", UIClient.getInstance());
+            setLabelStatus(false);
+            return;
+        }
+        if (!TextUtils.isNumeric(port)) {
+            UIUtils.showErrorMessage("Error", "El puerto dado es inválido.", parent);
+            setLabelStatus(false);
+            return;
+        }
+
         enableInputFields(false);
         enableContinue(false);
         setCursor(UIUtils.WAIT_CURSOR);
@@ -252,8 +264,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
             protected void done() {
                 try {
                     boolean success = get();
-                    lblConnectionStatus.setText(success ? "Exitoso" : "Fallido");
-                    UIUtils.changeLabelColour(lblConnectionStatus, success ? UIUtils.DARK_GREEN : Color.RED);
+                    setLabelStatus(success);
                     enableContinue(success);
                     setCursor(UIUtils.DEFAULT_CURSOR);
                     enableInputFields(true);
@@ -272,6 +283,11 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         };
 
         tester.execute();
+    }
+
+    public void setLabelStatus(boolean successful) {
+        lblConnectionStatus.setText(successful ? "Exitoso" : "Fallido");
+        UIUtils.changeLabelColour(lblConnectionStatus, successful ? UIUtils.DARK_GREEN : Color.RED);
     }
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed

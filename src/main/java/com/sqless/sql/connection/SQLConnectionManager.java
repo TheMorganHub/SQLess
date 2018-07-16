@@ -78,7 +78,7 @@ public class SQLConnectionManager {
             String hostName, String port, Frame parent) {
         try {
             closeConnection();
-            long start = System.currentTimeMillis();            
+            long start = System.currentTimeMillis();
             DriverManager.setLoginTimeout(3);
             connection = DriverManager.getConnection("jdbc:mysql://" + hostName + ":" + port + "/" + dbName
                     + "?zeroDateTimeBehavior=convertToNull", username, password);

@@ -45,22 +45,6 @@ public class SQLUtils {
         return matches.toArray(new String[matches.size()]);
     }
 
-    public static Map<String, String> getMySQLInfo() {
-        Map<String, String> info = new HashMap<>();
-        SQLQuery mysqlInfoQuery = new SQLSelectQuery("SHOW VARIABLES;") {
-            @Override
-            public void onSuccess(ResultSet rs) throws SQLException {
-                while (rs.next()) {
-                    String key = rs.getString(1);
-                    String value = rs.getString(2);
-                    info.put(key, value);
-                }
-            }
-        };
-        mysqlInfoQuery.exec();
-        return info;
-    }
-
     /**
      * Retrieves the names of all DBs in the DB engine. Each time this method is
      * called, the DB engine is queried for names. This guarantees that the list
@@ -215,7 +199,7 @@ public class SQLUtils {
             @Override
             public void onFailure(String errMessage) {
                 UIUtils.showErrorMessage("Error", "Hubo un error al traer información del auto increment de la fila.\nEl servidor respondió con mensaje: " + errMessage, UIClient.getInstance());
-            }            
+            }
         };
         getAutoIncrementQuery.exec();
         return autoIncrement.get();
@@ -590,7 +574,7 @@ public class SQLUtils {
 
         if (!skipRows) {
             rowCountQuery.exec();
-        }        
+        }
         tableCountQuery.exec();
         routinesCountQuery.exec();
         return mapStats;
@@ -607,7 +591,7 @@ public class SQLUtils {
 
             @Override
             public void onFailure(String errMessage) {
-                UIUtils.showErrorMessage("Error", "No se pudo traer información sobre las tablas para la base de datos " + getConnectedDBName() 
+                UIUtils.showErrorMessage("Error", "No se pudo traer información sobre las tablas para la base de datos " + getConnectedDBName()
                         + ".\nEl servidor respondió con mensaje: " + errMessage, null);
             }
         };

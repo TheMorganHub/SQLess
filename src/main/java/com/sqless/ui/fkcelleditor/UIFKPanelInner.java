@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -38,13 +40,28 @@ public class UIFKPanelInner extends javax.swing.JPanel {
 
     public void loadKeybindings() {
         txtSearch.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "ACTION_SEARCH");
-        txtSearch.getActionMap().put("ACTION_SEARCH", actionSearch);        
+        txtSearch.getActionMap().put("ACTION_SEARCH", actionSearch);
         EventQueue.invokeLater(() -> {
             txtSearch.requestFocus();
         });
     }
 
     public void loadTable() {
+        uiTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                int row = uiTable.rowAtPoint(e.getPoint());
+                if (row == -1) {
+                    return;
+                }
+                actionOK.actionPerformed(null);
+            }
+        });
+        uiTable.getActionMap().put("CONFIRM", actionOK);
+        uiTable.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "CONFIRM");
         SQLQuery query = new SQLSelectQuery("SELECT * FROM `" + fk.getReferencedTableName() + "` LIMIT 50") {
             @Override
             public void onSuccess(ResultSet rs) throws SQLException {

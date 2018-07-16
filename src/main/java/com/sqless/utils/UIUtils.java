@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,6 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import java.net.URL;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
@@ -67,6 +69,14 @@ public class UIUtils {
 
     public enum CellEdit {
         STOP, CANCEL
+    }
+
+    public static int indexAtPoint(JList list, Point p) {
+        int index = list.locationToIndex(p);
+        if (index > -1 && list.getCellBounds(index, index).contains(p)) {
+            return index;
+        }
+        return -1;
     }
 
     private static Font loadFont(String name, float size) {

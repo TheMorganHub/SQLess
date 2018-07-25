@@ -4,7 +4,7 @@ import com.sqless.utils.SQLUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameable,
+public class SQLTable extends SQLDataObject implements SQLEditable,
         SQLCreatable, SQLDroppable {
 
     private List<SQLForeignKey> foreignKeys;
@@ -275,10 +275,5 @@ public class SQLTable extends SQLDataObject implements SQLEditable, SQLRenameabl
         builder.append("\nENGINE=InnoDB");
         builder.append("\nROW_FORMAT=COMPACT");
         return builder.toString();
-    }
-
-    @Override
-    public String getRenameStatement(String newName) {
-        return "RENAME TABLE `" + getName() + "` to `" + newName + "`";
     }
 }

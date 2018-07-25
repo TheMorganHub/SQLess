@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author David Orquin, Tomás Casir, Valeria Fornieles
  */
-public abstract class SQLDataObject extends SQLObject implements SQLSelectable {
+public abstract class SQLDataObject extends SQLObject implements SQLSelectable, SQLRenameable {
 
     private List<SQLColumn> columns;
     private List<SQLIndex> indexes;
@@ -173,6 +173,10 @@ public abstract class SQLDataObject extends SQLObject implements SQLSelectable {
     @Override
     public String getMapleSelectStatement(int limit) {
         return "$" + getName() + (limit == SQLSelectable.ALL ? "" : " [" + limit + "]");
-    }    
+    }
 
+    @Override
+    public String getRenameStatement(String newName) {
+        return "RENAME TABLE `" + getName() + "` to `" + newName + "`";
+    }
 }

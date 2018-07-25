@@ -43,7 +43,7 @@ public class TreeContextMenuHandler {
         tableObjectContext.add(new TreeContextMenuItem("Modificar tabla", ContextItemFunctionality.MODIFY));
         tableObjectContext.add(new TreeContextMenuItem("Editar filas", ContextItemFunctionality.EDIT));
 
-        TreeMenuItemSet columnTableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN);
+        TreeMenuItemSet columnTableObjectContext = new TreeMenuItemSet(TABLE, TABLE_COLUMN, VIEW);
         columnTableObjectContext.add(new TreeContextMenuItem("Renombrar", ContextItemFunctionality.RENAME));
 
         TreeMenuItemSet executableContext = new TreeMenuItemSet(FUNCTION, PROCEDURE);

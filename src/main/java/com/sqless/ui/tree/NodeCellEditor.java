@@ -77,7 +77,7 @@ public class NodeCellEditor extends DefaultTreeCellEditor {
                     editingIcon = icon("jtree", "TRIGGER");
                     break;
                 case VIEW:
-                    editingIcon = icon("jtree", "VIEWS");
+                    editingIcon = icon("jtree", "VIEW");
                     break;
                 case PROCEDURE:
                     editingIcon = icon("jtree", "STORED_PROCEDURE");

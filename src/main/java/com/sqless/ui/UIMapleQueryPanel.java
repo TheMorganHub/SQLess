@@ -191,7 +191,7 @@ public class UIMapleQueryPanel extends FrontPanel {
     public void clearMessages() {
         panelMessages.clear();
     }
-    
+
     public void clearConvertedSQL() {
         txtSQLQuery.setText("");
     }
@@ -440,6 +440,7 @@ public class UIMapleQueryPanel extends FrontPanel {
     private JButton btnUncomment;
     private JButton btnIndent;
     private JButton btnUnindent;
+    private JButton btnManual;
     private JMenuItem menuSave;
     private JMenuItem menuSaveAs;
 
@@ -457,7 +458,9 @@ public class UIMapleQueryPanel extends FrontPanel {
             btnUncomment = UIUtils.newToolbarBtn(actionUncommentQuery, "Descomentar", UIUtils.icon(this, "UNCOMMENT"));
             btnIndent = UIUtils.newToolbarBtn(actionIndent, "Indentar", UIUtils.icon(this, "INDENT"));
             btnUnindent = UIUtils.newToolbarBtn(actionUnindent, "Desindentar", UIUtils.icon(this, "UNINDENT"));
-            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop, UIUtils.newSeparator(), btnUndo, btnRedo, btnDelete, btnComment, btnUncomment, btnIndent, btnUnindent};
+            btnManual = UIUtils.newToolbarBtn(actionOpenMapleManual, "Manual de usuario de Maple", UIUtils.icon(this, "MAPLE_MANUAL"));
+            toolbarComponents = new Component[]{btnSave, UIUtils.newSeparator(), btnRun, btnStop, UIUtils.newSeparator(), btnUndo, btnRedo, btnDelete, btnComment, btnUncomment, btnIndent, btnUnindent,
+                UIUtils.newSeparator(), btnManual};
         }
         return toolbarComponents;
     }
@@ -504,6 +507,9 @@ public class UIMapleQueryPanel extends FrontPanel {
         return UIUtils.icon(this, "MAPLE_SMALL");
     }
 
+    private ActionListener actionOpenMapleManual = e -> {
+        MiscUtils.openInBrowser("https://sqless.ddns.net/maple/docs");
+    };
     private ActionListener actionRunQuery = e -> {
         clearResults();
         String toExec = txtMapleQuery.getSelectedText() != null ? txtMapleQuery.getSelectedText() : txtMapleQuery.getText();

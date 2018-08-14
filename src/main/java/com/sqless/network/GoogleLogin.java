@@ -160,8 +160,6 @@ public class GoogleLogin {
             RestRequest rest = new PostRequest(RestRequest.AUTH_URL, Resty.data("id_token", idToken)) {
                 @Override
                 public void onSuccess(JSONObject json) throws Exception {
-                    //si la autenticación con el backend fue exitosa, el json va a contener token_info. Si no fue exitosa, esto va a tirar una exception e ir a onFailure()
-                    json.get("token_info");
                     execPostLoginCallbackAndStartService(new GoogleUser(userinfo.getId(), userinfo.getName(), userinfo.getEmail(), userinfo.getPicture()));
                 }
 

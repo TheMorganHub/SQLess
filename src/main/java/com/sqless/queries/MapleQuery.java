@@ -81,7 +81,7 @@ public class MapleQuery extends SQLQuery {
                                 return;
                             }
 
-                            setSql(json.getString("CONVERTED_SQL"));
+                            setSql(json.getString("sql_from_maple"));
                             filterDelimiterKeyword();
                             queryPanel.setConvertedSQL(getSql());
                             requestSuccess.set(true);
@@ -89,6 +89,7 @@ public class MapleQuery extends SQLQuery {
 
                         @Override
                         public void onFailure(String message) {
+                            System.out.println(message);
                             errorMessage = message.equalsIgnoreCase("connect timed out") ? "El servidor no se encuentra disponible en estos momentos (el tiempo de espera se agotó)." : message;
                             queryStatus = Status.FAILED;
                             requestSuccess.set(false);

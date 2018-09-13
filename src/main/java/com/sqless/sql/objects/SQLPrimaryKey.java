@@ -3,7 +3,7 @@ package com.sqless.sql.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLPrimaryKey implements SQLEditable {
+public class SQLPrimaryKey implements SQLEditable, SQLDroppable {
 
     private List<SQLColumn> pkColumns;
     private List<SQLColumn> pkColumnsBackup;
@@ -153,6 +153,7 @@ public class SQLPrimaryKey implements SQLEditable {
         return builder.toString();
     }
 
+    @Override
     public String getDropStatement() {
         return "DROP PRIMARY KEY" + (isEmpty() ? "" : ",");
     }

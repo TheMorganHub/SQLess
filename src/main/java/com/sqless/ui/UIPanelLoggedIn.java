@@ -129,11 +129,11 @@ public class UIPanelLoggedIn extends javax.swing.JPanel {
     }//GEN-LAST:event_btnLogOutActionPerformed
 
     private void lblPruebaloMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPruebaloMousePressed
-        MiscUtils.openInBrowser("https://sqless.ddns.net/maple");
+        MiscUtils.openInBrowser("https://sqless.000webhostapp.com/maple");
     }//GEN-LAST:event_lblPruebaloMousePressed
 
     private void lblAprendeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAprendeMousePressed
-        MiscUtils.openInBrowser("https://sqless.ddns.net/maple/docs");
+        MiscUtils.openInBrowser("https://sqless.000webhostapp.com/maple/docs");
     }//GEN-LAST:event_lblAprendeMousePressed
 
     public void doLogOut() {

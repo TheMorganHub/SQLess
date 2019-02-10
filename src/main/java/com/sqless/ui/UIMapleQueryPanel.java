@@ -508,7 +508,7 @@ public class UIMapleQueryPanel extends FrontPanel {
     }
 
     private ActionListener actionOpenMapleManual = e -> {
-        MiscUtils.openInBrowser("https://sqless.ddns.net/maple/docs");
+        MiscUtils.openInBrowser("https://sqless.000webhostapp.com/maple/docs");
     };
     private ActionListener actionRunQuery = e -> {
         clearResults();

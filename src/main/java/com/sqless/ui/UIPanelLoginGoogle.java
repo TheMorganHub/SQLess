@@ -92,7 +92,7 @@ public class UIPanelLoginGoogle extends javax.swing.JPanel {
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void lblAprendeMasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAprendeMasMousePressed
-        MiscUtils.openInBrowser("https://sqless.ddns.net/maple/docs");
+        MiscUtils.openInBrowser("https://sqless.000webhostapp.com/maple/docs");
     }//GEN-LAST:event_lblAprendeMasMousePressed
 
     public void doLogIn() {

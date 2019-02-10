@@ -8,8 +8,8 @@ public abstract class RestRequest {
 
     protected String url;
     protected Resty rest;
-    public static final String AUTH_URL = "https://sqless.ddns.net/api/validate";
-    public static final String MAPLE_URL = "https://sqless.ddns.net/api/maple";
+    public static final String AUTH_URL = "https://sqless.000webhostapp.com/api/validate";
+    public static final String MAPLE_URL = "https://sqless.000webhostapp.com/api/maple";
     protected boolean newThread = true;
 
     public RestRequest(String url) {

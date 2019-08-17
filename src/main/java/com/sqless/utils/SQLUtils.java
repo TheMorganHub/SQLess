@@ -45,6 +45,31 @@ public class SQLUtils {
         return matches.toArray(new String[matches.size()]);
     }
 
+    public static String translateErrorMessage(String errorMessage) {
+        String translated = "";
+        String lowercasedErrorMessage = errorMessage.toLowerCase();
+        if (lowercasedErrorMessage.contains("syntax")) {
+            translated = "Hubo un error de sintaxis en tu sentencia SQL. Por favor, verifica que estés escribiendo bien la sentencia.";
+        } else if (lowercasedErrorMessage.contains("unknown") || lowercasedErrorMessage.contains("doesn't exist")) {
+            if (lowercasedErrorMessage.contains("table")) {
+                translated = "La sentencia que estás ejecutando está intentando utilizar una tabla que no existe.";
+            } else if (lowercasedErrorMessage.contains("column")) {
+                translated = "La sentencia que estás ejecutando está intentando utilizar una columna que no existe.";
+            } else if (lowercasedErrorMessage.contains("database")) {
+                translated = "La sentencia que estás ejecutando está intentando utilizar una base de datos que no existe.";
+            }
+        } else if (lowercasedErrorMessage.contains("communications link")) {
+            translated = "Hubo un error al llevar a cabo la conexión con el servidor de base de datos. Por favor, revisa el host y el puerto; es probable que alguno de los dos sea incorrecto.";                    
+        }
+        
+        if (lowercasedErrorMessage.contains("where clause")) {
+            translated += "\nRevisa el condicional de tu sentencia.";
+        }
+        
+        translated += "\nMensaje original desde el motor de la base de datos: " + errorMessage;
+        return translated;
+    }
+
     /**
      * Retrieves the names of all DBs in the DB engine. Each time this method is
      * called, the DB engine is queried for names. This guarantees that the list

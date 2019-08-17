@@ -6,6 +6,7 @@ import com.sqless.ui.UIClient;
 import com.sqless.ui.UIPanelResult;
 import com.sqless.ui.UIQueryPanel;
 import com.sqless.utils.DataTypeUtils;
+import com.sqless.utils.SQLUtils;
 import com.sqless.utils.UIUtils;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -83,7 +84,7 @@ public class SQLUIQuery extends SQLQuery {
                     }
                 } catch (SQLException | InterruptedException e) {
                     queryStatus = queryStatus.equals(Status.STOPPED) ? Status.STOPPED : Status.FAILED;
-                    errorMessage = e.getMessage();
+                    errorMessage = SQLUtils.translateErrorMessage(e.getMessage());
                 } finally {
                     closeQuery();
                 }

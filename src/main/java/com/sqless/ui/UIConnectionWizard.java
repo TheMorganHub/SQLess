@@ -7,6 +7,7 @@ import javax.swing.SwingWorker;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.settings.UserPreferencesLoader;
 import com.sqless.utils.TextUtils;
+import java.awt.event.ItemEvent;
 import java.util.concurrent.ExecutionException;
 
 public class UIConnectionWizard extends javax.swing.JDialog {
@@ -20,6 +21,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     private Task task;
     public static int CONNECTION_CHANGED = 641;
     private int outcome = -1;
+    private char defaultEchoChar;
 
     public UIConnectionWizard(java.awt.Frame parent, Task task) {
         super(parent, true);
@@ -35,6 +37,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         } else {
             setTitle("Crear una conexión");
         }
+        defaultEchoChar = txtPassword.getEchoChar();
         getRootPane().setDefaultButton(btnTestConnection);
     }
 
@@ -57,6 +60,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         btnTestConnection = new javax.swing.JButton();
         iLblConStatus = new javax.swing.JLabel();
         lblConnectionStatus = new javax.swing.JLabel();
+        chkShowPassword = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -107,6 +111,14 @@ public class UIConnectionWizard extends javax.swing.JDialog {
 
         iLblConStatus.setText("Estado de la conexión:");
 
+        chkShowPassword.setText("Mostrar contraseña");
+        chkShowPassword.setFocusable(false);
+        chkShowPassword.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chkShowPasswordItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlContainerLayout = new javax.swing.GroupLayout(pnlContainer);
         pnlContainer.setLayout(pnlContainerLayout);
         pnlContainerLayout.setHorizontalGroup(
@@ -122,28 +134,34 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                             .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtPassword)
-                            .addComponent(txtUserName, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPort, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                            .addComponent(txtHost, javax.swing.GroupLayout.Alignment.LEADING))
+                            .addComponent(txtHost)
+                            .addComponent(txtUserName)
+                            .addComponent(txtPort, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                            .addComponent(txtPassword))
                         .addContainerGap())
                     .addGroup(pnlContainerLayout.createSequentialGroup()
                         .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlContainerLayout.createSequentialGroup()
-                                .addComponent(iLblConStatus)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblConnectionStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(pnlContainerLayout.createSequentialGroup()
-                                .addComponent(lblLogin)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(pnlContainerLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGap(0, 64, Short.MAX_VALUE)
                                 .addComponent(btnTestConnection)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnCancel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnContinue)))
-                        .addGap(10, 10, 10))))
+                                .addComponent(btnContinue))
+                            .addGroup(pnlContainerLayout.createSequentialGroup()
+                                .addComponent(lblLogin)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(10, 10, 10))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlContainerLayout.createSequentialGroup()
+                        .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(pnlContainerLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(chkShowPassword))
+                            .addGroup(pnlContainerLayout.createSequentialGroup()
+                                .addComponent(iLblConStatus)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblConnectionStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         pnlContainerLayout.setVerticalGroup(
             pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,16 +184,18 @@ public class UIConnectionWizard extends javax.swing.JDialog {
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblPassword)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(iLblConStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblConnectionStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkShowPassword)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnContinue)
+                    .addComponent(iLblConStatus)
+                    .addComponent(lblConnectionStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnTestConnection)
                     .addComponent(btnCancel)
-                    .addComponent(btnTestConnection))
-                .addContainerGap())
+                    .addComponent(btnContinue))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -302,6 +322,14 @@ public class UIConnectionWizard extends javax.swing.JDialog {
         testConnection(false);
     }//GEN-LAST:event_btnTestConnectionActionPerformed
 
+    private void chkShowPasswordItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chkShowPasswordItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            txtPassword.setEchoChar((char) 0);
+        } else {
+            txtPassword.setEchoChar(defaultEchoChar);
+        }
+    }//GEN-LAST:event_chkShowPasswordItemStateChanged
+
     public void prepareUI() {
         txtHost.setText((String) userPrefLoader.getProperty("Connection.Host"));
         txtPort.setText((String) userPrefLoader.getProperty("Connection.Port"));
@@ -330,6 +358,7 @@ public class UIConnectionWizard extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnContinue;
     private javax.swing.JButton btnTestConnection;
+    private javax.swing.JCheckBox chkShowPassword;
     private javax.swing.JLabel iLblConStatus;
     private javax.swing.JLabel lblConnectionStatus;
     private javax.swing.JLabel lblHost;

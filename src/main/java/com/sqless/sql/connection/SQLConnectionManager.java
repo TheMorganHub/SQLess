@@ -102,7 +102,9 @@ public class SQLConnectionManager {
             } catch (SQLException ex) {
                 System.err.println("La conexión no pudo cerrarse.");
             }
-            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
+            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", 
+                    "Por favor, verifique que los datos de conexión sean los correctos. "
+                            + "Esto incluye el usuario, la contraseña, la dirección del servidor (host) y el puerto.\nMensaje original del motor de base de datos: " + e.getMessage(), parent);
             System.err.println(e.getMessage());
         }
         return false;
@@ -208,7 +210,9 @@ public class SQLConnectionManager {
             System.out.println("Test successful.");
             return true;
         } catch (SQLException e) {
-            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", e.getMessage(), parent);
+            UIUtils.showErrorMessage("Error al conectar al motor de base de datos", 
+                    "Por favor, verifique que los datos de conexión sean los correctos. "
+                            + "Esto incluye el usuario, la contraseña, la dirección del servidor (host) y el puerto.\nMensaje original del motor de base de datos: " + e.getMessage(), parent);
             System.out.println("Test failed.");
             System.err.println(e.getMessage());
         }

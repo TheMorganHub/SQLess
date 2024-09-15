@@ -1,7 +1,9 @@
 package com.sqless.utils;
 
-import com.mysql.jdbc.Blob;
+import com.mysql.cj.jdbc.Blob;
 import com.sqless.sql.objects.SQLColumn;
+
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -68,12 +70,11 @@ public class DataTypeUtils {
      * Example: if given {@code Thu Jul 20 00:00:00 ART 2017}, this method will
      * convert that to {@code 2017-07-20 00:00:00}.
      *
-     *
-     * @param date a {@code Date} object to be converted.
+     * @param date   a {@code Date} object to be converted.
      * @param column a {@code SQLColumn} from which to take the data type.
      * @return A formatted {@code String} compatible with MySQL date datatypes.
      * @throws IllegalArgumentException if the column given is of a data type
-     * that doesn't display time.
+     *                                  that doesn't display time.
      */
     public static String convertDateToValidSQLDate(Object date, SQLColumn column) {
         if (!column.isTimeBased()) {

@@ -158,7 +158,7 @@ public class FileManager {
     }
 
     public boolean isNewFile(String filePath) {
-        return !filePath.contains("\\");
+        return !filePath.contains(java.io.File.separator);
     }
 
     public void doOpenFile(JTabbedPane tabPane, File selectedFile) {

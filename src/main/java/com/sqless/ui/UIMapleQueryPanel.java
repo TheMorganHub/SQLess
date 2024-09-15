@@ -494,7 +494,7 @@ public class UIMapleQueryPanel extends FrontPanel {
             return null;
         }
         return MapleFileManager.getInstance().isNewFile(filePath)
-                ? "Maple_File_" + (MapleFileManager.getInstance().getFilesCreatedThisSession()) + ".mpl" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
+                ? "Maple_File_" + (MapleFileManager.getInstance().getFilesCreatedThisSession()) + ".mpl" : filePath.substring(filePath.lastIndexOf(java.io.File.separator) + 1, filePath.length());
     }
 
     @Override

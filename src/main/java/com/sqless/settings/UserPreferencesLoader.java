@@ -20,8 +20,8 @@ import com.sqless.ui.UIClient;
 public class UserPreferencesLoader {
 
     public final String USER_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath()
-            + "\\" + "SQLess";
-    public final File SETTINGS_FILE = new File((USER_DIR) + "\\settings.properties");
+            + java.io.File.separator + "SQLess";
+    public final File SETTINGS_FILE = new File((USER_DIR) + java.io.File.separator + "settings.properties");
     public boolean forceReload;
     private static final UserPreferencesLoader instance = new UserPreferencesLoader();
 
@@ -103,8 +103,8 @@ public class UserPreferencesLoader {
     public String getDefaultFor(String key) {
         switch (key) {
             case "Default.SaveDir":
-                FileManager.createDirIfNotExists(USER_DIR + "\\Saves");
-                return USER_DIR + "\\Saves";
+                FileManager.createDirIfNotExists(USER_DIR + java.io.File.separator + "Saves");
+                return USER_DIR + java.io.File.separator + "Saves";
             case "Default.Database":
                 return "N/A";
         }

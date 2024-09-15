@@ -470,7 +470,7 @@ public class UIQueryPanel extends FrontPanel {
 
     @Override
     public String getTabTitle() {
-        return FileManager.getInstance().isNewFile(filePath) ? "SQL_File_" + (FileManager.getInstance().getFilesCreatedThisSession()) + ".sql" : filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
+        return FileManager.getInstance().isNewFile(filePath) ? "SQL_File_" + (FileManager.getInstance().getFilesCreatedThisSession()) + ".sql" : filePath.substring(filePath.lastIndexOf(java.io.File.separator) + 1, filePath.length());
     }
 
     @Override

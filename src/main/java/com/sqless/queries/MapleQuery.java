@@ -1,6 +1,6 @@
 package com.sqless.queries;
 
-import com.mysql.jdbc.Blob;
+import com.mysql.cj.jdbc.Blob;
 import com.sqless.network.OAuth2TokenRefreshService;
 import com.sqless.network.PostRequest;
 import com.sqless.network.RestRequest;

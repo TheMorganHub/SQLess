@@ -1,6 +1,6 @@
 package com.sqless.queries;
 
-import com.mysql.jdbc.Blob;
+import com.mysql.cj.jdbc.Blob;
 import com.sqless.sql.connection.SQLConnectionManager;
 import com.sqless.ui.UIClient;
 import com.sqless.ui.UIPanelResult;

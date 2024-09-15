@@ -1,7 +1,7 @@
 package com.sqless.ui;
 
+import com.mysql.cj.jdbc.Blob;
 import com.sqless.ui.seteditor.SQLSetCellEditor;
-import com.mysql.jdbc.Blob;
 import com.sqless.queries.*;
 import com.sqless.sql.objects.*;
 import com.sqless.ui.fkcelleditor.FKCellEditor;
